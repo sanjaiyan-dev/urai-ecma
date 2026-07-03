@@ -1171,6 +1171,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "jsdoc"
+version = "23.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af5c16ae4699d45ce263ad6ec6fdbc4a40ecd77f3fa4ff69a4ab151acd90b5a7"
+dependencies = [
+ "nom",
+ "serde",
+ "swc_atoms",
+ "swc_common",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.186"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2969,6 +2981,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "jsdoc",
  "petgraph",
  "rayon",
  "reqwest",

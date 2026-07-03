@@ -1,6 +1,6 @@
 use anyhow::Result;
-use swc_common::comments::SingleThreadedComments;
 use std::sync::Arc;
+use swc_common::comments::SingleThreadedComments;
 use swc_common::sync::Lrc;
 use swc_common::{FileName, SourceMap};
 use swc_ecma_ast::Module;
