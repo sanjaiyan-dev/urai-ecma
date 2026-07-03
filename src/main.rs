@@ -1,6 +1,8 @@
 use std::path::PathBuf;
 
 use clap::{Parser, ValueHint};
+mod ast;
+mod markdown;
 mod ollama;
 #[derive(Parser, Debug)]
 #[command(name = "urai-ecma", version = "1.0", about = "")]
