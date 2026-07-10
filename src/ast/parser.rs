@@ -1,12 +1,14 @@
 use anyhow::Result;
-use std::sync::Arc;
 use swc_common::comments::SingleThreadedComments;
 use swc_common::sync::Lrc;
 use swc_common::{FileName, SourceMap};
 use swc_ecma_ast::Module;
 use swc_ecma_parser::{EsSyntax, Parser, StringInput, Syntax, TsSyntax, lexer::Lexer};
 
-pub fn parse_file(content: &str, file_name: &str) -> Result<(Module, Lrc<SourceMap>)> {
+pub fn parse_file(
+    content: &str,
+    file_name: &str,
+) -> Result<(Module, SingleThreadedComments, Lrc<SourceMap>)> {
     let code_map: Lrc<SourceMap> = Default::default();
     let file_map = code_map.new_source_file(
         FileName::Custom(file_name.to_string()).into(),
@@ -36,5 +38,10 @@ pub fn parse_file(content: &str, file_name: &str) -> Result<(Module, Lrc<SourceM
         StringInput::from(&*file_map),
         Some(&comments),
     );
-    unimplemented!()
+    let mut parser = Parser::new_from(lexer);
+    let module = parser
+        .parse_module()
+        .map_err(|e| anyhow::anyhow!("{:?}", e))?;
+
+    Ok((module, comments, code_map))
 }
