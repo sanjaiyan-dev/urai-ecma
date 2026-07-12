@@ -69,8 +69,15 @@ impl PackageJsonUrai {
 
         let pkg_json_name_len = pkg_json.name.len();
         let pkg_json_desc_len = pkg_json.description.as_ref().map_or(0, |d| d.len());
-        let pkg_json_content_est_size = pkg_json_name_len + pkg_json_desc_len + 212;
-        let mut pkg_json_content: String = String::with_capacity(pkg_json_content_est_size);
+        let mut pkg_json_content_est_size = pkg_json_name_len + pkg_json_desc_len + 212;
+        if let Some(deps) = &pkg_json.dependencies {
+            pkg_json_content_est_size += 50 + (deps.len() * 30);
+        }
+        if let Some(dev_deps) = &pkg_json.dev_dependencies {
+            pkg_json_content_est_size += 50 + (dev_deps.len() * 30);
+        }
+
+        let mut pkg_json_content = String::with_capacity(pkg_json_content_est_size);
 
         let _ = writeln!(pkg_json_content, "# Project Title: {} \n", &pkg_json.name);
         if let Some(desc) = &pkg_json.description {
@@ -78,7 +85,6 @@ impl PackageJsonUrai {
         }
 
         if let Some(dependencies) = pkg_json.dependencies.as_ref().filter(|m| !m.is_empty()) {
-            pkg_json_content.reserve(35 + dependencies.len() * 12);
             pkg_json_content.push_str("Dependencies used in this project: ");
 
             for (name, version) in dependencies.iter() {
@@ -88,7 +94,6 @@ impl PackageJsonUrai {
 
         if let Some(dev_dependencies) = pkg_json.dev_dependencies.as_ref().filter(|m| !m.is_empty())
         {
-            pkg_json_content.reserve(40 + dev_dependencies.len() * 12);
             pkg_json_content.push_str("Dev dependencies used in this project: ");
 
             for (name, version) in dev_dependencies.iter() {
