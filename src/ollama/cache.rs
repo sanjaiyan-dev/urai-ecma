@@ -3,5 +3,4 @@ pub struct CacheEntry {
     pub size: u64,
     pub pruned_code: String,
     pub token_count: usize,
-
 }
