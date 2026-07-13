@@ -1,5 +1,8 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+
+use crate::{UraiContext, ollama::OllamaUrai};
 
 pub struct ProgramConciseInfoParams {
     ollama_endpoint: String,
@@ -14,6 +17,7 @@ struct OllamaRequest {
     model: String,
     prompt: String,
     stream: bool,
+    system: &'static str,
 }
 
 #[derive(Deserialize)]
@@ -21,29 +25,66 @@ struct OllamaResponse {
     response: String,
 }
 
-pub fn program_concise_info(params: ProgramConciseInfoParams) -> Result<String> {
-    let payload = OllamaRequest {
-        model: params.model_name,
-        stream: false,
-        prompt: format!("{}", params.program_code),
-    };
-    let response = params
-        .netowrk_reqwest
-        .post(params.ollama_endpoint)
-        .json(&payload)
-        .send()
-        .context("Failed to connect to ollama server")?;
+const SYSTEM_PROMPT: &str = "# Role
+You are an elite, highly precise Program Semantic Analyst. Your sole objective is to summarize the core behavioral purpose of any given source code block with high semantic accuracy.
 
-    if !response.status().is_success() {
-        return Err(anyhow::anyhow!(
-            "Ollama server returned an error: {}",
-            response.status()
-        ));
+# Core Instructions
+1. **Deep Code Analysis**: Internally analyze the code's control flow, input/output structures, logic branches, and side effects step-by-step. Trace the execution path mentally to determine its deep functional intent before formulating your response.
+2. **Silent Reasoning Constraint**: You must perform your step-by-step logical analysis entirely in your internal, silent thinking process. Do NOT output your step-by-step thinking, code blocks, or intermediate analytical steps to the final output.
+3. **Length Constraint**: Your final output must be exactly one to two sentences.
+4. **Output Restrictions**: 
+   - Output ONLY the natural language explanation of the code.
+   - Do NOT include any preamble, introductory text, or conversational filler (such as 'This code...', 'Here is...', or 'The provided function...').
+   - Do NOT wrap your output in markdown code blocks or backticks.
+   - Start immediately with the first word of the explanation.";
+
+impl OllamaUrai {
+    pub fn new(ctx: Arc<UraiContext>) -> Self {
+        Self { ctx }
     }
 
-    let res_body: OllamaResponse = response
-        .json()
-        .context("Failed to parse the response JSON from Ollama")?;
+    fn summarize_code_block(&self, params: ProgramConciseInfoParams) -> Result<String> {
+        let ctx = &self.ctx;
 
-    Ok(res_body.response.trim().to_string())
+        match ctx.ollama_endpoint.ollama_endpoint {
+            None => bail!("No need Ollama"),
+            Some(_) => {
+                println!("Ollama Process is begins ")
+            }
+        }
+
+        let ollama_model_name = ctx
+            .ollama_endpoint
+            .ollama_model_name
+            .clone()
+            .unwrap_or_else(|| "".to_string());
+        let ollama_endpoint_url = ctx
+            .ollama_endpoint
+            .ollama_endpoint
+            .as_deref()
+            .unwrap_or_else(|| "http://localhost:11234");
+
+        let payload = OllamaRequest {
+            model: ollama_model_name.to_string(),
+            stream: false,
+            prompt: format!("{}", params.program_code),
+            system: SYSTEM_PROMPT,
+        };
+        let response = params
+            .netowrk_reqwest
+            .post(format!("{}/api/generate", ollama_endpoint_url))
+            .json(&payload)
+            .send()
+            .context("Failed to connect to ollama server")?;
+
+        if !response.status().is_success() {
+            bail!("Ollama server returned an error: {}", response.status());
+        }
+
+        let res_body: OllamaResponse = response
+            .json()
+            .context("Failed to parse the response JSON from Ollama")?;
+
+        Ok(res_body.response.trim().to_string())
+    }
 }
