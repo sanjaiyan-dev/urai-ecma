@@ -28,7 +28,7 @@ impl PackageJsonUrai {
         Self { ctx }
     }
 
-    pub fn read_package_json_from_file(&self) -> Result<PackageJson> {
+    fn read_package_json_from_file(&self) -> Result<PackageJson> {
         let input_path = self.ctx.input_filename.clone();
         let is_dir = self.ctx.input_filename.is_dir();
         let package_json_path = if is_dir {
