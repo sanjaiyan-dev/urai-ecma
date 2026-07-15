@@ -1,6 +1,6 @@
 use std::{
     fs::{File, OpenOptions},
-    io::BufWriter,
+    io::{BufWriter, Write},
     path::PathBuf,
     sync::Arc,
 };
@@ -28,6 +28,7 @@ impl MarkdownUrai {
             Err(err) => match err.kind() {
                 ErrorKind::AlreadyExists => OpenOptions::new()
                     .write(true)
+                    .append(true)
                     .open(&self.ctx.output_filename)?,
 
                 _ => {
@@ -43,5 +44,12 @@ impl MarkdownUrai {
             file_name: self.ctx.output_filename.clone(),
             markdown_writter: BufWriter::new(markdown_file),
         })
+    }
+
+    pub fn markdown_content_writer(&self, txt_content: String) -> Result<()> {
+        let mut markdown_file = self.create_markdown_file()?;
+        writeln!(markdown_file.markdown_writter, "{txt_content}")?;
+        markdown_file.markdown_writter.flush()?;
+        Ok(())
     }
 }
