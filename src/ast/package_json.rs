@@ -7,6 +7,7 @@ use std::io::BufReader;
 use std::sync::Arc;
 
 use crate::UraiContext;
+use crate::ast::PackageJsonUrai;
 
 #[derive(Deserialize, Debug)]
 pub struct PackageJson {
@@ -20,16 +21,14 @@ pub struct PackageJson {
     pub author: Option<serde_json::Value>,
     pub license: Option<String>,
 }
-pub struct PackageJsonUrai {
-    ctx: Arc<UraiContext>,
-}
+
 impl PackageJsonUrai {
     pub fn new(ctx: Arc<UraiContext>) -> Self {
         Self { ctx }
     }
 
     fn read_package_json_from_file(&self) -> Result<PackageJson> {
-        let input_path = self.ctx.input_filename.clone();
+        let input_path = &self.ctx.input_filename;
         let is_dir = self.ctx.input_filename.is_dir();
         let package_json_path = if is_dir {
             let package_json_path = input_path.join("package.json");
