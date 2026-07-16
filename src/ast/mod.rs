@@ -4,6 +4,8 @@ use crate::UraiContext;
 
 pub mod package_json;
 pub mod parser;
+pub mod visitor;
+
 pub struct PackageJsonUrai {
     ctx: Arc<UraiContext>,
 }
