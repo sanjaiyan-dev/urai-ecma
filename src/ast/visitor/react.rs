@@ -4,6 +4,47 @@ use swc_ecma_visit::{Visit, VisitMut};
 
 use crate::ast::CodeAnalyze;
 pub struct ReactCodeVisitor {}
+
+fn resolve_ts_type(ts_type: &TsType) -> String {
+    match ts_type {
+        TsType::TsKeywordType(keyword) => match keyword.kind {
+            TsKeywordTypeKind::TsNumberKeyword | TsKeywordTypeKind::TsBigIntKeyword => {
+                "number".to_string()
+            }
+            TsKeywordTypeKind::TsStringKeyword => "string".to_string(),
+            TsKeywordTypeKind::TsBooleanKeyword => "boolean".to_string(),
+            TsKeywordTypeKind::TsObjectKeyword => "object".to_string(),
+            TsKeywordTypeKind::TsAnyKeyword => "any".to_string(),
+            TsKeywordTypeKind::TsVoidKeyword => "void".to_string(),
+            _ => "unknown_keyword".to_string(),
+        },
+
+        TsType::TsArrayType(array_type) => {
+            let element_type_str = resolve_ts_type(&array_type.elem_type);
+
+            format!("{}[]", element_type_str)
+        }
+
+        TsType::TsTypeRef(type_ref) => {
+            if let TsEntityName::Ident(ident) = &type_ref.type_name {
+                ident.sym.to_string()
+            } else {
+                "object".to_string()
+            }
+        }
+
+        TsType::TsUnionOrIntersectionType(union_or_intersect) => {
+            if union_or_intersect.is_ts_union_type() {
+                "union_type".to_string()
+            } else {
+                "intersection_type".to_string()
+            }
+        }
+
+        _ => "object".to_string(),
+    }
+}
+
 impl Visit for CodeAnalyze {
     fn visit_var_decl(&mut self, decls: &swc_ecma_ast::VarDecl) {
         for decl in &decls.decls {
@@ -24,54 +65,15 @@ impl Visit for CodeAnalyze {
                                     _ => "unknown".to_string(),
                                 };
 
-                                fn resolve_ts_type(ts_type: &TsType) -> String {
-                                    match ts_type {
-                                        TsType::TsKeywordType(keyword) => match keyword.kind {
-                                            TsKeywordTypeKind::TsNumberKeyword
-                                            | TsKeywordTypeKind::TsBigIntKeyword => {
-                                                "number".to_string()
-                                            }
-                                            TsKeywordTypeKind::TsStringKeyword => {
-                                                "string".to_string()
-                                            }
-                                            TsKeywordTypeKind::TsBooleanKeyword => {
-                                                "boolean".to_string()
-                                            }
-                                            TsKeywordTypeKind::TsObjectKeyword => {
-                                                "object".to_string()
-                                            }
-                                            TsKeywordTypeKind::TsAnyKeyword => "any".to_string(),
-                                            TsKeywordTypeKind::TsVoidKeyword => "void".to_string(),
-                                            _ => "unknown_keyword".to_string(),
-                                        },
-
-                                        TsType::TsArrayType(array_type) => {
-                                            let element_type_str =
-                                                resolve_ts_type(&array_type.elem_type);
-
-                                            format!("{}[]", element_type_str)
-                                        }
-
-                                        TsType::TsTypeRef(type_ref) => {
-                                            if let TsEntityName::Ident(ident) = &type_ref.type_name
-                                            {
-                                                ident.sym.to_string()
-                                            } else {
-                                                "object".to_string()
-                                            }
-                                        }
-
-                                        TsType::TsUnionOrIntersectionType(union_or_intersect) => {
-                                            if union_or_intersect.is_ts_union_type() {
-                                                "union_type".to_string()
-                                            } else {
-                                                "intersection_type".to_string()
-                                            }
-                                        }
-
-                                        _ => "object".to_string(),
+                                let state_type = if let Some(type_args) = &init_expr.type_args {
+                                    if let Some(first_type) = type_args.params.get(0) {
+                                        resolve_ts_type(&**first_type) // <--- Calls our recursive helper!
+                                    } else {
+                                        "any".to_string()
                                     }
-                                }
+                                } else {
+                                    "any".to_string()
+                                };
                             }
                         }
                     }
