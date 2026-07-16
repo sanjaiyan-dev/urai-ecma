@@ -8,10 +8,9 @@ pub struct ReactCodeVisitor {}
 fn resolve_ts_type(ts_type: &TsType) -> String {
     match ts_type {
         TsType::TsKeywordType(keyword) => match keyword.kind {
-            TsKeywordTypeKind::TsNumberKeyword | TsKeywordTypeKind::TsBigIntKeyword => {
-                "number".to_string()
-            }
             TsKeywordTypeKind::TsStringKeyword => "string".to_string(),
+            TsKeywordTypeKind::TsNumberKeyword => "number".to_string(),
+            TsKeywordTypeKind::TsBigIntKeyword => "bigint".to_string(),
             TsKeywordTypeKind::TsBooleanKeyword => "boolean".to_string(),
             TsKeywordTypeKind::TsObjectKeyword => "object".to_string(),
             TsKeywordTypeKind::TsAnyKeyword => "any".to_string(),
