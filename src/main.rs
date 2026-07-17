@@ -20,6 +20,8 @@ struct Args {
 struct OllamaContext {
     ollama_model_name: Option<String>,
     ollama_endpoint: Option<String>,
+
+    ollama_cache_folder: PathBuf,
 }
 pub struct UraiContext {
     input_filename: PathBuf,
@@ -30,12 +32,22 @@ pub struct UraiContext {
 
 fn main() {
     let args = Args::parse();
+    let input_root_file = args.input_file;
+    let ollama_cache_folder = if input_root_file.is_dir() {
+        input_root_file.join(".urai-cache")
+    } else {
+        input_root_file
+            .parent()
+            .map(|parent| parent.join(".urai-cache"))
+            .unwrap_or_else(|| std::path::PathBuf::from(".urai-cache"))
+    };
     let ctx = UraiContext {
-        input_filename: args.input_file,
+        input_filename: input_root_file,
         output_filename: args.output_file,
         ollama_endpoint: OllamaContext {
             ollama_model_name: args.ollama_modelname,
             ollama_endpoint: args.ollama_endpoint,
+            ollama_cache_folder,
         },
     };
     let urai_ctx = Arc::new(ctx);

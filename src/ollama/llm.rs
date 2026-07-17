@@ -57,17 +57,17 @@ impl OllamaUrai {
             .ollama_endpoint
             .ollama_model_name
             .clone()
-            .unwrap_or_else(|| "".to_string());
+            .unwrap_or("".to_string());
         let ollama_endpoint_url = ctx
             .ollama_endpoint
             .ollama_endpoint
             .as_deref()
-            .unwrap_or_else(|| "http://localhost:11234");
+            .unwrap_or("http://localhost:11234");
 
         let payload = OllamaRequest {
             model: ollama_model_name.to_string(),
             stream: false,
-            prompt: format!("{}", params.program_code),
+            prompt: params.program_code.to_string(),
             system: SYSTEM_PROMPT,
         };
         let response = params

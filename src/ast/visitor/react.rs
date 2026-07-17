@@ -13,16 +13,18 @@ impl Visit for VisitorCode {
                     let import_as_name = &named.local.sym;
 
                     let imported_original_name = match &named.imported {
-                        Some(ModuleExportName::Ident(ident)) => &ident.sym,
-                        Some(ModuleExportName::Str(str_lit)) => &str_lit.value.as_atom().unwrap(),
-                        None => import_as_name,
+                        Some(ModuleExportName::Ident(ident)) => ident.sym.as_str(),
+                        Some(ModuleExportName::Str(str_lit)) => {
+                            str_lit.value.as_str().unwrap_or("")
+                        }
+                        None => import_as_name.as_str(),
                     };
 
-                    match imported_original_name.as_str() {
+                    match imported_original_name {
                         "useState" | "startTransition" => {
                             self.local_to_canonical_track_imports.insert(
                                 import_as_name.to_string(),
-                                (&imported_original_name).to_string(),
+                                imported_original_name.to_string(),
                             );
                         }
                         _ => {}
@@ -47,7 +49,7 @@ impl Visit for VisitorCode {
                                     .contains_key(&callee_id.sym.to_string());
 
                             if is_use_state {
-                                let state_name = match array_pat.elems.get(0) {
+                                let state_name = match array_pat.elems.first() {
                                     Some(Some(Pat::Ident(bind_id))) => bind_id.id.sym.to_string(),
                                     _ => "unknown".to_string(),
                                 };
@@ -58,7 +60,7 @@ impl Visit for VisitorCode {
 
                                 let state_type = if let Some(type_args) = &init_expr.type_args {
                                     if let Some(first_type) = type_args.params.get(0) {
-                                        resolve_ts_type(&**first_type) // <--- Calls our recursive helper!
+                                        resolve_ts_type(first_type)
                                     } else {
                                         "any".to_string()
                                     }
