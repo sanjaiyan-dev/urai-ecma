@@ -1,50 +1,40 @@
-use swc_ecma_ast::{Callee, Expr, Pat, TsEntityName, TsKeywordTypeKind, TsType};
+use swc_ecma_ast::{Callee, Expr, ImportSpecifier, ModuleExportName, Pat};
 
 use swc_ecma_visit::{Visit, VisitMut};
 
-use crate::ast::CodeAnalyze;
+use crate::ast::visitor::{VisitorCode, resolve_ts_type};
 pub struct ReactCodeVisitor {}
 
-fn resolve_ts_type(ts_type: &TsType) -> String {
-    match ts_type {
-        TsType::TsKeywordType(keyword) => match keyword.kind {
-            TsKeywordTypeKind::TsStringKeyword => "string".to_string(),
-            TsKeywordTypeKind::TsNumberKeyword => "number".to_string(),
-            TsKeywordTypeKind::TsBigIntKeyword => "bigint".to_string(),
-            TsKeywordTypeKind::TsBooleanKeyword => "boolean".to_string(),
-            TsKeywordTypeKind::TsObjectKeyword => "object".to_string(),
-            TsKeywordTypeKind::TsAnyKeyword => "any".to_string(),
-            TsKeywordTypeKind::TsVoidKeyword => "void".to_string(),
-            _ => "unknown_keyword".to_string(),
-        },
+impl Visit for VisitorCode {
+    fn visit_import_decl(&mut self, node: &swc_ecma_ast::ImportDecl) {
+        if node.src.value == "react" {
+            for specifier in &node.specifiers {
+                if let ImportSpecifier::Named(named) = specifier {
+                    let import_as_name = named.local.sym.to_string();
 
-        TsType::TsArrayType(array_type) => {
-            let element_type_str = resolve_ts_type(&array_type.elem_type);
+                    let imported_original_name = match &named.imported {
+                        Some(ModuleExportName::Ident(ident)) => ident.sym.to_string(),
+                        Some(ModuleExportName::Str(str_lit)) => {
+                            str_lit.value.to_string_lossy().into_owned()
+                        }
+                        None => import_as_name.clone(),
+                    };
 
-            format!("{}[]", element_type_str)
-        }
-
-        TsType::TsTypeRef(type_ref) => {
-            if let TsEntityName::Ident(ident) = &type_ref.type_name {
-                ident.sym.to_string()
-            } else {
-                "object".to_string()
+                    match imported_original_name.as_str() {
+                        "useState" => {
+                            self.local_to_canonical_track_imports
+                                .insert(import_as_name, "useState".to_string());
+                        }
+                        "startTransition" => {
+                            self.local_to_canonical_track_imports
+                                .insert(import_as_name, "startTransition".to_string());
+                        }
+                        _ => {}
+                    };
+                }
             }
         }
-
-        TsType::TsUnionOrIntersectionType(union_or_intersect) => {
-            if union_or_intersect.is_ts_union_type() {
-                "union_type".to_string()
-            } else {
-                "intersection_type".to_string()
-            }
-        }
-
-        _ => "object".to_string(),
     }
-}
-
-impl Visit for CodeAnalyze {
     fn visit_var_decl(&mut self, decls: &swc_ecma_ast::VarDecl) {
         for decl in &decls.decls {
             if let Pat::Array(array_pat) = &decl.name {
@@ -54,7 +44,7 @@ impl Visit for CodeAnalyze {
                 }) {
                     if let Callee::Expr(callee_expr) = &init_expr.callee {
                         if let Expr::Ident(callee_id) = &**callee_expr {
-                            if (callee_id.sym == "useState") {
+                            if callee_id.sym == "useState" {
                                 let state_name = match array_pat.elems.get(0) {
                                     Some(Some(Pat::Ident(bind_id))) => bind_id.id.sym.to_string(),
                                     _ => "unknown".to_string(),
@@ -81,4 +71,3 @@ impl Visit for CodeAnalyze {
         }
     }
 }
-impl VisitMut for CodeAnalyze {}
