@@ -10,24 +10,20 @@ impl Visit for VisitorCode {
         if node.src.value == "react" {
             for specifier in &node.specifiers {
                 if let ImportSpecifier::Named(named) = specifier {
-                    let import_as_name = named.local.sym.to_string();
+                    let import_as_name = &named.local.sym;
 
                     let imported_original_name = match &named.imported {
-                        Some(ModuleExportName::Ident(ident)) => ident.sym.to_string(),
-                        Some(ModuleExportName::Str(str_lit)) => {
-                            str_lit.value.to_string_lossy().into_owned()
-                        }
-                        None => import_as_name.clone(),
+                        Some(ModuleExportName::Ident(ident)) => &ident.sym,
+                        Some(ModuleExportName::Str(str_lit)) => &str_lit.value.as_atom().unwrap(),
+                        None => import_as_name,
                     };
 
                     match imported_original_name.as_str() {
-                        "useState" => {
-                            self.local_to_canonical_track_imports
-                                .insert(import_as_name, "useState".to_string());
-                        }
-                        "startTransition" => {
-                            self.local_to_canonical_track_imports
-                                .insert(import_as_name, "startTransition".to_string());
+                        "useState" | "startTransition" => {
+                            self.local_to_canonical_track_imports.insert(
+                                import_as_name.to_string(),
+                                (&imported_original_name).to_string(),
+                            );
                         }
                         _ => {}
                     };
@@ -35,6 +31,7 @@ impl Visit for VisitorCode {
             }
         }
     }
+
     fn visit_var_decl(&mut self, decls: &swc_ecma_ast::VarDecl) {
         for decl in &decls.decls {
             if let Pat::Array(array_pat) = &decl.name {
@@ -44,7 +41,12 @@ impl Visit for VisitorCode {
                 }) {
                     if let Callee::Expr(callee_expr) = &init_expr.callee {
                         if let Expr::Ident(callee_id) = &**callee_expr {
-                            if callee_id.sym == "useState" {
+                            let is_use_state = callee_id.sym == "useState"
+                                || self
+                                    .local_to_canonical_track_imports
+                                    .contains_key(&callee_id.sym.to_string());
+
+                            if is_use_state {
                                 let state_name = match array_pat.elems.get(0) {
                                     Some(Some(Pat::Ident(bind_id))) => bind_id.id.sym.to_string(),
                                     _ => "unknown".to_string(),
