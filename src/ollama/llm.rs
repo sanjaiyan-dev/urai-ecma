@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::{
     UraiContext,
-    ollama::{OllamaResponse, OllamaUrai},
+    ollama::{OllamaResponse, OllamaUrai, cache::init_cache},
 };
 
 pub struct ProgramConciseInfoParams {
@@ -16,7 +16,7 @@ pub struct ProgramConciseInfoParams {
 }
 
 #[derive(Serialize)]
-struct OllamaRequest {
+pub struct OllamaRequest {
     model: String,
     prompt: String,
     stream: bool,
@@ -37,6 +37,16 @@ You are an elite, highly precise Program Semantic Analyst. Your sole objective i
    - Start immediately with the first word of the explanation.";
 
 impl OllamaUrai {
+    pub fn new(ctx: Arc<UraiContext>) -> anyhow::Result<Self> {
+        let rt = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()?;
+
+        let cache_folder = &ctx.ollama_endpoint.ollama_cache_folder;
+        let cache = init_cache(cache_folder, &rt)?;
+
+        Ok(Self { ctx, cache, rt })
+    }
     fn summarize_code_block(&self, params: ProgramConciseInfoParams) -> Result<String> {
         let ctx = &self.ctx;
 
@@ -58,12 +68,26 @@ impl OllamaUrai {
             .as_deref()
             .unwrap_or("http://localhost:11234");
 
+        let cache_key = self.generate_cache_key(&params.program_code);
+
+        let cached_response = match self.get_cache_res(&cache_key) {
+            Ok(res) => res,
+            Err(_) => OllamaResponse {
+                response: "URAI_OLLAMA_CACHE_MISS".to_string(),
+            },
+        };
+
+        if cached_response.response != "URAI_OLLAMA_CACHE_MISS" {
+            return Ok(cached_response.response);
+        }
+
         let payload = OllamaRequest {
-            model: ollama_model_name.to_string(),
+            model: ollama_model_name,
             stream: false,
-            prompt: params.program_code.to_string(),
+            prompt: params.program_code,
             system: SYSTEM_PROMPT,
         };
+
         let response = params
             .netowrk_reqwest
             .post(format!("{}/api/generate", ollama_endpoint_url))
@@ -78,7 +102,7 @@ impl OllamaUrai {
         let res_body: OllamaResponse = response
             .json()
             .context("Failed to parse the response JSON from Ollama")?;
-
+        self.insert_res_cache(cache_key, res_body.clone());
         Ok(res_body.response.trim().to_string())
     }
 }
