@@ -2,7 +2,10 @@ use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-use crate::{UraiContext, ollama::OllamaUrai};
+use crate::{
+    UraiContext,
+    ollama::{OllamaResponse, OllamaUrai},
+};
 
 pub struct ProgramConciseInfoParams {
     ollama_endpoint: String,
@@ -20,11 +23,6 @@ struct OllamaRequest {
     system: &'static str,
 }
 
-#[derive(Deserialize)]
-struct OllamaResponse {
-    response: String,
-}
-
 const SYSTEM_PROMPT: &str = "# Role
 You are an elite, highly precise Program Semantic Analyst. Your sole objective is to summarize the core behavioral purpose of any given source code block with high semantic accuracy.
 
@@ -39,10 +37,6 @@ You are an elite, highly precise Program Semantic Analyst. Your sole objective i
    - Start immediately with the first word of the explanation.";
 
 impl OllamaUrai {
-    pub fn new(ctx: Arc<UraiContext>) -> Self {
-        Self { ctx }
-    }
-
     fn summarize_code_block(&self, params: ProgramConciseInfoParams) -> Result<String> {
         let ctx = &self.ctx;
 
