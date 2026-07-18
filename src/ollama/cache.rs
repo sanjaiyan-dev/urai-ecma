@@ -28,9 +28,9 @@ pub fn init_cache(
 
 impl OllamaUrai {
     pub fn generate_cache_key(&self, prompt: &String) -> String {
-        let cache_key = Sha512_256::digest(prompt);
+        let cache_key = Sha512_256::digest(prompt.as_bytes());
 
-        format!("{:?}", cache_key)
+        const_hex::encode(cache_key)
     }
 
     pub fn get_cache_res(&self, cache_key: &String) -> Result<OllamaResponse> {
