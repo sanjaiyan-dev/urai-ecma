@@ -59,7 +59,7 @@ impl Visit for VisitorCode {
                                 };
 
                                 let state_type = if let Some(type_args) = &init_expr.type_args {
-                                    if let Some(first_type) = type_args.params.get(0) {
+                                    if let Some(first_type) = type_args.params.first() {
                                         resolve_ts_type(first_type)
                                     } else {
                                         "any".to_string()

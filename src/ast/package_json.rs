@@ -28,8 +28,8 @@ impl PackageJsonUrai {
     }
 
     fn read_package_json_from_file(&self) -> Result<PackageJson> {
-        let input_path = &self.ctx.input_filename;
-        let is_dir = self.ctx.input_filename.is_dir();
+        let input_path = &self.ctx.input_project;
+        let is_dir = self.ctx.input_project.is_dir();
         let package_json_path = if is_dir {
             let package_json_path = input_path.join("package.json");
             if !package_json_path.exists() {
