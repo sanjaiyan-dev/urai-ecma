@@ -10,7 +10,6 @@ use anyhow::{Context, Result};
 use crate::{UraiContext, markdown::MarkdownUrai};
 
 struct MarkdownFileData {
-    file_name: PathBuf,
     pub markdown_writer: File,
 }
 
@@ -20,7 +19,7 @@ impl MarkdownUrai {
     }
 
     pub fn create_markdown_file(&self) -> Result<MarkdownFileData> {
-        let mut markdown_file = OpenOptions::new()
+        let markdown_file = OpenOptions::new()
             .create(true)
             .append(true)
             .open(&self.ctx.output_filename)
@@ -32,20 +31,20 @@ impl MarkdownUrai {
             })?;
 
         Ok(MarkdownFileData {
-            file_name: self.ctx.output_filename.clone(),
             markdown_writer: markdown_file,
         })
     }
     pub fn markdown_content_writer(&self, txt_content: &str) -> Result<()> {
         let mut file_data = self.create_markdown_file()?;
 
-        writeln!(file_data.markdown_writer, "{txt_content}")
-            .context("Failed to write content to the markdown file")?;
-
         file_data
             .markdown_writer
-            .flush()
-            .context("Failed to flush markdown file contents to disk")?;
+            .write_all(txt_content.as_bytes())
+            .context("Failed to write content bytes to the markdown file")?;
+        file_data
+            .markdown_writer
+            .write_all(b"\n")
+            .context("Failed to write newline")?;
 
         Ok(())
     }
