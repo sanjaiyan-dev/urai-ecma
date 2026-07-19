@@ -2,8 +2,7 @@ use anyhow::{Context, Result, bail};
 use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::fmt::Write;
-use std::fs::File;
-use std::io::BufReader;
+use std::fs;
 use std::sync::Arc;
 
 use crate::UraiContext;
@@ -48,17 +47,15 @@ impl PackageJsonUrai {
             );
         };
 
-        let file = File::open(&package_json_path).with_context(|| {
+        let content = fs::read_to_string(&package_json_path).with_context(|| {
             format!(
-                "Failed to open file at path: {}",
+                "Failed to read file at path: {}",
                 package_json_path.display()
             )
         })?;
 
-        let reader = BufReader::new(file);
-
         let package_json: PackageJson =
-            serde_json::from_reader(reader).context("Failed to parse JSON structure")?;
+            json5::from_str(&content).context("Failed to parse JSON/JSON5 structure")?;
 
         Ok(package_json)
     }
