@@ -96,7 +96,7 @@ impl PackageJsonUrai {
                 let _ = writeln!(pkg_json_content, "   - **{name}** : `{version}`");
             }
 
-            let _ = writeln!(pkg_json_content);
+            pkg_json_content.push('\n');
         }
 
         let _ = writeln!(
