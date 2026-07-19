@@ -76,6 +76,7 @@ impl PackageJsonUrai {
         let mut pkg_json_content = String::with_capacity(pkg_json_content_est_size);
 
         let _ = writeln!(pkg_json_content, "# Project Title: {} \n", &pkg_json.name);
+
         if let Some(desc) = &pkg_json.description {
             let _ = writeln!(pkg_json_content, "## Project Description\n\n{desc}\n");
         }
@@ -86,6 +87,7 @@ impl PackageJsonUrai {
             for (name, version) in dependencies.iter() {
                 let _ = writeln!(pkg_json_content, "   - **{name}** : `{version}`");
             }
+            pkg_json_content.push('\n');
         }
 
         if let Some(dev_dependencies) = pkg_json.dev_dependencies.as_ref().filter(|m| !m.is_empty())
