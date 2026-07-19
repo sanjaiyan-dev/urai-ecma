@@ -27,6 +27,7 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Creates urai.config.json file
     Create,
 }
 
