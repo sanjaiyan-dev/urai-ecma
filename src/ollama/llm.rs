@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, bail};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::sync::Arc;
 
 use crate::{
@@ -7,37 +7,31 @@ use crate::{
     ollama::{OllamaResponse, OllamaUrai, cache::init_cache},
 };
 
-pub struct ProgramConciseInfoParams {
-    ollama_endpoint: String,
-    program_code: String,
-    program_lang: String,
-    netowrk_reqwest: &'static reqwest::blocking::Client,
-    model_name: String,
-}
-
 #[derive(Serialize)]
 pub struct OllamaRequest {
     model: String,
     prompt: String,
     stream: bool,
-    system: &'static str,
+    system: String,
 }
 
-const SYSTEM_PROMPT: &str = "# Role
-You are an elite, highly precise Program Semantic Analyst. Your sole objective is to summarize the core behavioral purpose of any given source code block with high semantic accuracy.
+const FUNCTION_SYSTEM_PROMPT: &str = "# Role
+You are an elite, highly precise Program Semantic Analyst. Your sole objective is to summarize the core behavioral purpose of any given source code function block in 1 concise sentence.
 
-# Core Instructions
-1. **Deep Code Analysis**: Internally analyze the code's control flow, input/output structures, logic branches, and side effects step-by-step. Trace the execution path mentally to determine its deep functional intent before formulating your response.
-2. **Silent Reasoning Constraint**: You must perform your step-by-step logical analysis entirely in your internal, silent thinking process. Do NOT output your step-by-step thinking, code blocks, or intermediate analytical steps to the final output.
-3. **Length Constraint**: Your final output must be exactly one to two sentences.
-4. **Output Restrictions**: 
-   - Output ONLY the natural language explanation of the code.
-   - Do NOT include any preamble, introductory text, or conversational filler (such as 'This code...', 'Here is...', or 'The provided function...').
-   - Do NOT wrap your output in markdown code blocks or backticks.
-   - Start immediately with the first word of the explanation.";
+# Instructions
+1. Silent Reasoning: Mentally trace logic and output ONLY a 1-sentence explanation of what the function does.
+2. Length: Exactly 1 sentence.
+3. No Preamble: Do NOT say 'This function...', 'Here is...', or wrap output in code blocks. Start directly with the active description verb (e.g. 'Calculates user permissions based on role matrix.').";
+
+const TAILWIND_SYSTEM_PROMPT: &str = "# Role
+You are a UI Design & CSS Expert. Your objective is to summarize complex Tailwind CSS utility class names into a concise single-line description of the visual layout and component style.
+
+# Instructions
+1. Length: Under 12 words (e.g., 'Flex card layout with dark mode background and rounded borders').
+2. Output ONLY the short natural language style description. Do NOT include quotes, backticks, or intro text.";
 
 impl OllamaUrai {
-    pub fn new(ctx: Arc<UraiContext>) -> anyhow::Result<Self> {
+    pub fn new(ctx: Arc<UraiContext>) -> Result<Self> {
         let rt = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()?;
@@ -47,62 +41,70 @@ impl OllamaUrai {
 
         Ok(Self { ctx, cache, rt })
     }
-    fn summarize_code_block(&self, params: ProgramConciseInfoParams) -> Result<String> {
-        let ctx = &self.ctx;
 
-        match ctx.ollama_endpoint.ollama_endpoint {
-            None => bail!("No need Ollama"),
-            Some(_) => {
-                println!("Ollama Process is begins ")
+    pub fn summarize_function(&self, fn_name: &str, fn_code: &str) -> Result<String> {
+        let prompt = format!("Function Name: {}\nCode:\n{}", fn_name, fn_code);
+        self.generate_completion(&prompt, FUNCTION_SYSTEM_PROMPT)
+    }
+
+    pub fn summarize_tailwind_classes(&self, class_names: &str) -> Result<String> {
+        let prompt = format!("Tailwind CSS Classes:\n{}", class_names);
+        self.generate_completion(&prompt, TAILWIND_SYSTEM_PROMPT)
+    }
+
+    fn generate_completion(&self, prompt: &str, system: &str) -> Result<String> {
+        let endpoint_url = match &self.ctx.ollama_endpoint.ollama_endpoint {
+            Some(ep) => ep.as_str(),
+            None => bail!("Ollama endpoint not configured"),
+        };
+
+        let model_name = self
+            .ctx
+            .ollama_endpoint
+            .ollama_model_name
+            .as_deref()
+            .unwrap_or("gemma2");
+
+        let cache_key = self.generate_cache_key(&prompt.to_string());
+        if let Ok(cached_response) = self.get_cache_res(&cache_key) {
+            if cached_response.response != "URAI_OLLAMA_CACHE_MISS" {
+                return Ok(cached_response.response);
             }
         }
 
-        let ollama_model_name = ctx
-            .ollama_endpoint
-            .ollama_model_name
-            .clone()
-            .unwrap_or("".to_string());
-        let ollama_endpoint_url = ctx
-            .ollama_endpoint
-            .ollama_endpoint
-            .as_deref()
-            .unwrap_or("http://localhost:11234");
-
-        let cache_key = self.generate_cache_key(&params.program_code);
-
-        let cached_response = match self.get_cache_res(&cache_key) {
-            Ok(res) => res,
-            Err(_) => OllamaResponse {
-                response: "URAI_OLLAMA_CACHE_MISS".to_string(),
-            },
-        };
-
-        if cached_response.response != "URAI_OLLAMA_CACHE_MISS" {
-            return Ok(cached_response.response);
-        }
-
         let payload = OllamaRequest {
-            model: ollama_model_name,
+            model: model_name.to_string(),
+            prompt: prompt.to_string(),
             stream: false,
-            prompt: params.program_code,
-            system: SYSTEM_PROMPT,
+            system: system.to_string(),
         };
 
-        let response = params
-            .netowrk_reqwest
-            .post(format!("{}/api/generate", ollama_endpoint_url))
+        let client = reqwest::blocking::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()?;
+
+        let response = client
+            .post(format!("{}/api/generate", endpoint_url))
             .json(&payload)
             .send()
-            .context("Failed to connect to ollama server")?;
+            .context("Failed to send HTTP request to Ollama endpoint")?;
 
         if !response.status().is_success() {
-            bail!("Ollama server returned an error: {}", response.status());
+            bail!("Ollama endpoint returned HTTP status {}", response.status());
         }
 
         let res_body: OllamaResponse = response
             .json()
-            .context("Failed to parse the response JSON from Ollama")?;
-        self.insert_res_cache(cache_key, res_body.clone());
-        Ok(res_body.response.trim().to_string())
+            .context("Failed to parse JSON response from Ollama")?;
+
+        let cleaned = res_body.response.trim().to_string();
+        self.insert_res_cache(
+            cache_key,
+            OllamaResponse {
+                response: cleaned.clone(),
+            },
+        );
+
+        Ok(cleaned)
     }
 }

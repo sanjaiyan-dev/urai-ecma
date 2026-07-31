@@ -1,13 +1,8 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-    sync::Arc,
-};
+use swc_ecma_ast::{TsEntityName, TsKeywordTypeKind, TsType};
 
-use swc_ecma_ast::{Stmt, TsEntityName, TsKeywordTypeKind, TsType};
-
-use crate::UraiContext;
-
+pub mod function_summarizer;
 pub mod react;
+pub mod routes;
 
 pub fn resolve_ts_type(ts_type: &TsType) -> String {
     match ts_type {
@@ -24,7 +19,6 @@ pub fn resolve_ts_type(ts_type: &TsType) -> String {
 
         TsType::TsArrayType(array_type) => {
             let element_type_str = resolve_ts_type(&array_type.elem_type);
-
             format!("{}[]", element_type_str)
         }
 
@@ -46,12 +40,4 @@ pub fn resolve_ts_type(ts_type: &TsType) -> String {
 
         _ => "object".to_string(),
     }
-}
-
-pub struct VisitorCode {
-    pub ctx: Arc<UraiContext>,
-    pub extracted_handlers: Vec<Stmt>,
-    pub counter: usize,
-
-    pub local_to_canonical_track_imports: BTreeMap<String, String>,
 }

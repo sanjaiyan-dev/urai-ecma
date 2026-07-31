@@ -1,0 +1,31 @@
+{
+    // Path to the project directory or single source file
+    "input_project": "./test/",
+
+    // Target output Markdown file path
+    "output_file": "./output.md",
+
+    // Ollama local endpoint URL (Optional, e.g., "http://localhost:11434")
+    "ollama_endpoint": "http://localhost:11434",
+
+    // Ollama Model Name (e.g., "gemma2", "llama3.2")
+    "ollama_modelname": "gemma4",
+
+    // Tailwind CSS / className pruning mode: "remove" | "summarize" | "preserve"
+    // "remove": completely strips verbose static class utility strings while keeping dynamic expressions.
+    // "summarize": sends massive class strings to Ollama to obtain 1-line style descriptions.
+    // "preserve": keeps classNames untouched.
+    "tailwind_mode": "summarize",
+
+    // Summarize function block bodies using local Ollama if available
+    "summarize_functions": true,
+
+    // Extract and generate Express/Fastify/Next.js/NestJS API Route Table
+    "generate_route_table": true,
+
+    // Analyze React / React Native components and output detailed explanations
+    "analyze_react_components": true,
+
+    // Generate ASCII File Structure & Module Dependency Graph
+    "generate_file_graph": true
+}

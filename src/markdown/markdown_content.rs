@@ -1,16 +1,121 @@
-use anyhow::Context;
+use std::fmt::Write;
+use std::sync::Arc;
 
+use crate::UraiContext;
+use crate::ast::graph::ProjectGraph;
 use crate::ast::package_json::PackageJson;
-pub struct MarkdownContent {
-    package_json_content: Option<PackageJson>,
+use crate::ast::{FileAnalysisResult, PackageJsonUrai, RouteInfo};
+
+pub struct MarkdownContentBuilder {
+    pub ctx: Arc<UraiContext>,
+    pub package_info: String,
+    pub all_routes: Vec<RouteInfo>,
+    pub file_results: Vec<FileAnalysisResult>,
+    pub graph_data: Option<ProjectGraph>,
 }
-fn markdown_content(params: MarkdownContent) -> String {
-    let package_json = params.package_json_content;
-    format!(
-        "
-{:?}
-    ",
-        package_json.unwrap().name
-    );
-    unimplemented!()
+
+impl MarkdownContentBuilder {
+    pub fn build_markdown_prompt(&self) -> String {
+        let mut out = String::new();
+        let pkg_json = PackageJsonUrai::new(self.ctx.to_owned());
+
+        // 1. Header & Overview
+        out.push_str("# Project Technical Context & LLM Prompt\n\n");
+        if !self.package_info.is_empty() {
+            out.push_str(&self.package_info);
+            out.push_str("\n---\n\n");
+        }
+
+        let pkg_json_content = match pkg_json.parse_package_json() {
+            Ok(content) => {
+                out.push_str(&content);
+                println!("{content}")
+            }
+            Err(err) => {
+                eprint!("{:?}", err)
+            }
+        };
+
+        // 2. Project File Structure & Dependency Graph
+        if let Some(ref graph) = self.graph_data {
+            out.push_str("## Project File Structure & PEG Graph\n\n");
+            out.push_str("```\n");
+            out.push_str(&graph.ascii_tree);
+            out.push_str("```\n\n");
+
+            if !graph.dependency_graph.is_empty() {
+                out.push_str("### Module Dependency Graph\n\n");
+                out.push_str(&graph.dependency_graph);
+                out.push_str("\n");
+            }
+            out.push_str("---\n\n");
+        }
+
+        // 3. Backend Route Table
+        if !self.all_routes.is_empty() {
+            out.push_str("## Backend API Route Table\n\n");
+            out.push_str("| Framework | Method | Path | Handler | File Location |\n");
+            out.push_str("| :--- | :--- | :--- | :--- | :--- |\n");
+            for r in &self.all_routes {
+                let _ = writeln!(
+                    out,
+                    "| **{}** | `{}` | `{}` | `{}` | `{}:{}` |",
+                    r.framework, r.method, r.path, r.handler_name, r.file_path, r.line_number
+                );
+            }
+            out.push_str("\n---\n\n");
+        }
+
+        // 4. React Component Detailed Explanations
+        let has_react = self
+            .file_results
+            .iter()
+            .any(|f| !f.react_components.is_empty());
+        if has_react {
+            out.push_str("## React Component Architecture & Explanations\n\n");
+            for file in &self.file_results {
+                for comp in &file.react_components {
+                    out.push_str(&comp.detailed_explanation);
+                    if !comp.rendered_elements.is_empty() {
+                        out.push_str(&format!(
+                            "- **Rendered JSX Tree**: `<{}>` \n\n",
+                            comp.rendered_elements.join(">, <")
+                        ));
+                    }
+                }
+            }
+            out.push_str("---\n\n");
+        }
+
+        // 5. Source Code Section
+        out.push_str("## AST-Pruned Source Code Repository\n\n");
+        out.push_str("> Note: Tailwind classNames and static styles have been pruned according to mode to maximize token efficiency.\n\n");
+
+        for file in &self.file_results {
+            out.push_str(&format!("### File: `{}`\n\n", file.relative_path));
+
+            if !file.function_summaries.is_empty() {
+                out.push_str("**Function Summaries**:\n");
+                for fn_sum in &file.function_summaries {
+                    out.push_str(&format!(
+                        "- Line {}: `{}` -> *{}*\n",
+                        fn_sum.line_number, fn_sum.function_name, fn_sum.concise_summary
+                    ));
+                }
+                out.push_str("\n");
+            }
+
+            let lang = match file.file_path.extension().and_then(|e| e.to_str()) {
+                Some("ts") | Some("tsx") => "typescript",
+                Some("jsx") => "jsx",
+                _ => "javascript",
+            };
+
+            out.push_str(&format!("```{}\n", lang));
+            out.push_str(&file.processed_content);
+            out.push_str("\n```\n\n");
+        }
+
+        out
+    }
 }
