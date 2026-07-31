@@ -1,13 +1,13 @@
 use anyhow::{Context, Result};
+use ignore::WalkBuilder;
+use rayon::prelude::*;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-
 use swc_common::SourceMap;
 use swc_common::sync::Lrc;
 use swc_ecma_codegen::{Emitter, text_writer::JsWriter};
-use swc_ecma_visit::VisitMutWith;
-use swc_ecma_visit::VisitWith;
+use swc_ecma_visit::{VisitMutWith, VisitWith};
 
 use crate::UraiContext;
 use crate::ast::PackageJsonUrai;
@@ -22,94 +22,119 @@ use crate::markdown::markdown_content::MarkdownContentBuilder;
 use crate::ollama::OllamaUrai;
 
 pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
-    let mut file_results = Vec::new();
-    let mut all_routes: Vec<RouteInfo> = Vec::new();
-
     let ollama_client = if ctx.ollama_endpoint.ollama_endpoint.is_some() {
         OllamaUrai::new(ctx.clone()).ok()
     } else {
         None
     };
-    println!("San Running");
-    let files = collect_source_files(&ctx.input_project)?;
 
+    let files = collect_source_files(&ctx.input_project);
     println!("🔍 Found {} source file(s) for analysis.", files.len());
 
-    for file_path in &files {
-        let rel_path = file_path
-            .strip_prefix(&ctx.input_project)
-            .unwrap_or(file_path)
-            .display()
-            .to_string();
+    let ollama_ref = ollama_client.as_ref();
 
-        let raw_content = fs::read_to_string(file_path)
-            .with_context(|| format!("Failed to read file: {}", file_path.display()))?;
+    let processed_data: Vec<(FileAnalysisResult, Vec<RouteInfo>)> = files
+        .par_iter()
+        .filter_map(|file_path| {
+            let rel_path = file_path
+                .strip_prefix(&ctx.input_project)
+                .unwrap_or(file_path)
+                .display()
+                .to_string();
 
-        let parse_res = parse_file(&raw_content, file_path.to_str().unwrap_or_default());
-        match parse_res {
-            Ok((mut module, _comments, cm)) => {
-                // Route Extraction
-                if ctx.generate_route_table {
-                    let mut route_vis = RouteVisitor::new(rel_path.as_str(), &cm);
-                    module.visit_with(&mut route_vis);
-                    all_routes.extend(route_vis.routes);
+            let raw_content = match fs::read_to_string(file_path) {
+                Ok(content) => content,
+                Err(e) => {
+                    eprintln!(
+                        "⚠️ Warning: Failed to read file '{}': {}",
+                        file_path.display(),
+                        e
+                    );
+                    return None;
                 }
+            };
 
-                // React Component Analysis
-                let mut react_components = Vec::new();
-                if ctx.analyze_react_components {
-                    let mut react_analyzer = ReactComponentAnalyzer::new(&cm);
-                    module.visit_with(&mut react_analyzer);
-                    react_components = react_analyzer.components;
-                }
+            let parse_res = parse_file(&raw_content, file_path.to_str().unwrap_or_default());
 
-                // Function Summaries
-                let mut fn_summaries = Vec::new();
-                if ctx.summarize_functions {
-                    let mut fn_vis =
-                        FunctionSummarizerVisitor::new(&cm, &raw_content, ollama_client.as_ref());
-                    module.visit_with(&mut fn_vis);
-                    fn_summaries = fn_vis.summaries;
-                }
+            match parse_res {
+                Ok((mut module, comments, cm)) => {
+                    let mut routes = Vec::new();
 
-                // JSX Pruning
-                if ctx.analyze_react_components {
-                    let mut pruner = ReactJsxPruner {
-                        mode: ctx.tailwind_mode,
-                        ollama: ollama_client.as_ref(),
+                    // Route Extraction
+                    if ctx.generate_route_table {
+                        let mut route_vis = RouteVisitor::new(rel_path.as_str(), &cm);
+                        module.visit_with(&mut route_vis);
+                        routes = route_vis.routes;
+                    }
+
+                    // React Component Analysis
+                    let mut react_components = Vec::new();
+                    if ctx.analyze_react_components {
+                        let mut react_analyzer = ReactComponentAnalyzer::new(&cm);
+                        module.visit_with(&mut react_analyzer);
+                        react_components = react_analyzer.components;
+                    }
+
+                    // Function Summaries
+                    let mut fn_summaries = Vec::new();
+                    if ctx.summarize_functions {
+                        let mut fn_vis =
+                            FunctionSummarizerVisitor::new(&cm, &raw_content, ollama_ref, comments);
+                        module.visit_with(&mut fn_vis);
+                        fn_summaries = fn_vis.summaries;
+                    }
+
+                    // JSX Pruning
+                    if ctx.analyze_react_components {
+                        let mut pruner = ReactJsxPruner {
+                            mode: ctx.tailwind_mode,
+                            ollama: ollama_ref,
+                        };
+                        module.visit_mut_with(&mut pruner);
+                    }
+
+                    let processed_code = emit_code(&module, cm);
+
+                    let result = FileAnalysisResult {
+                        file_path: file_path.clone(),
+                        relative_path: rel_path,
+                        raw_content,
+                        processed_content: processed_code,
+                        routes: Vec::new(),
+                        react_components,
+                        function_summaries: fn_summaries,
                     };
-                    module.visit_mut_with(&mut pruner);
+
+                    Some((result, routes))
                 }
+                Err(e) => {
+                    eprintln!(
+                        "⚠️  Warning: Failed to parse JS/TS file '{}': {}",
+                        file_path.display(),
+                        e
+                    );
+                    let result = FileAnalysisResult {
+                        file_path: file_path.clone(),
+                        relative_path: rel_path,
+                        raw_content: raw_content.clone(),
+                        processed_content: raw_content,
+                        routes: Vec::new(),
+                        react_components: Vec::new(),
+                        function_summaries: Vec::new(),
+                    };
 
-                let processed_code = emit_code(&module, cm);
+                    Some((result, Vec::new()))
+                }
+            }
+        })
+        .collect();
 
-                file_results.push(FileAnalysisResult {
-                    file_path: file_path.clone(),
-                    relative_path: rel_path,
-                    raw_content,
-                    processed_content: processed_code,
-                    routes: Vec::new(),
-                    react_components,
-                    function_summaries: fn_summaries,
-                });
-            }
-            Err(e) => {
-                eprintln!(
-                    "⚠️  Warning: Failed to parse JS/TS file '{}': {}",
-                    file_path.display(),
-                    e
-                );
-                file_results.push(FileAnalysisResult {
-                    file_path: file_path.clone(),
-                    relative_path: rel_path,
-                    raw_content: raw_content.clone(),
-                    processed_content: raw_content,
-                    routes: Vec::new(),
-                    react_components: Vec::new(),
-                    function_summaries: Vec::new(),
-                });
-            }
-        }
+    let mut file_results = Vec::with_capacity(processed_data.len());
+    let mut all_routes = Vec::new();
+
+    for (file_res, routes) in processed_data {
+        file_results.push(file_res);
+        all_routes.extend(routes);
     }
 
     // Package.json parsing
@@ -125,7 +150,6 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
 
     // Assemble final Markdown output
     let markdown_builder = MarkdownContentBuilder {
-        ctx: ctx.clone(),
         package_info: pkg_markdown,
         all_routes,
         file_results,
@@ -141,46 +165,49 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
     Ok(())
 }
 
-fn collect_source_files(path: &Path) -> Result<Vec<PathBuf>> {
-    let mut files = Vec::new();
-
+/// Collects source files using `WalkBuilder` from the `ignore` crate.
+/// Respects `.gitignore`, `.ignore`, `.git/info/exclude`, and skips hidden directories.
+fn collect_source_files(path: &Path) -> Vec<PathBuf> {
     if path.is_file() {
-        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
-        if matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs") {
-            files.push(path.to_path_buf());
+        if is_supported_extension(path) {
+            return vec![path.to_path_buf()];
         }
-        println!("{:?}", &files);
-
-        return Ok(files);
+        return Vec::new();
     }
 
-    if let Ok(entries) = fs::read_dir(path) {
-        for entry in entries.filter_map(|e| e.ok()) {
-            let p = entry.path();
-            let name = p.file_name().unwrap_or_default().to_string_lossy();
-            println!("{}", p.display());
-            if name.starts_with('.')
-                || name == "node_modules"
-                || name == "dist"
-                || name == "build"
-                || name == "target"
-            {
-                continue;
-            }
-            println!("{}", p.display());
-            if p.is_dir() {
-                let mut sub = collect_source_files(&p)?;
-                files.append(&mut sub);
-            } else {
-                let ext = p.extension().and_then(|e| e.to_str()).unwrap_or("");
-                if matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs") {
-                    files.push(p);
+    WalkBuilder::new(path)
+        .hidden(true)
+        .git_ignore(true)
+        .ignore(true)
+        .filter_entry(|entry| {
+            // Prune heavy directories early before recursing into them
+            if let Some(file_name) = entry.file_name().to_str() {
+                if file_name == "node_modules"
+                    || file_name == "dist"
+                    || file_name == "build"
+                    || file_name == "target"
+                {
+                    return false;
                 }
             }
-        }
-    }
+            true
+        })
+        .build()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| {
+            entry.file_type().map_or(false, |ft| ft.is_file())
+                && is_supported_extension(entry.path())
+        })
+        .map(|entry| entry.into_path())
+        .collect()
+}
 
-    Ok(files)
+fn is_supported_extension(path: &Path) -> bool {
+    path.extension()
+        .and_then(|e| e.to_str())
+        .map_or(false, |ext| {
+            matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs")
+        })
 }
 
 fn emit_code(module: &swc_ecma_ast::Module, cm: Lrc<SourceMap>) -> String {

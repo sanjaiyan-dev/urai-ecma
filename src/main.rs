@@ -56,7 +56,7 @@ enum Commands {
 }
 
 #[derive(Deserialize, Default, Debug)]
-struct UraiConfig {
+pub struct UraiConfig {
     input_project: Option<PathBuf>,
     output_file: Option<PathBuf>,
     ollama_endpoint: Option<String>,

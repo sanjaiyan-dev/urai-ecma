@@ -16,6 +16,7 @@ pub struct PackageJson {
     pub main: Option<String>,
     pub scripts: Option<BTreeMap<String, String>>,
     pub dependencies: Option<BTreeMap<String, String>>,
+    #[serde(rename = "devDependencies")]
     pub dev_dependencies: Option<BTreeMap<String, String>>,
     pub author: Option<serde_json::Value>,
     pub license: Option<String>,
@@ -82,7 +83,7 @@ impl PackageJsonUrai {
         }
 
         if let Some(dependencies) = pkg_json.dependencies.as_ref().filter(|m| !m.is_empty()) {
-            pkg_json_content.push_str("Dependencies used in this project: ");
+            pkg_json_content.push_str("Dependencies used in this project: \n");
 
             for (name, version) in dependencies.iter() {
                 let _ = writeln!(pkg_json_content, "   - **{name}** : `{version}`");
@@ -92,8 +93,7 @@ impl PackageJsonUrai {
 
         if let Some(dev_dependencies) = pkg_json.dev_dependencies.as_ref().filter(|m| !m.is_empty())
         {
-            pkg_json_content.push_str("Dev dependencies used in this project: ");
-
+            pkg_json_content.push_str("Dev dependencies used in this project: \n");
             for (name, version) in dev_dependencies.iter() {
                 let _ = writeln!(pkg_json_content, "   - **{name}** : `{version}`");
             }

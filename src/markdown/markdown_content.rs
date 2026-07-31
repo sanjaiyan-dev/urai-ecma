@@ -1,13 +1,9 @@
-use std::fmt::Write;
-use std::sync::Arc;
-
-use crate::UraiContext;
 use crate::ast::graph::ProjectGraph;
-use crate::ast::package_json::PackageJson;
+use std::fmt::Write;
+
 use crate::ast::{FileAnalysisResult, PackageJsonUrai, RouteInfo};
 
 pub struct MarkdownContentBuilder {
-    pub ctx: Arc<UraiContext>,
     pub package_info: String,
     pub all_routes: Vec<RouteInfo>,
     pub file_results: Vec<FileAnalysisResult>,
@@ -17,26 +13,15 @@ pub struct MarkdownContentBuilder {
 impl MarkdownContentBuilder {
     pub fn build_markdown_prompt(&self) -> String {
         let mut out = String::new();
-        let pkg_json = PackageJsonUrai::new(self.ctx.to_owned());
 
-        // 1. Header & Overview
-        out.push_str("# Project Technical Context & LLM Prompt\n\n");
         if !self.package_info.is_empty() {
             out.push_str(&self.package_info);
             out.push_str("\n---\n\n");
-        }
-
-        let pkg_json_content = match pkg_json.parse_package_json() {
-            Ok(content) => {
-                out.push_str(&content);
-                println!("{content}")
-            }
-            Err(err) => {
-                eprint!("{:?}", err)
-            }
+        } else {
+            out.push_str("# Project Technical Context & LLM Prompt\n\n");
         };
 
-        // 2. Project File Structure & Dependency Graph
+        // Project File Structure & Dependency Graph
         if let Some(ref graph) = self.graph_data {
             out.push_str("## Project File Structure & PEG Graph\n\n");
             out.push_str("```\n");
@@ -51,7 +36,7 @@ impl MarkdownContentBuilder {
             out.push_str("---\n\n");
         }
 
-        // 3. Backend Route Table
+        //  Backend Route Table
         if !self.all_routes.is_empty() {
             out.push_str("## Backend API Route Table\n\n");
             out.push_str("| Framework | Method | Path | Handler | File Location |\n");
@@ -66,7 +51,7 @@ impl MarkdownContentBuilder {
             out.push_str("\n---\n\n");
         }
 
-        // 4. React Component Detailed Explanations
+        //  React Component Detailed Explanations
         let has_react = self
             .file_results
             .iter()
@@ -87,7 +72,7 @@ impl MarkdownContentBuilder {
             out.push_str("---\n\n");
         }
 
-        // 5. Source Code Section
+        //  Source Code Section
         out.push_str("## AST-Pruned Source Code Repository\n\n");
         out.push_str("> Note: Tailwind classNames and static styles have been pruned according to mode to maximize token efficiency.\n\n");
 
