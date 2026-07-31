@@ -1,6 +1,6 @@
 {
     // Path to the project directory or single source file
-    "input_project": "./test",
+    "input_project": "../GithubPRs/third-party-capital",
 
     // Target output Markdown file path
     "output_file": "./output.md",

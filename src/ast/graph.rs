@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Error, Result, bail};
 use ignore::WalkBuilder;
 use petgraph::graph::UnGraph;
 use std::collections::HashMap;
@@ -53,9 +53,9 @@ fn build_ascii_tree(dir: &Path, prefix: &str, out: &mut String) -> Result<()> {
 
     paths.sort();
 
-    let count = paths.len();
+    let count = &paths.len();
     for (i, path) in paths.iter().enumerate() {
-        let is_last = i == count - 1;
+        let is_last = (i == count - 1) && (i < 1000);
         let connector = if is_last { "└── " } else { "├── " };
         let name = path.file_name().unwrap_or_default().to_string_lossy();
 
@@ -135,32 +135,36 @@ fn collect_js_ts_files(dir: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
         }
         return Ok(());
     }
-    let current_folder_files: Vec<PathBuf> = WalkBuilder::new(dir)
-        .hidden(true)
-        .git_ignore(true)
-        .ignore(true)
-        .filter_entry(|entry| {
-            // Prune heavy directories early before recursing into them
-            if let Some(file_name) = entry.file_name().to_str() {
-                if file_name == "node_modules"
-                    || file_name == "dist"
-                    || file_name == "build"
-                    || file_name == "target"
-                {
-                    return false;
+    if dir.is_dir() {
+        let current_folder_files: Vec<PathBuf> = WalkBuilder::new(dir)
+            .hidden(true)
+            .git_ignore(true)
+            .ignore(true)
+            .filter_entry(|entry| {
+                // Prune heavy directories early before recursing into them
+                if let Some(file_name) = entry.file_name().to_str() {
+                    if file_name == "node_modules"
+                        || file_name == "dist"
+                        || file_name == "build"
+                        || file_name == "target"
+                    {
+                        return false;
+                    }
                 }
-            }
-            true
-        })
-        .build()
-        .filter_map(|entry| entry.ok())
-        .filter(|entry| {
-            entry.file_type().map_or(false, |ft| ft.is_file())
-                && is_supported_extension(entry.path())
-        })
-        .map(|entry| entry.into_path())
-        .collect();
-    files.extend(current_folder_files);
+                true
+            })
+            .build()
+            .filter_map(|entry| entry.ok())
+            .filter(|entry| {
+                entry.file_type().map_or(false, |ft| ft.is_file())
+                    && is_supported_extension(&entry.path())
+            })
+            .map(|entry| entry.into_path())
+            .collect();
+        files.extend(current_folder_files);
 
-    Ok(())
+        Ok(())
+    } else {
+        bail!("This is not directory")
+    }
 }

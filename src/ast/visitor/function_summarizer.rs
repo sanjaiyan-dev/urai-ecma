@@ -49,7 +49,7 @@ impl<'a> Visit for FunctionSummarizerVisitor<'a> {
 
         // First Preference: Check for JSDoc comments (@description, @param, @return)
         let jsdoc_summary = self.extract_jsdoc_summary(fn_decl);
-println!("Summary, {:?}", fn_decl);
+
         let summary = if let Some(jsdoc_text) = jsdoc_summary {
             // Found JSDoc documentation -> Skip Ollama execution
             jsdoc_text
@@ -105,8 +105,6 @@ struct JsDocInfo {
 
 /// Parses JSDoc annotations with `jsdoc` crate & robust string fallback
 fn parse_jsdoc_comment(raw_comment: &Comment) -> Option<JsDocInfo> {
-            println!("San: {:?}", raw_comment);
-  
     if let Ok((_, ast)) = parse_jsdoc(JsDocInput::from(raw_comment)) {
         let mut description_lines = Vec::new();
         let mut params = Vec::new();
@@ -167,7 +165,7 @@ fn parse_jsdoc_comment(raw_comment: &Comment) -> Option<JsDocInfo> {
         }
     }
 
-    // 2. Manual line-by-line fallback parser for non-standard or line comments
+    // Manual line-by-line fallback parser for non-standard or line comments
     let mut description_lines = Vec::new();
     let mut params = Vec::new();
     let mut returns = None;
