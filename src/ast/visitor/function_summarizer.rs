@@ -1,5 +1,5 @@
-use swc_common::SourceMap;
 use swc_common::comments::{Comment, Comments, SingleThreadedComments};
+use swc_common::{BytePos, SourceMap};
 use swc_ecma_ast::*;
 use swc_ecma_visit::{Visit, VisitWith};
 
@@ -19,6 +19,7 @@ pub struct FunctionSummarizerVisitor<'a> {
     pub summaries: Vec<FunctionSummary>,
     pub comments: SingleThreadedComments,
     pub line_threshold: usize,
+    pub current_export_lo: Option<BytePos>,
 }
 
 impl<'a> FunctionSummarizerVisitor<'a> {
@@ -36,11 +37,25 @@ impl<'a> FunctionSummarizerVisitor<'a> {
             summaries: Vec::new(),
             comments,
             line_threshold,
+            current_export_lo: None,
         }
     }
 }
 
 impl<'a> Visit for FunctionSummarizerVisitor<'a> {
+    fn visit_export_decl(&mut self, export_decl: &ExportDecl) {
+        let prev = self.current_export_lo;
+        self.current_export_lo = Some(export_decl.span.lo);
+        export_decl.visit_children_with(self);
+        self.current_export_lo = prev;
+    }
+
+    fn visit_export_default_decl(&mut self, export_default: &ExportDefaultDecl) {
+        let prev = self.current_export_lo;
+        self.current_export_lo = Some(export_default.span.lo);
+        export_default.visit_children_with(self);
+        self.current_export_lo = prev;
+    }
     fn visit_fn_decl(&mut self, fn_decl: &FnDecl) {
         let fn_name = fn_decl.ident.sym.to_string();
         let lo_pos = self.cm.lookup_char_pos(fn_decl.function.span.lo);
@@ -81,15 +96,31 @@ impl<'a> Visit for FunctionSummarizerVisitor<'a> {
 impl<'a> FunctionSummarizerVisitor<'a> {
     /// Extract and format JSDoc annotations (@description, @param, @return)
     fn extract_jsdoc_summary(&self, fn_decl: &FnDecl) -> Option<String> {
-        let leading_comments = self
-            .comments
-            .get_leading(fn_decl.function.span.lo)
-            .or_else(|| self.comments.get_leading(fn_decl.ident.span.lo))?;
+        let fn_lo = fn_decl.function.span.lo;
+        let ident_lo = fn_decl.ident.span.lo;
 
-        for comment in leading_comments {
-            // Try parsing with `jsdoc` crate first, then fallback to custom line parser
-            if let Some(info) = parse_jsdoc_comment(&comment) {
-                return Some(format_jsdoc_summary(&info));
+        let positions_to_check = [self.current_export_lo, Some(fn_lo), Some(ident_lo)];
+        for pos in positions_to_check.into_iter().flatten() {
+            if let Some(leading_comments) = self.comments.get_leading(pos) {
+                for comment in &leading_comments {
+                    if let Some(info) = parse_jsdoc_comment(comment) {
+                        return Some(format_jsdoc_summary(&info));
+                    }
+                }
+            }
+        }
+
+        let (leading_map, _trailing_map) = self.comments.borrow_all();
+
+        for (pos, comment_list) in leading_map.iter() {
+            let distance = pos.0.abs_diff(fn_lo.0);
+
+            if distance <= 300 {
+                for cmt in comment_list {
+                    if let Some(info) = parse_jsdoc_comment(cmt) {
+                        return Some(format_jsdoc_summary(&info));
+                    }
+                }
             }
         }
 
