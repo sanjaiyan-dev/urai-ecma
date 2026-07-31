@@ -32,12 +32,26 @@ struct Cli {
     #[arg(
         long,
         value_name = "MODE",
-        help = "Tailwind CSS mode: remove, summarize, preserve"
+        help = "Tailwind CSS mode: remove, remove_aggr, summarize, preserve"
     )]
     tailwind_mode: Option<String>,
 
-    #[arg(long, help = "Summarize function blocks using Ollama")]
+    #[arg(
+        long,
+        value_name = "CHARS",
+        help = "Character count threshold for Tailwind pruning (default: 96)"
+    )]
+    tailwind_threshold: Option<usize>,
+
+    #[arg(long, help = "Summarize function blocks using Ollama or JSDoc")]
     summarize_functions: Option<bool>,
+
+    #[arg(
+        long,
+        value_name = "LINES",
+        help = "Line count threshold to trigger function summarization (default: 5)"
+    )]
+    summarize_functions_threshold: Option<usize>,
 
     #[arg(long, help = "Generate route table for backend frameworks")]
     generate_route_table: Option<bool>,
@@ -62,7 +76,9 @@ pub struct UraiConfig {
     ollama_endpoint: Option<String>,
     ollama_modelname: Option<String>,
     tailwind_mode: Option<TailwindMode>,
+    tailwind_threshold: Option<usize>,
     summarize_functions: Option<bool>,
+    summarize_functions_threshold: Option<usize>,
     generate_route_table: Option<bool>,
     analyze_react_components: Option<bool>,
     generate_file_graph: Option<bool>,
@@ -79,7 +95,9 @@ pub struct UraiContext {
     pub output_filename: PathBuf,
     pub ollama_endpoint: OllamaContext,
     pub tailwind_mode: TailwindMode,
+    pub tailwind_threshold: usize,
     pub summarize_functions: bool,
+    pub summarize_functions_threshold: usize,
     pub generate_route_table: bool,
     pub analyze_react_components: bool,
     pub generate_file_graph: bool,
@@ -98,14 +116,21 @@ const DEFAULT_CONFIG: &str = r#"{
     // Ollama Model Name (e.g., "gemma4", "ornith")
     "ollama_modelname": "gemma4",
 
-    // Tailwind CSS / className pruning mode: "remove" | "summarize" | "preserve"
-    // "remove": completely strips verbose static class utility strings while keeping dynamic expressions.
-    // "summarize": sends massive class strings to Ollama to obtain 1-line style descriptions.
+    // Tailwind CSS / className pruning mode: "remove" | "remove_aggr" | "summarize" | "preserve"
+    // "remove": strips static class strings exceeding threshold while keeping dynamic expressions.
+    // "remove_aggr": aggressively removes class strings even if below character threshold.
+    // "summarize": sends class strings exceeding threshold to Ollama for 1-line style descriptions.
     // "preserve": keeps classNames untouched.
     "tailwind_mode": "remove",
 
-    // Summarize function block bodies using local Ollama if available
+    // Character length threshold for Tailwind pruning (default: 96 characters)
+    "tailwind_threshold": 96,
+
+    // Summarize function block bodies using local Ollama or fallback to JSDoc comments
     "summarize_functions": true,
+
+    // Line count threshold to trigger function summarization (default: 5 lines)
+    "summarize_functions_threshold": 5,
 
     // Extract and generate Express/Fastify/Next.js/NestJS API Route Table
     "generate_route_table": true,
@@ -173,15 +198,27 @@ fn main() {
         .map(|s| match s.to_lowercase().as_str() {
             "summarize" => TailwindMode::Summarize,
             "preserve" => TailwindMode::Preserve,
+            "remove_aggr" | "remove_aggressive" | "aggressive" => TailwindMode::RemoveAggr,
             _ => TailwindMode::Remove,
         })
         .or(config.tailwind_mode)
         .unwrap_or(TailwindMode::Remove);
 
+    let tailwind_threshold = cli
+        .tailwind_threshold
+        .or(config.tailwind_threshold)
+        .unwrap_or(96);
+
     let summarize_functions = cli
         .summarize_functions
         .or(config.summarize_functions)
         .unwrap_or(true);
+
+    let summarize_functions_threshold = cli
+        .summarize_functions_threshold
+        .or(config.summarize_functions_threshold)
+        .unwrap_or(5);
+
     let generate_route_table = cli
         .generate_route_table
         .or(config.generate_route_table)
@@ -213,7 +250,9 @@ fn main() {
             ollama_cache_folder,
         },
         tailwind_mode,
+        tailwind_threshold,
         summarize_functions,
+        summarize_functions_threshold,
         generate_route_table,
         analyze_react_components,
         generate_file_graph,

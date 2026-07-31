@@ -1,8 +1,11 @@
 use anyhow::Result;
+use ignore::WalkBuilder;
 use petgraph::graph::UnGraph;
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+
+use crate::ast::analyze::is_supported_extension;
 
 pub struct ProjectGraph {
     pub ascii_tree: String,
@@ -90,7 +93,7 @@ fn build_petgraph_dependencies(root_path: &Path) -> Result<String> {
     }
 
     let mut dep_summary = String::new();
-    dep_summary.push_str("```mermaid\ngraph TD;\n");
+    dep_summary.push_str("```mermaid\ngraph LR;\n");
 
     for file in &files {
         let source_rel = file
@@ -111,10 +114,8 @@ fn build_petgraph_dependencies(root_path: &Path) -> Result<String> {
                             .trim_matches('\'')
                             .trim_matches('"');
                         if clean_spec.starts_with('.') {
-                            dep_summary.push_str(&format!(
-                                "    \"{}\" --> \"{}\";\n",
-                                source_rel, clean_spec
-                            ));
+                            dep_summary
+                                .push_str(&format!("    {} --> {};\n", source_rel, clean_spec));
                         }
                     }
                 }
@@ -134,29 +135,32 @@ fn collect_js_ts_files(dir: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
         }
         return Ok(());
     }
-
-    if let Ok(entries) = fs::read_dir(dir) {
-        for entry in entries.filter_map(|e| e.ok()) {
-            let path = entry.path();
-            let name = path.file_name().unwrap_or_default().to_string_lossy();
-            if name.starts_with('.')
-                || name == "node_modules"
-                || name == "dist"
-                || name == "build"
-                || name == "target"
-            {
-                continue;
-            }
-            if path.is_dir() {
-                collect_js_ts_files(&path, files)?;
-            } else {
-                let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
-                if matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs") {
-                    files.push(path);
+    let current_folder_files: Vec<PathBuf> = WalkBuilder::new(dir)
+        .hidden(true)
+        .git_ignore(true)
+        .ignore(true)
+        .filter_entry(|entry| {
+            // Prune heavy directories early before recursing into them
+            if let Some(file_name) = entry.file_name().to_str() {
+                if file_name == "node_modules"
+                    || file_name == "dist"
+                    || file_name == "build"
+                    || file_name == "target"
+                {
+                    return false;
                 }
             }
-        }
-    }
+            true
+        })
+        .build()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| {
+            entry.file_type().map_or(false, |ft| ft.is_file())
+                && is_supported_extension(entry.path())
+        })
+        .map(|entry| entry.into_path())
+        .collect();
+    files.extend(current_folder_files);
 
     Ok(())
 }

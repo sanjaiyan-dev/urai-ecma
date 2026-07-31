@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use ignore::WalkBuilder;
 use rayon::prelude::*;
 use std::fs;
@@ -78,8 +78,13 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                     // Function Summaries
                     let mut fn_summaries = Vec::new();
                     if ctx.summarize_functions {
-                        let mut fn_vis =
-                            FunctionSummarizerVisitor::new(&cm, &raw_content, ollama_ref, comments);
+                        let mut fn_vis = FunctionSummarizerVisitor::new(
+                            &cm,
+                            &raw_content,
+                            ollama_ref,
+                            comments,
+                            ctx.summarize_functions_threshold,
+                        );
                         module.visit_with(&mut fn_vis);
                         fn_summaries = fn_vis.summaries;
                     }
@@ -202,7 +207,7 @@ fn collect_source_files(path: &Path) -> Vec<PathBuf> {
         .collect()
 }
 
-fn is_supported_extension(path: &Path) -> bool {
+pub fn is_supported_extension(path: &Path) -> bool {
     path.extension()
         .and_then(|e| e.to_str())
         .map_or(false, |ext| {

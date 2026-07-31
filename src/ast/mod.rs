@@ -10,10 +10,12 @@ pub mod package_json;
 pub mod parser;
 pub mod visitor;
 
-#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum TailwindMode {
     Remove,
+    #[serde(alias = "remove_aggressive", alias = "aggressive")]
+    RemoveAggr,
     Summarize,
     Preserve,
 }

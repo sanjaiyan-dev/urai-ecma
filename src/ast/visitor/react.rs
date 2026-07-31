@@ -68,6 +68,7 @@ impl<'a> VisitMut for ReactJsxPruner<'a> {
                             TailwindMode::Preserve => {
                                 pruned_attrs.push(JSXAttrOrSpread::JSXAttr(jsx_attr));
                             }
+                            _ => {}
                         }
                     } else {
                         pruned_attrs.push(JSXAttrOrSpread::JSXAttr(jsx_attr));
