@@ -1,28 +1,31 @@
-# Project Title: third-party-capital 
+# Project Title: rspress-plugin-third-parties 
 
 ## Project Description
 
-
+Optimized third-party components (YouTube, Google Maps, Twitter/X, GA) and script loading strategies for Rspress.
 
 Dependencies used in this project: 
-   - **semver** : `^7.6.2`
+   - **react-compiler-runtime** : `0.0.0-experimental-a1856f3-20260507`
+   - **react-tweet** : `^3.3.1`
+   - **third-party-capital** : `^3.0.0`
 
 Dev dependencies used in this project: 
-   - **@types/jest** : `^29.5.1`
-   - **@typescript-eslint/eslint-plugin** : `^5.59.5`
-   - **@typescript-eslint/parser** : `^5.59.5`
-   - **eslint** : `^8.40.0`
-   - **eslint-config-prettier** : `^8.8.0`
-   - **husky** : `^8.0.3`
-   - **jest** : `^29.5.0`
-   - **lint-staged** : `^13.2.1`
-   - **prettier** : `2.8.7`
-   - **ts-jest** : `^29.1.0`
-   - **ts-node** : `^10.9.1`
-   - **typescript** : `^5.4.4`
-   - **unbuild** : `^2.0.0`
+   - **@biomejs/biome** : `2.5.5`
+   - **@changesets/cli** : `^2.31.1`
+   - **@rsbuild/plugin-react** : `^2.1.0`
+   - **@rslib/core** : `^0.23.2`
+   - **@rspress/core** : `^2.0.18`
+   - **@rspress/shared** : `^2.0.18`
+   - **@types/node** : `^26.1.1`
+   - **@types/react** : `^19.2.17`
+   - **@types/react-dom** : `^19.2.3`
+   - **babel-plugin-react-compiler** : `0.0.0-experimental-a1856f3-20260507`
+   - **gh-pages** : `^6.3.0`
+   - **react** : `^19.2.8`
+   - **react-dom** : `^19.2.8`
+   - **typescript** : `^7.0.2`
 
-#### Project Version: 3.0.0 
+#### Project Version: 2.1.1 
 
 
 ---
@@ -30,91 +33,74 @@ Dev dependencies used in this project:
 ## Project File Structure & PEG Graph
 
 ```
-📁 third-party-capital
-├── CONTRIBUTING.md
+📁 rspress-plugin-third-parties
+├── CHANGELOG.md
 ├── LICENSE
-├── README.md
-├── composer.json
-├── composer.lock
-├── data/
-│   ├── google-analytics.json
-│   ├── google-maps-embed.json
-│   ├── google-tag-manager.json
-│   └── youtube-embed.json
-├── inc/
-│   ├── Contracts/
-│   │   ├── Arrayable.php
-│   │   └── ThirdParty.php
-│   ├── Data/
-│   │   ├── ThirdPartyData.php
-│   │   ├── ThirdPartyDataFormatter.php
-│   │   ├── ThirdPartyHtmlAttributes.php
-│   │   ├── ThirdPartyHtmlData.php
-│   │   ├── ThirdPartyOutput.php
-│   │   ├── ThirdPartyScriptData.php
-│   │   ├── ThirdPartyScriptOutput.php
-│   │   └── ThirdPartySrcValue.php
-│   ├── Exception/
-│   │   ├── InvalidThirdPartyDataException.php
-│   │   └── NotFoundException.php
-│   ├── ThirdParties/
-│   │   ├── GoogleAnalytics.php
-│   │   ├── GoogleMapsEmbed.php
-│   │   ├── GoogleTagManager.php
-│   │   ├── ThirdPartyBase.php
-│   │   └── YouTubeEmbed.php
-│   └── Util/
-│       ├── HtmlAttributes.php
-│       └── JsonDir.php
-├── jest.config.ts
-├── package-lock.json
+├── Readme.md
+├── biome.json
+├── examples/
+│   └── demo/
+│       ├── doc_build/
+│       │   ├── 404.html
+│       │   ├── demo.html
+│       │   ├── demo.md
+│       │   ├── index.html
+│       │   ├── index.md
+│       │   ├── llms-full.txt
+│       │   ├── llms.txt
+│       │   ├── readme.html
+│       │   ├── readme.md
+│       │   ├── rspress-plugin-third-party-hero.png
+│       │   ├── rspress-plugin-third-party-icon.png
+│       │   └── static/
+│       │       ├── css/
+│       │       │   └── styles.dbac63abca.css
+│       │       ├── js/
+│       │       │   ├── 446.f8fecbd06e.js
+│       │       │   ├── 446.f8fecbd06e.js.LICENSE.txt
+│       │       │   ├── async/
+│       │       │   │   ├── 147.5e325c50c1.js
+│       │       │   │   ├── 147.5e325c50c1.js.LICENSE.txt
+│       │       │   │   ├── 338.b72b9ddc0e.js
+│       │       │   │   ├── 822.94e475284c.js
+│       │       │   │   ├── route-2308615ee227.bddbb04ec6.js
+│       │       │   │   ├── route-803c96454bcf.dda240fa67.js
+│       │       │   │   └── route-f0296560b05f.db882ed34d.js
+│       │       │   ├── index.2d81cf6c70.js
+│       │       │   ├── lib-react.b8456f9435.js
+│       │       │   ├── lib-react.b8456f9435.js.LICENSE.txt
+│       │       │   ├── lib-router.bfd57fec2a.js
+│       │       │   ├── lib-router.bfd57fec2a.js.LICENSE.txt
+│       │       │   └── styles.5a599e8897.js
+│       │       └── search_index.en.56b50b1f.json
+│       ├── docs/
+│       │   ├── demo.mdx
+│       │   ├── index.mdx
+│       │   ├── public/
+│       │   │   ├── rspress-plugin-third-party-hero.png
+│       │   │   └── rspress-plugin-third-party-icon.png
+│       │   └── readme.mdx
+│       ├── package.json
+│       ├── rspress.config.ts
+│       └── tsconfig.json
 ├── package.json
-├── phpcs.xml.dist
-├── phpmd.xml
-├── phpstan.neon.dist
-├── phpunit.xml.dist
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── rslib.config.ts
 ├── src/
+│   ├── components/
+│   │   ├── GoogleAnalytics/
+│   │   │   ├── GlobalGoogleAnalytics.tsx
+│   │   │   └── index.tsx
+│   │   ├── GoogleMapsEmbed.tsx
+│   │   ├── GoogleTagManager.tsx
+│   │   ├── Script.tsx
+│   │   ├── ThirdPartyScripts.tsx
+│   │   ├── TweetEmbed.tsx
+│   │   ├── YouTubeEmbed.tsx
+│   │   └── utils.ts
 │   ├── index.ts
-│   ├── third-parties/
-│   │   ├── google-analytics/
-│   │   │   └── index.ts
-│   │   ├── google-maps-embed/
-│   │   │   └── index.ts
-│   │   ├── google-tag-manager/
-│   │   │   └── index.ts
-│   │   ├── index.ts
-│   │   └── youtube-embed/
-│   │       └── index.ts
-│   ├── types/
-│   │   ├── index.ts
-│   │   ├── type-declarations.ts
-│   │   └── type-guards.ts
-│   └── utils/
-│       ├── index.test.ts
-│       └── index.ts
-├── tests/
-│   └── phpunit/
-│       ├── bootstrap.php
-│       ├── tests/
-│       │   ├── Data/
-│       │   │   ├── ThirdPartyDataFormatterTest.php
-│       │   │   ├── ThirdPartyDataTest.php
-│       │   │   ├── ThirdPartyHtmlAttributesTest.php
-│       │   │   ├── ThirdPartyHtmlDataTest.php
-│       │   │   ├── ThirdPartyOutputTest.php
-│       │   │   ├── ThirdPartyScriptDataTest.php
-│       │   │   ├── ThirdPartyScriptOutputTest.php
-│       │   │   └── ThirdPartySrcValueTest.php
-│       │   ├── ThirdParties/
-│       │   │   ├── GoogleAnalyticsTest.php
-│       │   │   ├── GoogleMapsEmbedTest.php
-│       │   │   ├── GoogleTagManagerTest.php
-│       │   │   └── YouTubeEmbedTest.php
-│       │   └── Util/
-│       │       ├── HtmlAttributesTest.php
-│       │       └── JsonDirTest.php
-│       └── utils/
-│           └── TestCase.php
+│   └── plugin.ts
 └── tsconfig.json
 ```
 
@@ -122,756 +108,804 @@ Dev dependencies used in this project:
 
 ```mermaid
 graph LR;
-    src/index.ts --> ./third-parties/google-analytics;
-    src/index.ts --> ./third-parties/google-tag-manager;
-    src/index.ts --> ./third-parties/google-maps-embed;
-    src/index.ts --> ./third-parties/youtube-embed;
-    src/index.ts --> ./utils;
-    src/index.ts --> ./types;
-    src/index.ts --> ./third-parties;
-    src/third-parties/google-analytics/index.ts --> ../../../data/google-analytics.json;
-    src/third-parties/google-analytics/index.ts --> ../../utils;
-    src/third-parties/google-analytics/index.ts --> ../../types;
-    src/third-parties/google-maps-embed/index.ts --> ../../../data/google-maps-embed.json;
-    src/third-parties/google-maps-embed/index.ts --> ../../utils;
-    src/third-parties/google-maps-embed/index.ts --> ../../types;
-    src/third-parties/google-tag-manager/index.ts --> ../../../data/google-tag-manager.json;
-    src/third-parties/google-tag-manager/index.ts --> ../../utils;
-    src/third-parties/google-tag-manager/index.ts --> ../../types;
-    src/third-parties/index.ts --> ../../data/google-analytics.json;
-    src/third-parties/index.ts --> ../../data/google-tag-manager.json;
-    src/third-parties/index.ts --> ../../data/google-maps-embed.json;
-    src/third-parties/index.ts --> ../../data/youtube-embed.json;
-    src/third-parties/youtube-embed/index.ts --> ../../../data/youtube-embed.json;
-    src/third-parties/youtube-embed/index.ts --> ../../utils;
-    src/third-parties/youtube-embed/index.ts --> ../../types;
-    src/types/index.ts --> ./type-declarations;
-    src/types/index.ts --> ./type-guards;
-    src/types/type-guards.ts --> .;
-    src/utils/index.test.ts --> .;
-    src/utils/index.test.ts --> ../types;
-    src/utils/index.ts --> ../types;
+    src/index.ts --> ./components/GoogleAnalytics/index;
+    src/index.ts --> ./components/GoogleMapsEmbed;
+    src/index.ts --> ./components/GoogleTagManager;
+    src/index.ts --> ./components/Script;
+    src/index.ts --> ./components/TweetEmbed;
+    src/index.ts --> ./components/YouTubeEmbed;
+    src/components/YouTubeEmbed.tsx --> ./Script;
+    src/components/YouTubeEmbed.tsx --> ./Script;
+    src/components/YouTubeEmbed.tsx --> ./ThirdPartyScripts;
+    src/components/GoogleAnalytics/index.tsx --> ../Script;
+    src/components/GoogleAnalytics/GlobalGoogleAnalytics.tsx --> ./index;
+    src/components/Script.tsx --> ./utils;
+    src/components/GoogleMapsEmbed.tsx --> ./ThirdPartyScripts;
+    src/components/GoogleTagManager.tsx --> ./Script;
 ```
 
 ---
 
 ## React Component Architecture & Explanations
 
-### React Component Breakdown: `<GoogleAnalytics>` 
-
-- **Props**: Receives no explicit props (or uses `children` only).
-- **State**: Stateless component.
-### React Component Breakdown: `<GoogleMapsEmbed>` 
-
-- **Props**: Receives no explicit props (or uses `children` only).
-- **State**: Stateless component.
-### React Component Breakdown: `<GoogleTagManager>` 
-
-- **Props**: Receives no explicit props (or uses `children` only).
-- **State**: Stateless component.
 ### React Component Breakdown: `<YouTubeEmbed>` 
 
-- **Props**: Receives no explicit props (or uses `children` only).
+- **Props**:
+  - `props` (type: `YouTubeEmbedTypes`)
 - **State**: Stateless component.
+- **Rendered JSX Tree**: `<ThirdPartyScriptEmbed>, <Script>` 
+
+### React Component Breakdown: `<GoogleAnalytics>` 
+
+- **Props**:
+  - `props` (type: `GAParams`)
+- **State**: Stateless component.
+- **Rendered JSX Tree**: `<Script>` 
+
+### React Component Breakdown: `<Script>` 
+
+- **Props**:
+  - `props` (type: `ScriptProps`)
+- **State**: Stateless component.
+- **Hooks**: Uses `useRef, useEffect` (Total Side-Effects: 2).
+- **Rendered JSX Tree**: `<script>` 
+
+### React Component Breakdown: `<GoogleMapsEmbed>` 
+
+- **Props**:
+  - `props` (type: `GoogleMapsEmbedTypes`)
+- **State**: Stateless component.
+- **Rendered JSX Tree**: `<ThirdPartyScriptEmbed>` 
+
+### React Component Breakdown: `<GoogleTagManager>` 
+
+- **Props**:
+  - `props` (type: `GTMParams`)
+- **State**: Stateless component.
+- **Rendered JSX Tree**: `<Script>` 
+
+### React Component Breakdown: `<TweetEmbed>` 
+
+- **Props**:
+  - `props` (type: `TweetEmbedTypes`)
+- **State**: Stateless component.
+- **Hooks**: Uses `useDark` (Total Side-Effects: 0).
+- **Rendered JSX Tree**: `<figure>, <Tweet>, <figcaption>` 
+
 ---
 
 ## AST-Pruned Source Code Repository
 
 > Note: Tailwind classNames and static styles have been pruned according to mode to maximize token efficiency.
 
-### File: `jest.config.ts`
+### File: `rslib.config.ts`
 
 ```typescript
-module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node'
-};
+import { pluginReact } from "@rsbuild/plugin-react";
+import { defineConfig } from "@rslib/core";
+export default defineConfig({
+    source: {
+        entry: {
+            index: "./src/index.ts",
+            plugin: "./src/plugin.ts",
+            GlobalGoogleAnalytics: "./src/components/GoogleAnalytics/GlobalGoogleAnalytics.tsx"
+        }
+    },
+    lib: [
+        {
+            format: "esm",
+            syntax: "es2022",
+            dts: true
+        },
+        {
+            format: "cjs",
+            syntax: "es2022",
+            dts: true
+        }
+    ],
+    plugins: [
+        pluginReact({
+            reactCompiler: {
+                target: "18"
+            }
+        })
+    ]
+});
 
 ```
 
 ### File: `src/index.ts`
 
 ```typescript
-export { GoogleAnalytics } from './third-parties/google-analytics';
-export { GoogleTagManager } from './third-parties/google-tag-manager';
-export { GoogleMapsEmbed } from './third-parties/google-maps-embed';
-export { YouTubeEmbed } from './third-parties/youtube-embed';
-export * from './utils';
-export * from './types';
-export * from './third-parties';
+export * from "./components/GoogleAnalytics/index";
+export * from "./components/GoogleMapsEmbed";
+export * from "./components/GoogleTagManager";
+export * from "./components/Script";
+export * from "./components/TweetEmbed";
+export * from "./components/YouTubeEmbed";
 
 ```
 
-### File: `src/third-parties/google-analytics/index.ts`
+### File: `src/components/YouTubeEmbed.tsx`
+
+**Function Summaries**:
+- Line 40: `YouTubeEmbed` -> *Fallback to 'lazyOnload' since Rspress/custom loader does not support web workers*
 
 ```typescript
-import data from '../../../data/google-analytics.json';
-import { formatData } from '../../utils';
-import type { Data, Inputs } from '../../types';
-export const GoogleAnalytics = ({ ...args }: Inputs)=>{
-    return formatData(data as Data, args);
-};
-
-```
-
-### File: `src/third-parties/google-maps-embed/index.ts`
-
-```typescript
-import data from '../../../data/google-maps-embed.json';
-import { formatData } from '../../utils';
-import type { Data, Inputs } from '../../types';
-export const GoogleMapsEmbed = ({ ...args }: Inputs)=>{
-    return formatData(data as Data, args);
-};
-
-```
-
-### File: `src/third-parties/google-tag-manager/index.ts`
-
-```typescript
-import data from '../../../data/google-tag-manager.json';
-import { formatData } from '../../utils';
-import type { Data, Inputs } from '../../types';
-export const GoogleTagManager = ({ ...args }: Inputs)=>{
-    return formatData(data as Data, args);
-};
-
-```
-
-### File: `src/third-parties/index.ts`
-
-```typescript
-import GooglaAnalyticsData from '../../data/google-analytics.json';
-import GoogleTagManagerData from '../../data/google-tag-manager.json';
-import GoogleMapsEmbedData from '../../data/google-maps-embed.json';
-import GoogleYoutubeEmbedData from '../../data/youtube-embed.json';
-export { GooglaAnalyticsData, GoogleTagManagerData, GoogleMapsEmbedData, GoogleYoutubeEmbedData };
-
-```
-
-### File: `src/third-parties/youtube-embed/index.ts`
-
-```typescript
-import data from '../../../data/youtube-embed.json';
-import { formatData } from '../../utils';
-import type { Data, Inputs } from '../../types';
-export const YouTubeEmbed = ({ ...args }: Inputs)=>{
-    return formatData(data as Data, args);
-};
-
-```
-
-### File: `src/types/index.ts`
-
-```typescript
-export * from './type-declarations';
-export * from './type-guards';
-
-```
-
-### File: `src/types/type-declarations.ts`
-
-```typescript
-type ScriptStrategy = 'server' | 'client' | 'idle' | 'worker';
-type ScriptLocation = 'head' | 'body';
-type ScriptAction = 'append' | 'prepend';
-export type SrcVal = {
-    url: string;
-    slugParam?: string;
-    params?: Array<string>;
-};
-export type AttributeVal = string | null | SrcVal | boolean | undefined;
-export type HtmlAttributes = {
-    src?: SrcVal;
-    [key: string]: AttributeVal;
-};
-type ScriptBase = {
-    params?: Array<string>;
-    optionalParams?: Record<string, string | number | undefined | null>;
-    strategy: ScriptStrategy;
-    location: ScriptLocation;
-    action: ScriptAction;
-    key?: string;
-};
-export type ExternalScript = ScriptBase & {
-    url: string;
-};
-export type CodeBlock = ScriptBase & {
-    code: string;
-};
-export type Script = ExternalScript | CodeBlock;
-export type Scripts = Script[];
-export interface Data {
-    id: string;
-    description: string;
-    website?: string;
-    html?: {
-        element: string;
-        attributes: HtmlAttributes;
-    };
-    stylesheets?: Array<string>;
-    scripts?: Scripts;
-}
-export interface Inputs {
-    [key: string]: any;
-}
-export interface Output {
-    id: string;
-    description: string;
-    website?: string;
-    html?: string;
-    stylesheets?: Array<string>;
-    scripts?: Scripts;
-}
-export type ConsentValues = {
-    ad_user_data?: 'granted' | 'denied';
-    ad_personalization?: 'granted' | 'denied';
-    ad_storage?: 'granted' | 'denied';
-    analytics_storage?: 'granted' | 'denied';
-    wait_for_update?: number;
-};
-export type ConsentType = 'default' | 'update';
-export interface GoogleAnalyticsParams {
-    id: string;
-    l?: string;
-    consentType?: ConsentType;
-    consentValues?: ConsentValues;
-}
-export interface GTag {
-    (fn: 'js', opt: Date) : void;
-    (fn: 'config', opt: string) : void;
-    (fn: 'event', opt: string, opt2?: {
-        [key: string]: any;
-    }) : void;
-    (fn: 'set', opt: {
-        [key: string]: string;
-    }) : void;
-    (fn: 'get', opt: string) : void;
-    (fn: 'consent', opt: 'default', opt2: {
-        [key: string]: string;
-    }) : void;
-    (fn: 'consent', opt: 'update', opt2: {
-        [key: string]: string;
-    }) : void;
-    (fn: 'config', opt: 'reset') : void;
-}
-export type DataLayer = Array<Parameters<GTag> | Record<string, unknown>>;
-export interface GoogleTagManagerParams {
-    id: string;
-    l?: string;
-    consentType?: ConsentType;
-    consentValues?: ConsentValues;
-}
-interface GoogleTagManagerDataLayerApi {
-    name: 'dataLayer';
-    set: (opt: {
-        [key: string]: string;
-    }) => void;
-    get: (key: string) => void;
-    reset: () => void;
-}
-type GoogleTagManagerDataLayerStatus = {
-    dataLayer: {
-        gtmDom: boolean;
-        gtmLoad: boolean;
-        subscribers: number;
-    };
-};
-export type GoogleTagManagerInstance = GoogleTagManagerDataLayerStatus & {
-    [key: string]: {
-        callback: () => void;
-        dataLayer: GoogleTagManagerDataLayerApi;
-    };
-};
-export interface GoogleTagManagerApi {
-    google_tag_manager: GoogleTagManagerInstance;
-}
-export interface GoogleMapsEmbedParams {
-    key: string;
-    mode: 'place' | 'view' | 'directions' | 'streetview' | 'search';
-    q?: string;
-    center?: string;
-    zoom?: string;
-    maptype?: 'roadmap' | 'satellite';
-    language?: string;
-    region?: string;
-}
-export interface YoutubeEmbedAttributes {
+import ReactDOM from "react-dom";
+import { YouTubeEmbed as TPCYouTubeEmbed } from "third-party-capital";
+import type { ScriptProps } from "./Script";
+import { Script } from "./Script";
+import ThirdPartyScriptEmbed from "./ThirdPartyScripts";
+export type YouTubeEmbedTypes = {
+    height?: number;
+    width?: number;
     videoid: string;
     playlabel?: string;
+    params?: string;
+    style?: string;
+};
+interface PreconnectOptions {
+    crossOrigin?: "anonymous" | "use-credentials" | "";
 }
-
-```
-
-### File: `src/types/type-guards.ts`
-
-**Function Summaries**:
-- Line 3: `isExternalScript` -> *Executes logic for function isExternalScript*
-
-```typescript
-import { Script, ExternalScript } from '.';
-export function isExternalScript(script: Script): script is ExternalScript {
-    return (script as ExternalScript).url !== undefined;
-}
-
-```
-
-### File: `src/utils/index.test.ts`
-
-```typescript
-import { formatUrl, createHtml, formatData, formatCode } from '.';
-import type { CodeBlock, Data, ExternalScript } from '../types';
-describe('Utils', ()=>{
-    describe('formatUrl', ()=>{
-        it('should pass user inputs as values for required params', ()=>{
-            const oldUrl = 'https://example.com';
-            const requiredParams = [
-                'unit',
-                'type'
-            ];
-            const args = {
-                unit: 'imperial',
-                type: 'main'
-            };
-            const newUrl = formatUrl(oldUrl, requiredParams, args);
-            expect(newUrl).toEqual('https://example.com/?unit=imperial&type=main');
-        });
-        it('should add default value', ()=>{
-            const oldUrl = 'https://example.com';
-            const requiredParams = [
-                'unit',
-                'type'
-            ];
-            const args = {
-                unit: 'imperial'
-            };
-            const optionalParams = {
-                type: 'main'
-            };
-            const newUrl = formatUrl(oldUrl, requiredParams, args, undefined, optionalParams);
-            expect(newUrl).toEqual('https://example.com/?unit=imperial&type=main');
-        });
-    });
-    describe('createHtml', ()=>{
-        it('should construct a HTML element with no attributes or arguments', ()=>{
-            const element = 'lite-element';
-            const htmlElement = createHtml(element);
-            expect(htmlElement).toEqual('<lite-element></lite-element>');
-        });
-        it('should construct a HTML element with default attributes and values', ()=>{
-            const element = 'lite-element';
-            const defaultAttrs = {
-                id: '123',
-                loading: 'lazy'
-            };
-            const htmlElement = createHtml(element, defaultAttrs);
-            expect(htmlElement).toEqual('<lite-element id="123" loading="lazy"></lite-element>');
-        });
-        it('should construct a HTML element passing parameters to any required src URLs', ()=>{
-            const element = 'lite-element';
-            const defaultAttrs = {
-                id: '123',
-                src: {
-                    url: 'https://example.com/',
-                    params: [
-                        'unit',
-                        'type'
-                    ]
-                }
-            };
-            const urlQueryParamInputs = {
-                unit: 'imperial',
-                type: 'main'
-            };
-            const htmlElement = createHtml(element, defaultAttrs, {}, urlQueryParamInputs);
-            expect(htmlElement).toEqual('<lite-element id="123" src="https://example.com/?unit=imperial&type=main"></lite-element>');
-        });
-        it('should construct a HTML element overwriting default attribute values with user-defined inputs', ()=>{
-            const element = 'lite-element';
-            const defaultAttrs = {
-                id: '123',
-                src: {
-                    url: 'https://example.com/',
-                    params: [
-                        'unit',
-                        'type'
-                    ]
-                }
-            };
-            const htmlAttrInputs = {
-                src: 'https://example.com/overwrite'
-            };
-            const htmlElement = createHtml(element, defaultAttrs, htmlAttrInputs);
-            expect(htmlElement).toEqual('<lite-element id="123" src="https://example.com/overwrite"></lite-element>');
-        });
-    });
-    describe('formatData', ()=>{
-        it('should correctly format and overwrite data and inputs', ()=>{
-            const data = {
-                id: 'third-party',
-                description: 'Description',
-                html: {
-                    element: 'iframe',
-                    attributes: {
-                        loading: 'lazy',
-                        src: {
-                            url: 'https://www.example.com/',
-                            params: [
-                                'id'
-                            ]
-                        },
-                        width: '100',
-                        height: '100'
-                    }
-                }
-            };
-            const inputs = {
-                id: 'props.id',
-                loading: 'auto',
-                width: '150'
-            };
-            const result = formatData(data, inputs);
-            expect(result.html).toEqual('<iframe loading="auto" src="https://www.example.com/?id=props.id" width="150" height="100"></iframe>');
-            expect(result.scripts).toEqual(undefined);
-        });
-        it('should pass scripts and correctly assign params if available', ()=>{
-            const data = {
-                id: 'third-party',
-                description: 'Description',
-                html: {
-                    element: 'iframe',
-                    attributes: {
-                        loading: 'lazy'
-                    }
-                },
-                scripts: [
-                    {
-                        url: 'https://www.example.com',
-                        params: [
-                            'id'
-                        ],
-                        strategy: 'worker',
-                        location: 'head',
-                        action: 'append'
-                    }
-                ]
-            };
-            const inputs = {
-                id: 'userDefinedId'
-            };
-            const result = formatData(data as Data, inputs);
-            expect(result.html).toEqual('<iframe loading="lazy"></iframe>');
-            expect(result.scripts).not.toEqual(undefined);
-            expect(result.scripts!.length).toEqual(1);
-            expect((result.scripts![0] as ExternalScript).url).toEqual('https://www.example.com/?id=userDefinedId');
-        });
-        it('should forward all additional inputs as html attributes if not used elsewhere', ()=>{
-            const data = {
-                id: 'third-party',
-                description: 'Description',
-                html: {
-                    element: 'iframe',
-                    attributes: {
-                        loading: 'lazy',
-                        width: '100',
-                        height: '100'
-                    }
-                }
-            };
-            const inputs = {
-                id: 'props.id',
-                loading: 'auto',
-                width: '150'
-            };
-            const result = formatData(data, inputs);
-            expect(result.html).toEqual('<iframe loading="auto" width="150" height="100" id="props.id"></iframe>');
-            expect(result.scripts).toEqual(undefined);
-        });
-        it('should include the user inputted slug to the src URL if provided as a parameter', ()=>{
-            const data = {
-                id: 'third-party',
-                description: 'Description',
-                html: {
-                    element: 'iframe',
-                    attributes: {
-                        loading: 'lazy',
-                        src: {
-                            url: 'https://www.example.com/',
-                            slugParam: 'inputSlug'
-                        }
-                    }
-                }
-            };
-            const inputs = {
-                inputSlug: 'cool-slug'
-            };
-            const result = formatData(data, inputs);
-            expect(result.html).toEqual('<iframe loading="lazy" src="https://www.example.com/cool-slug"></iframe>');
-            expect(result.scripts).toEqual(undefined);
-        });
-        it('should replace the already existing slug if the user includes a slug parameter slug', ()=>{
-            const data = {
-                id: 'third-party',
-                description: 'Description',
-                html: {
-                    element: 'iframe',
-                    attributes: {
-                        loading: 'lazy',
-                        src: {
-                            url: 'https://www.google.com/maps/embed/v1/place',
-                            slugParam: 'mode',
-                            params: [
-                                'key'
-                            ]
-                        }
-                    }
-                }
-            };
-            const inputs = {
-                mode: 'view',
-                key: '123'
-            };
-            const result = formatData(data, inputs);
-            expect(result.html).toEqual('<iframe loading="lazy" src="https://www.google.com/maps/embed/v1/view?key=123"></iframe>');
-            expect(result.scripts).toEqual(undefined);
-        });
-        it('should replace with default values when needed', ()=>{
-            const data = {
-                id: 'third-party',
-                description: 'Description',
-                html: {
-                    element: 'iframe',
-                    attributes: {
-                        loading: 'lazy',
-                        src: {
-                            url: 'https://www.google.com/maps/embed/v1/place',
-                            slugParam: 'mode',
-                            params: [
-                                'key'
-                            ]
-                        }
-                    }
-                },
-                scripts: [
-                    {
-                        code: 'window[{{hello}}]=window[{{hello}}]||[];console.log({{world}})',
-                        optionalParams: {
-                            hello: 'hoho'
-                        },
-                        params: [
-                            'world'
-                        ],
-                        strategy: 'worker',
-                        location: 'head',
-                        action: 'append',
-                        key: 'setup'
-                    } as CodeBlock
-                ]
-            };
-            const result = formatData(data, {
-                test: 'hello',
-                world: 'earth',
-                key: 404
-            });
-            const script = result.scripts![0] as CodeBlock;
-            expect(script.code).toEqual('window["hoho"]=window["hoho"]||[];console.log("earth")');
-            expect(result.html).toEqual('<iframe loading="lazy" src="https://www.google.com/maps/embed/v1/place?key=404" test="hello"></iframe>');
-        });
-    });
-    describe('formatCode', ()=>{
-        const inputs = [
-            {
-                input: 'window[{{l}}]=window[{{l}}]||[];',
-                params: {
-                    l: 'some-datalayer'
-                },
-                output: `window["some-datalayer"]=window["some-datalayer"]||[];`
-            },
-            {
-                input: '{{number}}+1',
-                params: {
-                    number: 4
-                },
-                output: `4+1`
-            },
-            {
-                input: '{{bool}}',
-                params: {
-                    bool: false
-                },
-                output: `false`
-            },
-            {
-                input: '{{val}}',
-                params: {
-                    val: null
-                },
-                output: `undefined`
-            },
-            {
-                input: 'window[{{l}}]=window[{{l}}]||[];',
-                output: `window[undefined]=window[undefined]||[];`
-            },
-            {
-                input: '{{obj}}',
-                params: {
-                    obj: {
-                        key: 'value'
-                    }
-                },
-                output: `{"key":"value"}`
-            },
-            {
-                input: '{{#enabled}}window.func("enable", true);{{/enabled}}',
-                params: {
-                    enabled: true
-                },
-                output: `window.func("enable", true);`
-            },
-            {
-                input: '{{#enabled}}window.func("enable", true);{{/enabled}}',
-                params: {
-                    enabled: false
-                },
-                output: ``
-            },
-            {
-                input: '{{#name}}window.func("setName", {{name}});{{/name}}',
-                params: {
-                    name: 'James'
-                },
-                output: `window.func("setName", "James");`
-            },
-            {
-                input: '{{#name}}window.func("setName", {{name}});{{/name}}',
-                params: {
-                    name: null
-                },
-                output: ``
-            },
-            {
-                input: '{{{#name}}}window.func("setName", {{name}});{{{/name}}}',
-                params: {
-                    name: 'James'
-                },
-                output: `{}window.func("setName", "James");{}`
-            }
-        ];
-        it.each(inputs)('should replace the input and stringify it', ({ input, output, params })=>{
-            expect(formatCode(input, params)).toEqual(output);
-        });
-        it.each(inputs)('should replace the input and stringify it with the default value', ({ input, output, params })=>{
-            expect(formatCode(input, undefined, params)).toEqual(output);
-        });
-        it('should replace the input and stringify it with the default value', ()=>{
-            const input = 'window[{{l}}]=window[{{l}}]||[];';
-            expect(formatCode(input, {
-                l: 'test'
-            }, {
-                l: 'dataLayer'
-            })).toMatchInlineSnapshot(`"window["test"]=window["test"]||[];"`);
-        });
-    });
-});
-
-```
-
-### File: `src/utils/index.ts`
-
-**Function Summaries**:
-- Line 10: `filterArgs` -> *Filters an input object to return a new object containing only properties whose keys are either specified in the `selectedArgs` list or, if inverse is true, all properties not listed in that array.*
-- Line 28: `formatUrl` -> *Constructs a complete and parameterized URL string by optionally setting a slug path, then appending required and optional query parameters using values derived from multiple source maps.*
-- Line 58: `formatCode` -> *Processes a template string by resolving variable-based conditional blocks using provided arguments and then replacing all remaining simple placeholders with their JSON-stringified values.*
-- Line 83: `createHtml` -> *Builds a complete HTML tag string using a specified element name, accepting initial attributes (which includes specialized URL handling for `src`), and allowing subsequent arguments to overwrite or append additional attributes.*
-- Line 122: `formatData` -> *Transforms raw data structure by injecting resolved values into scripts and HTML elements using provided arguments.*
-
-```typescript
-import type { Data, Inputs, AttributeVal, HtmlAttributes, Output } from '../types';
-import { isExternalScript } from '../types';
-function filterArgs(args: Inputs, selectedArgs?: string[], inverse: boolean = false) {
-    if (!selectedArgs) return {};
-    return Object.keys(args).filter((key)=>inverse ? !selectedArgs.includes(key) : selectedArgs.includes(key)).reduce((obj, key)=>{
-        obj[key] = args[key];
-        return obj;
-    }, {} as Record<string, any>);
-}
-export function formatUrl(url: string, params?: string[], args?: Inputs, slug?: Inputs, optionalParams?: Inputs) {
-    const newUrl = slug && Object.keys(slug).length > 0 ? new URL(Object.values(slug)[0], url) : new URL(url);
-    if (params && args) {
-        params.forEach((param: string)=>{
-            if (args[param]) newUrl.searchParams.set(param, args[param]);
-        });
+const safePreconnect = (href: string, options?: PreconnectOptions)=>{
+    const preconnectFn = (ReactDOM as any).preconnect || (ReactDOM as any).experimental_preconnect;
+    if (typeof preconnectFn === "function") {
+        preconnectFn(href, options);
     }
-    if (optionalParams) {
-        Object.keys(optionalParams).forEach((key: string)=>{
-            if (args?.[key]) newUrl.searchParams.set(key, args[key]);
-            else if (optionalParams[key]) {
-                newUrl.searchParams.set(key, optionalParams[key]);
-            }
-        });
-    }
-    return newUrl.toString();
-}
-export function formatCode(code: string, args?: Inputs, optionalParams?: Inputs) {
-    code = code.replace(/{{#([^{}]+?)}}(.*){{\/\1}}/g, (match, name, innerCode)=>{
-        if (args?.[name] || optionalParams?.[name]) {
-            return innerCode;
+};
+export const scriptStrategy = {
+    server: "beforeInteractive",
+    client: "afterInteractive",
+    idle: "lazyOnload",
+    worker: "lazyOnload"
+} as const;
+const youtubePreconnectOpts = {
+    crossOrigin: ""
+} as const;
+export function YouTubeEmbed(props: YouTubeEmbedTypes) {
+    const { html, scripts, stylesheets } = TPCYouTubeEmbed(props);
+    safePreconnect("https://cdn.jsdelivr.net", youtubePreconnectOpts);
+    return (<ThirdPartyScriptEmbed height={props.height || null} width={props.width || null} html={html}>
+			{scripts?.flatMap((script)=>{
+        if (script && "url" in script && typeof script.url === "string") {
+            return [
+                <Script key={script.key ?? script.url} src={script.url} strategy={scriptStrategy[script.strategy as keyof typeof scriptStrategy] as ScriptProps["strategy"]} stylesheets={stylesheets}/>
+            ];
         }
-        return '';
+        return [];
+    })}
+		</ThirdPartyScriptEmbed>);
+}
+
+```
+
+### File: `src/components/GoogleAnalytics/index.tsx`
+
+**Function Summaries**:
+- Line 14: `GoogleAnalytics` -> *Initializes Google Analytics tracking by injecting a data layer script and loading the necessary gtag.js library using the provided GA ID.*
+- Line 44: `sendGAEvent` -> *eslint-disable-next-line prefer-rest-params*
+
+```typescript
+"use client";
+import { Script } from "../Script";
+export type GAParams = {
+    gaId: string;
+    dataLayerName?: string;
+    debugMode?: boolean;
+    nonce?: string;
+};
+let currDataLayerName: string | undefined;
+export function GoogleAnalytics(props: GAParams) {
+    const { gaId, debugMode, dataLayerName = "dataLayer", nonce } = props;
+    if (currDataLayerName === undefined) {
+        currDataLayerName = dataLayerName;
+    }
+    return (<>
+			<Script id="_rspress-ga-init" dangerouslySetInnerHTML={{
+        __html: `
+            window['${dataLayerName}'] = window['${dataLayerName}'] || [];
+            function gtag(){window['${dataLayerName}'].push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}' ${debugMode ? ",{ 'debug_mode': true }" : ""});
+          `
+    }} nonce={nonce}/>
+			<Script id="_rspress-ga" src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} nonce={nonce}/>
+		</>);
+}
+export function sendGAEvent(..._args: any[]) {
+    if (currDataLayerName === undefined) {
+        console.warn(`Rspress Third Parties: GA has not been initialized`);
+        return;
+    }
+    const win = window as any;
+    if (win[currDataLayerName]) {
+        win[currDataLayerName].push(arguments);
+    } else {
+        console.warn(`Rspress Third Parties: GA dataLayer "${currDataLayerName}" does not exist`);
+    }
+}
+
+```
+
+### File: `src/components/GoogleAnalytics/GlobalGoogleAnalytics.tsx`
+
+```typescript
+import { GoogleAnalytics } from "./index";
+export default function GlobalGoogleAnalytics() {
+    const configString = process.env.RSPRESS_GA_CONFIG;
+    if (!configString || configString === "null") {
+        return null;
+    }
+    try {
+        const config = typeof configString === "string" ? JSON.parse(configString) : configString;
+        if (!config || !config.gaId) {
+            return null;
+        }
+        return <GoogleAnalytics {...config}/>;
+    } catch (err) {
+        console.error("[rspress-plugin-third-parties] Failed to parse GA config:", err);
+        return null;
+    }
+}
+
+```
+
+### File: `src/components/Script.tsx`
+
+**Function Summaries**:
+- Line 182: `handleClientScriptLoad` -> *Prevent invalid HTML attribute pollution by only passing standard props*
+- Line 193: `loadLazyScript` -> *Ensures a script is loaded asynchronously using `requestIdleCallback` either immediately if the document is ready or upon the window's load event.*
+- Line 203: `addBeforeInteractiveToCache` -> *Identifies all DOM elements marked with the 'beforeInteractive' attribute and registers their source URLs into a global application cache for tracking or loading management.*
+- Line 216: `initScriptLoader` -> *Load third-party scripts in an optimized way inside Rspress (SSG/React).*
+- Line 224: `Script` -> *Load third-party scripts in an optimized way inside Rspress (SSG/React).*
+
+```typescript
+"use client";
+import type React from "react";
+import type { ScriptHTMLAttributes } from "react";
+import { useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
+import { requestIdleCallback, setAttributesFromProps } from "./utils";
+const ScriptCache = new Map<string, Promise<Event>>();
+const LoadCache = new Set<string>();
+const insertedStylesheets = new Set<string>();
+export interface ScriptProps extends ScriptHTMLAttributes<HTMLScriptElement> {
+    strategy?: "afterInteractive" | "lazyOnload" | "beforeInteractive";
+    id?: string;
+    onLoad?: (e: any) => void;
+    onReady?: () => void | null;
+    onError?: (e: any) => void;
+    children?: React.ReactNode;
+    stylesheets?: string[];
+}
+const safePreinit = (href: string, options: {
+    as: "style" | "script";
+    [key: string]: any;
+}, precedence: "reset" | "low" | "medium" | "high" = "medium")=>{
+    const preinitFn = (ReactDOM as any).preinit || (ReactDOM as any).experimental_preinit;
+    if (typeof preinitFn === "function") {
+        preinitFn(href, {
+            precedence: precedence,
+            ...options
+        });
+    }
+};
+const safePreload = (href: string, options: {
+    as: "style" | "script";
+    [key: string]: any;
+})=>{
+    const preloadFn = (ReactDOM as any).preload || (ReactDOM as any).experimental_preload;
+    if (typeof preloadFn === "function") {
+        preloadFn(href, options);
+    }
+};
+const insertStylesheets = (stylesheets: string[])=>{
+    const preinitFn = (ReactDOM as any).preinit || (ReactDOM as any).experimental_preinit;
+    if (typeof preinitFn === "function") {
+        stylesheets.forEach((stylesheet: string)=>{
+            safePreinit(stylesheet, {
+                as: "style"
+            });
+        });
+        return;
+    }
+    if (typeof window !== "undefined") {
+        const head = document.head;
+        stylesheets.forEach((stylesheet: string)=>{
+            if (insertedStylesheets.has(stylesheet)) return;
+            if (head.querySelector(`link[href="${stylesheet}"]`)) {
+                insertedStylesheets.add(stylesheet);
+                return;
+            }
+            const link = document.createElement("link");
+            link.type = "text/css";
+            link.rel = "stylesheet";
+            link.href = stylesheet;
+            head.appendChild(link);
+            insertedStylesheets.add(stylesheet);
+        });
+    }
+};
+const loadScript = (props: ScriptProps): void =>{
+    const { src, id, onLoad, onReady = null, dangerouslySetInnerHTML, children = "", strategy = "afterInteractive", onError, stylesheets, ...restProps } = props;
+    const cacheKey = id || src;
+    if (cacheKey && LoadCache.has(cacheKey)) {
+        return;
+    }
+    const afterLoad = ()=>{
+        if (onReady) {
+            onReady();
+        }
+        if (cacheKey) {
+            LoadCache.add(cacheKey);
+        }
+    };
+    if (src && ScriptCache.has(src)) {
+        if (cacheKey) {
+            LoadCache.add(cacheKey);
+        }
+        const cachedPromise = ScriptCache.get(src);
+        if (cachedPromise) {
+            cachedPromise.then((e)=>{
+                if (onLoad) {
+                    onLoad(e);
+                }
+                afterLoad();
+            }, onError);
+        }
+        return;
+    }
+    const el = document.createElement("script");
+    const loadPromise = new Promise<Event>((resolve, reject)=>{
+        el.addEventListener("load", function(e) {
+            resolve(e);
+            if (onLoad) {
+                onLoad.call(this, e);
+            }
+            afterLoad();
+        });
+        el.addEventListener("error", (e)=>{
+            if (src) {
+                ScriptCache.delete(src);
+            }
+            reject(e);
+        });
     });
-    return code.replace(/{{[^#/](.*?)}}/g, (match)=>{
-        const name = match.split(/{{|}}/).filter(Boolean)[0];
-        return JSON.stringify(args?.[name] ?? optionalParams?.[name] ?? undefined);
+    loadPromise.catch((e)=>{
+        if (onError) {
+            onError(e);
+        }
+    });
+    if (dangerouslySetInnerHTML) {
+        el.innerHTML = (dangerouslySetInnerHTML.__html as string) || "";
+        afterLoad();
+    } else if (children) {
+        el.textContent = typeof children === "string" ? children : Array.isArray(children) ? children.join("") : "";
+        afterLoad();
+    } else if (src) {
+        el.src = src;
+        ScriptCache.set(src, loadPromise);
+    }
+    setAttributesFromProps(el, restProps);
+    el.setAttribute("data-rspress-script", strategy);
+    if (stylesheets) {
+        insertStylesheets(stylesheets);
+    }
+    document.body.appendChild(el);
+};
+export function handleClientScriptLoad(props: ScriptProps) {
+    const { strategy = "afterInteractive" } = props;
+    if (strategy === "lazyOnload") {
+        window.addEventListener("load", ()=>{
+            requestIdleCallback(()=>loadScript(props));
+        });
+    } else {
+        loadScript(props);
+    }
+}
+function loadLazyScript(props: ScriptProps) {
+    if (document.readyState === "complete") {
+        requestIdleCallback(()=>loadScript(props));
+    } else {
+        window.addEventListener("load", ()=>{
+            requestIdleCallback(()=>loadScript(props));
+        });
+    }
+}
+function addBeforeInteractiveToCache() {
+    if (typeof document === "undefined") return;
+    const scripts = document.querySelectorAll('[data-rspress-script="beforeInteractive"]');
+    scripts.forEach((script)=>{
+        const cacheKey = script.id || script.getAttribute("src");
+        if (cacheKey) {
+            LoadCache.add(cacheKey);
+        }
     });
 }
-export function createHtml(element: string, attributes?: HtmlAttributes, htmlAttrArgs?: Inputs, urlQueryParamArgs?: Inputs, slugParamArg?: Inputs) {
-    if (!attributes) return `<${element}></${element}>`;
-    const formattedAttributes: any = attributes.src?.url ? {
-        ...attributes,
-        src: formatUrl(attributes.src.url, attributes.src.params, urlQueryParamArgs, slugParamArg)
-    } : attributes;
-    const htmlAttributes = Object.keys({
-        ...formattedAttributes,
-        ...htmlAttrArgs
-    }).reduce((acc, name)=>{
-        const userVal = htmlAttrArgs?.[name];
-        const defaultVal = formattedAttributes[name];
-        const finalVal = userVal ?? defaultVal;
-        const attrString = (finalVal as AttributeVal) === true ? name : `${name}="${finalVal}"`;
-        return finalVal ? acc + ` ${attrString}` : acc;
-    }, '');
-    return `<${element}${htmlAttributes}></${element}>`;
+export function initScriptLoader(scriptLoaderItems: ScriptProps[]) {
+    addBeforeInteractiveToCache();
+    scriptLoaderItems.forEach(handleClientScriptLoad);
 }
-export function formatData(data: Data, args: Inputs): Output {
-    const allScriptParams = data.scripts?.reduce((acc, script)=>[
-            ...acc,
-            ...(Array.isArray(script.params) ? script.params : []),
-            ...(script.optionalParams ? Object.keys(script.optionalParams) : [])
-        ], [] as string[]);
-    const scriptUrlParamInputs = filterArgs(args, allScriptParams);
-    const htmlUrlParamInputs = filterArgs(args, data.html?.attributes.src?.params);
-    const htmlSlugParamInput = filterArgs(args, [
-        data.html?.attributes.src?.slugParam!
+export function Script(props: ScriptProps): React.JSX.Element | null {
+    const { id, src = "", onLoad, onReady = null, strategy = "afterInteractive", onError, stylesheets, nonce, dangerouslySetInnerHTML, children, ...restProps } = props;
+    const cacheKey = id || src;
+    const lastLoadedSrcOrId = useRef<string | null>(null);
+    useEffect(()=>{
+        if (lastLoadedSrcOrId.current !== cacheKey) {
+            if (onReady && cacheKey && LoadCache.has(cacheKey)) {
+                onReady();
+            }
+            lastLoadedSrcOrId.current = cacheKey;
+        }
+    }, [
+        onReady,
+        cacheKey
     ]);
-    const htmlAttrInputs = filterArgs(args, [
-        ...Object.keys(scriptUrlParamInputs),
-        ...Object.keys(htmlUrlParamInputs),
-        ...Object.keys(htmlSlugParamInput)
-    ], true);
-    return {
-        ...data,
-        html: data.html ? createHtml(data.html.element, data.html.attributes, htmlAttrInputs, htmlUrlParamInputs, htmlSlugParamInput) : undefined,
-        scripts: data.scripts ? data.scripts.map((script)=>{
-            return isExternalScript(script) ? {
-                ...script,
-                url: formatUrl(script.url, script.params, args, undefined, script.optionalParams)
+    const lastInitializedKey = useRef<string | null>(null);
+    const inlineContent = dangerouslySetInnerHTML?.__html || (typeof children === "string" ? children : "");
+    useEffect(()=>{
+        if (lastInitializedKey.current !== cacheKey) {
+            addBeforeInteractiveToCache();
+            if (strategy === "afterInteractive") {
+                loadScript(props);
+            } else if (strategy === "lazyOnload") {
+                loadLazyScript(props);
+            } else if (strategy === "beforeInteractive") {
+                loadScript(props);
+            }
+            lastInitializedKey.current = cacheKey;
+        }
+    }, [
+        cacheKey,
+        strategy,
+        inlineContent
+    ]);
+    if (stylesheets) {
+        stylesheets.forEach((styleSrc)=>{
+            safePreinit(styleSrc, {
+                as: "style",
+                precedence: "medium"
+            });
+        });
+    }
+    if (typeof window === "undefined") {
+        if (src && (strategy === "beforeInteractive" || strategy === "afterInteractive")) {
+            safePreload(src, restProps.integrity ? {
+                as: "script",
+                integrity: restProps.integrity,
+                nonce,
+                crossOrigin: restProps.crossOrigin
             } : {
-                ...script,
-                code: formatCode(script.code, args, script.optionalParams)
-            };
-        }) : undefined
+                as: "script",
+                nonce,
+                crossOrigin: restProps.crossOrigin
+            });
+        }
+        if (strategy === "beforeInteractive") {
+            if (!src) {
+                const innerHTML = dangerouslySetInnerHTML ? (dangerouslySetInnerHTML.__html as string) : typeof children === "string" ? children : Array.isArray(children) ? children.join("") : "";
+                return (<script nonce={nonce} dangerouslySetInnerHTML={{
+                    __html: innerHTML
+                }} data-rspress-script="beforeInteractive" {...restProps}/>);
+            } else {
+                return (<script src={src} nonce={nonce} data-rspress-script="beforeInteractive" {...restProps}/>);
+            }
+        }
+        return null;
+    }
+    return null;
+}
+
+```
+
+### File: `src/components/utils.ts`
+
+**Function Summaries**:
+- Line 39: `isBooleanScriptAttribute` -> *Checks if a given attribute string matches one of the recognized boolean attributes for scripting elements.*
+- Line 45: `setAttributesFromProps` -> *Synchronizes the HTML element's attributes using key-value pairs from a props object, applying type conversion while providing specialized logic to set and subsequently remove attributes for boolean or explicitly false values.*
+
+```typescript
+export const requestIdleCallback = (typeof self !== "undefined" && self.requestIdleCallback && self.requestIdleCallback.bind(window)) || ((cb: IdleRequestCallback): number =>{
+    const start = Date.now();
+    return self.setTimeout(()=>{
+        cb({
+            didTimeout: false,
+            timeRemaining: ()=>Math.max(0, 50 - (Date.now() - start))
+        });
+    }, 1);
+});
+export const cancelIdleCallback = (typeof self !== "undefined" && self.cancelIdleCallback && self.cancelIdleCallback.bind(window)) || ((id: number)=>clearTimeout(id));
+const DOMAttributeNames: Record<string, string> = {
+    acceptCharset: "accept-charset",
+    className: "class",
+    htmlFor: "for",
+    httpEquiv: "http-equiv",
+    noModule: "noModule"
+};
+const ignoreProps = [
+    "onLoad",
+    "onReady",
+    "dangerouslySetInnerHTML",
+    "children",
+    "onError",
+    "strategy",
+    "stylesheets"
+];
+function isBooleanScriptAttribute(attr: string): attr is "async" | "defer" | "noModule" {
+    return [
+        "async",
+        "defer",
+        "noModule"
+    ].includes(attr);
+}
+export function setAttributesFromProps(el: HTMLElement, props: object) {
+    for (const [p, value] of Object.entries(props)){
+        if (!Object.hasOwn(props, p)) continue;
+        if (ignoreProps.includes(p)) continue;
+        if (value === undefined) continue;
+        const attr = DOMAttributeNames[p] || p.toLowerCase();
+        if (el.tagName === "SCRIPT" && isBooleanScriptAttribute(attr)) {
+            (el as HTMLScriptElement)[attr] = !!value;
+        } else {
+            el.setAttribute(attr, String(value));
+        }
+        if (value === false || (el.tagName === "SCRIPT" && isBooleanScriptAttribute(attr) && (!value || value === "false"))) {
+            el.setAttribute(attr, "");
+            el.removeAttribute(attr);
+        }
+    }
+}
+
+```
+
+### File: `src/components/ThirdPartyScripts.tsx`
+
+```typescript
+"use client";
+export type ScriptEmbed = {
+    html?: string | null;
+    height?: string | number | null;
+    width?: string | number | null;
+    children?: React.ReactElement | React.ReactElement[];
+};
+export default function ThirdPartyScriptEmbed({ html, height = null, width = null, children }: ScriptEmbed) {
+    return (<>
+			{}
+			{children}
+			{}
+			{html ? (<div style={{
+        height: height != null ? `${height}px` : "auto",
+        width: width != null ? `${width}px` : "auto"
+    }} dangerouslySetInnerHTML={{
+        __html: html
+    }}/>) : null}
+		</>);
+}
+
+```
+
+### File: `src/components/GoogleMapsEmbed.tsx`
+
+**Function Summaries**:
+- Line 21: `GoogleMapsEmbed` -> *Renders a third-party Google Maps embed component by substituting the API key and passing all other provided configuration props.*
+
+```typescript
+import { GoogleMapsEmbed as TPCGoogleMapEmbed } from "third-party-capital";
+import ThirdPartyScriptEmbed from "./ThirdPartyScripts";
+export type GoogleMapsEmbedTypes = {
+    height?: number | string;
+    width?: number | string;
+    mode: "place" | "view" | "directions" | "streetview" | "search";
+    apiKey: string;
+    style?: string;
+    allowfullscreen?: boolean;
+    loading?: "eager" | "lazy";
+    q?: string;
+    id?: string;
+    center?: string;
+    zoom?: string;
+    maptype?: string;
+    language?: string;
+    region?: string;
+};
+export function GoogleMapsEmbed(props: GoogleMapsEmbedTypes) {
+    const { apiKey, ...restProps } = props;
+    const formattedProps = {
+        ...restProps,
+        key: apiKey
+    };
+    const { html } = TPCGoogleMapEmbed(formattedProps);
+    return (<ThirdPartyScriptEmbed height={formattedProps.height || null} width={formattedProps.width || null} html={html}/>);
+}
+
+```
+
+### File: `src/components/GoogleTagManager.tsx`
+
+**Function Summaries**:
+- Line 32: `GoogleTagManager` -> *Initializes and loads the specified Google Tag Manager script, optionally including custom data layers and preview parameters for tracking.*
+
+```typescript
+"use client";
+import { Script } from "./Script";
+type JSONValue = string | number | boolean | JSONValue[] | {
+    [key: string]: JSONValue;
+};
+type GTMParamsBaseParams = {
+    dataLayer?: {
+        [key: string]: JSONValue;
+    };
+    dataLayerName?: string;
+    auth?: string;
+    preview?: string;
+    nonce?: string;
+};
+type GTMParamsWithId = GTMParamsBaseParams & {
+    gtmId: string;
+    gtmScriptUrl?: string;
+};
+type GTMParamsWithScriptUrl = GTMParamsBaseParams & {
+    gtmId?: string;
+    gtmScriptUrl: string;
+};
+export type GTMParams = GTMParamsWithId | GTMParamsWithScriptUrl;
+export function GoogleTagManager(props: GTMParams) {
+    const { gtmId, gtmScriptUrl, dataLayerName = "dataLayer", auth, preview, dataLayer, nonce } = props;
+    const scriptUrl = new URL(gtmScriptUrl || "https://www.googletagmanager.com/gtm.js");
+    if (gtmId) {
+        scriptUrl.searchParams.set("id", gtmId);
+    }
+    if (dataLayerName !== "dataLayer") {
+        scriptUrl.searchParams.set("l", dataLayerName);
+    }
+    if (auth) {
+        scriptUrl.searchParams.set("gtm_auth", auth);
+    }
+    if (preview) {
+        scriptUrl.searchParams.set("gtm_preview", preview);
+        scriptUrl.searchParams.set("gtm_cookies_win", "x");
+    }
+    return (<>
+			<Script id="_rspress-gtm-init" dangerouslySetInnerHTML={{
+        __html: `
+      (function(w,l){
+        w[l]=w[l]||[];
+        w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        ${dataLayer ? `w[l].push(${JSON.stringify(dataLayer)})` : ""}
+      })(window,'${dataLayerName}');`
+    }} nonce={nonce}/>
+			<Script id="_rspress-gtm" src={scriptUrl.href} nonce={nonce}/>
+		</>);
+}
+
+```
+
+### File: `src/components/TweetEmbed.tsx`
+
+```typescript
+import { useDark } from "@rspress/core/runtime";
+import type { ReactNode } from "react";
+import { Tweet, type TweetProps } from "react-tweet";
+export type TweetEmbedTypes = TweetProps & {
+    theme?: "light" | "dark";
+    caption?: ReactNode;
+};
+export const TweetEmbed = (props: TweetEmbedTypes)=>{
+    const isDark = useDark();
+    const defaultTheme = isDark ? "dark" : "light";
+    const { theme = defaultTheme, caption, ...restProps } = props;
+    return (<figure data-theme={theme}>
+			<Tweet {...restProps}/>
+			{caption && <figcaption>{caption}</figcaption>}
+		</figure>);
+};
+
+```
+
+### File: `src/plugin.ts`
+
+**Function Summaries**:
+- Line 21: `pluginThirdParties` -> *Initializes and returns the plugin configuration object, conditionally including Google Analytics components and defining its global configuration variables based on provided options.*
+
+```typescript
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import type { RspressPlugin } from "@rspress/core";
+export interface ThirdPartiesPluginOptions {
+    googleAnalytics?: {
+        gaId: string;
+        dataLayerName?: string;
+        debugMode?: boolean;
+        nonce?: string;
     };
 }
+const getDirname = ()=>{
+    if (typeof __dirname !== "undefined") {
+        return __dirname;
+    }
+    return path.dirname(fileURLToPath(import.meta.url));
+};
+export function pluginThirdParties(options: ThirdPartiesPluginOptions = {}): RspressPlugin {
+    const globalUIComponents = [];
+    if (options.googleAnalytics) {
+        globalUIComponents.push(path.join(getDirname(), "GlobalGoogleAnalytics.js"));
+    }
+    const gaConfigDefine = options.googleAnalytics ? JSON.stringify(JSON.stringify(options.googleAnalytics)) : "null";
+    return {
+        name: "rspress-plugin-third-parties",
+        globalUIComponents,
+        builderConfig: {
+            source: {
+                define: {
+                    "process.env.RSPRESS_GA_CONFIG": gaConfigDefine
+                }
+            }
+        }
+    };
+}
+
+```
+
+### File: `examples/demo/rspress.config.ts`
+
+```typescript
+import path from "node:path";
+import { defineConfig } from "@rspress/core";
+import { pluginThirdParties } from "rspress-plugin-third-parties/plugin";
+export default defineConfig({
+    root: path.join(__dirname, "docs"),
+    title: "Rspress Third Parties Demo",
+    siteOrigin: "https://sanjaiyan-dev.github.io",
+    base: "/rspress-plugin-third-parties/",
+    llms: true,
+    description: "Live interactive playground for rspress-plugin-third-parties",
+    icon: "/rspress-plugin-third-party-icon.png",
+    logo: "/rspress-plugin-third-party-icon.png",
+    head: [
+        [
+            "meta",
+            {
+                property: "og:image",
+                content: "https://sanjaiyan-dev.github.io/rspress-plugin-third-parties/rspress-plugin-third-party-hero.png"
+            }
+        ]
+    ],
+    logoText: "Rspress Plugin Third Parties",
+    themeConfig: {
+        socialLinks: [
+            {
+                icon: "github",
+                mode: "link",
+                content: "https://github.com/sanjaiyan-dev/rspress-plugin-third-parties"
+            },
+            {
+                icon: "npm",
+                mode: "link",
+                content: "https://www.npmjs.com/package/rspress-plugin-third-parties"
+            },
+            {
+                icon: "instagram",
+                mode: "link",
+                content: "https://www.instagram.com/sanjaiyan_dev"
+            }
+        ],
+        enableAppearanceAnimation: true,
+        enableContentAnimation: true
+    },
+    plugins: [
+        pluginThirdParties({
+            googleAnalytics: {
+                gaId: "GA-ID"
+            }
+        })
+    ],
+    markdown: {
+        link: {
+            checkDeadLinks: false
+        }
+    }
+});
 
 ```
 

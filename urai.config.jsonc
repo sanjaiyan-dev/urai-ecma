@@ -1,6 +1,6 @@
 {
     // Path to the project directory or single source file
-       "input_project": "../rspress-plugin-third-parties",
+    "input_project": "../rspress-plugin-third-parties",
 
     // Target output Markdown file path
     "output_file": "./output.md",

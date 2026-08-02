@@ -19,6 +19,7 @@ pub fn init_cache(
             .memory(64 * 1024 * 1024)
             .storage()
             .with_engine_config(BlockEngineConfig::new(device))
+            .with_compression(foyer::Compression::Zstd)
             .build()
             .await?;
 
