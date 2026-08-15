@@ -333,12 +333,12 @@ graph LR;
 ### File: `entrypoints/background.ts`
 
 **Function Summaries**:
-- Line 1: `arrow_function` -> *Configures the browser's side panel to automatically open when a specific action is clicked, while logging any setup errors.*
-- Line 4: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 1: `anonymous_arrow` -> *Configures the browser's side panel to automatically open when an action is clicked.*
+- Line 4: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 
 ```typescript
 export default defineBackground(()=>{
-    '/* "Configures the browser\'s side panel to automatically open when a specific action is clicked, while logging any setup errors." */';
+    '/* "Configures the browser\'s side panel to automatically open when an action is clicked." */';
 });
 
 ```
@@ -364,7 +364,9 @@ export default defineContentScript({
 import { useOllamaEndPointRead } from "@/hooks/store";
 import "./App.css";
 import { preconnect } from "react-dom";
-function App() {}
+function App() {
+    return <>Hi</>;
+}
 export default App;
 
 ```
@@ -372,11 +374,11 @@ export default App;
 ### File: `entrypoints/sidepanel/main.tsx`
 
 **Function Summaries**:
-- Line 13: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 14: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 15: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 16: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 29: `arrow_function` -> *Renders the main application structure, including routing for various views, within a transition context using React and RTK Query.*
+- Line 13: `OllamaModelList` -> *Executes logic for function OllamaModelList*
+- Line 14: `SystemMonitor` -> *Executes logic for function SystemMonitor*
+- Line 15: `News` -> *Executes logic for function News*
+- Line 16: `ChatAI` -> *Executes logic for function ChatAI*
+- Line 29: `anonymous_arrow` -> *Renders the main application UI structure, including routing for various features, within a state transition context.*
 
 ```typescript
 "use memo";
@@ -404,7 +406,7 @@ export const queryClient = new QueryClient({
     }
 });
 startTransition(()=>{
-    '/* "Renders the main application structure, including routing for various views, within a transition context using React and RTK Query." */';
+    '/* "Renders the main application UI structure, including routing for various features, within a state transition context." */';
 });
 
 ```
@@ -412,18 +414,17 @@ startTransition(()=>{
 ### File: `entrypoints/sidepanel/routes/ModelLists.tsx`
 
 **Function Summaries**:
-- Line 26: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 29: `arrow_function` -> *Formats an ISO date string into a localized short date representation using English (UK) conventions.*
-- Line 50: `arrow_function` -> *Sets and transitions the selected model to a specified name.*
-- Line 52: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 57: `arrow_function` -> *Asynchronously copies a given name to the clipboard and temporarily sets the copied status index for display purposes.*
-- Line 60: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 60: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 106: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 132: `arrow_function` -> *Renders a list of individual model cards, displaying their specifications, capabilities, and allowing users to select or copy the model name.*
-- Line 138: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 162: `arrow_function` -> *Prevents the click event from propagating and then executes a copy operation and selects the active model.*
-- Line 225: `arrow_function` -> *Renders a list of capability tags, dynamically styling each tag based on whether the capability is "thinking," "tools," or "completion."*
+- Line 26: `formatSize` -> *Executes logic for function formatSize*
+- Line 29: `formatDate` -> *Converts a standardized ISO string into a localized short date format using British English conventions.*
+- Line 50: `selectActiveModel` -> *Sets the active model by immediately calling a setter and asynchronously scheduling the selected model update within a transition.*
+- Line 52: `selectActiveModel` -> *Executes logic for function selectActiveModel*
+- Line 57: `handleCopy` -> *Copies the provided name to the clipboard and sets a temporary display state for the operation, which clears itself after 1.5 seconds.*
+- Line 60: `handleCopy` -> *Executes logic for function handleCopy*
+- Line 106: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 132: `anonymous_arrow` -> *Renders an interactive card listing all filtered models, displaying their specifications, capabilities, and allowing the user to select or copy the model name.*
+- Line 138: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 162: `anonymous_arrow` -> *Stops the event propagation and subsequently handles copying and selecting the active model when the element is clicked.*
+- Line 225: `anonymous_arrow` -> *Maps an array of capabilities to display span elements, dynamically applying styling based on the capability type.*
 
 ```typescript
 import { useOllamaListModels } from "@/hooks/query/useOllamaModels";
@@ -448,10 +449,10 @@ export interface OllamaModel {
     capabilities: string[];
 }
 const formatSize = (bytes: number)=>{
-    '/* "Executes logic for function arrow_func" */';
+    '/* "Executes logic for function formatSize" */';
 };
 const formatDate = (isoString: string)=>{
-    '/* "Formats an ISO date string into a localized short date representation using English (UK) conventions." */';
+    '/* "Converts a standardized ISO string into a localized short date format using British English conventions." */';
 };
 export default function OllamaSidePanel() {
     const { data, isLoading, isError } = useOllamaListModels();
@@ -462,11 +463,11 @@ export default function OllamaSidePanel() {
     const [activeModel, setActiveModel] = useState<string>(selectedModel || models?.[0]?.name);
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
     const selectActiveModel = (modelName: string)=>{
-        '/* "Sets and transitions the selected model to a specified name." */';
+        '/* "Sets the active model by immediately calling a setter and asynchronously scheduling the selected model update within a transition." */';
     };
     const handleCopy = (name: string, index: number)=>{
         setTimeout(()=>setCopiedIndex(null), 1500);
-        '/* "Asynchronously copies a given name to the clipboard and temporarily sets the copied status index for display purposes." */';
+        '/* "Copies the provided name to the clipboard and sets a temporary display state for the operation, which clears itself after 1.5 seconds." */';
     };
     const { results: filteredModels, deferredSearchTerm } = useFuse({
         items: models || [],
@@ -513,7 +514,68 @@ export default function OllamaSidePanel() {
 				{filteredModels.length === 0 ? (<div>
 						No matching models named '{deferredSearchTerm}' were found.
 					</div>) : (filteredModels.map((result, idx)=>{
-        '/* "Renders a list of individual model cards, displaying their specifications, capabilities, and allowing users to select or copy the model name." */';
+        return (<div key={model.name} onClick={()=>selectActiveModel(model.name)} className={`group relative rounded-xl p-3.5 border transition-all cursor-pointer ${isActive ? "bg-zinc-900 border-violet-500/60 shadow-[0_4px_20px_-4px_rgba(139,92,246,0.15)]" : "bg-zinc-900/40 border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/60"}`}>
+								{}
+								{isActive && (<div/>)}
+
+								{}
+								<div>
+									<div>
+										<span>
+											{model.name}
+										</span>
+										<span>
+											{model.details?.family} • {model.details?.parameter_size}
+										</span>
+									</div>
+
+									<button onClick={(e)=>{
+            '/* "Stops the event propagation and subsequently handles copying and selecting the active model when the element is clicked." */';
+        }} title="Copy model name" type="button">
+										{copiedIndex === idx ? (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/>
+											</svg>) : (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+											</svg>)}
+									</button>
+								</div>
+
+								{}
+								<div>
+									<div>
+										<span>
+											Size
+										</span>
+										<span>
+											{formatSize(model.size)}
+										</span>
+									</div>
+									<div>
+										<span>
+											Quantization
+										</span>
+										<span>
+											{model.details?.quantization_level}
+										</span>
+									</div>
+								</div>
+
+								{}
+								<div>
+									{model.capabilities?.map?.((cap)=>{
+            return (<span key={cap} className={`text-[9px] font-medium tracking-wider uppercase px-2 py-0.5 rounded-full border ${capClass}`}>
+												{cap}
+											</span>);
+            '/* "Maps an array of capabilities to display span elements, dynamically applying styling based on the capability type." */';
+        })}
+								</div>
+
+								{}
+								<div>
+									Modified: {formatDate(model?.modified_at)}
+								</div>
+							</div>);
+        '/* "Renders an interactive card listing all filtered models, displaying their specifications, capabilities, and allowing the user to select or copy the model name." */';
     }))}
 			</div>
 		</div>);
@@ -524,34 +586,31 @@ export default function OllamaSidePanel() {
 ### File: `entrypoints/sidepanel/routes/CPUUsage.tsx`
 
 **Function Summaries**:
-- Line 66: `arrow_function` -> *Captures the user's mouse position relative to the component and animates a child element using spring physics towards that point while the cursor is over the button.*
-- Line 76: `arrow_function` -> *Calculates the relative mouse position with respect to a target element's center during movement.*
-- Line 81: `arrow_function` -> *Updates the coordinates by calculating the distance of a mouse event relative to a center point and initiating a transition.*
-- Line 89: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 76: `arrow_function` -> *Calculates the relative mouse position with respect to a target element's center during movement.*
-- Line 89: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 123: `arrow_function` -> *The component wraps children in a container that tracks mouse movement and applies a dynamic radial glow effect to the border when hovered.*
-- Line 129: `arrow_function` -> *Calculates the mouse position relative to a specific reference element and updates corresponding state coordinates.*
-- Line 142: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 143: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 129: `arrow_function` -> *Calculates the mouse position relative to a specific reference element and updates corresponding state coordinates.*
-- Line 186: `arrow_function` -> *Calculates and updates CPU usage percentages for each core and sets the average usage history based on new telemetry data, calculating deltas when previous data exists or initial usage otherwise.*
-- Line 192: `arrow_function` -> *Calculates the percentage breakdown of CPU usage (user, kernel, idle, and total) for each processor by comparing current usage metrics to previous usage metrics.*
-- Line 220: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 224: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 227: `arrow_function` -> *Updates a history state array by appending a new average value and truncating the array to maintain a maximum size of 15 entries.*
-- Line 228: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 235: `arrow_function` -> *Maps processor usage data into an array of objects containing calculated percentages for user, kernel, idle, and total utilization for each processor.*
-- Line 342: `arrow_function` -> *Renders a clickable progress indicator button for each core, visually representing its usage level and maintaining state based on selection status.*
-- Line 354: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 582: `arrow_function` -> *Generates a list of toggle buttons, rendering each CPU feature flag and handling selection state changes via click events.*
-- Line 587: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 657: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 666: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 754: `arrow_function` -> *Generates an array of 32 visual blocks whose background color and style reflect whether the current memory usage exceeds a specific percentage threshold for that block.*
-- Line 783: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 808: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 833: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 66: `MagneticNode` -> *Captures the mouse movement relative to the button and animates its internal content using a spring physics model towards the cursor's position.*
+- Line 76: `handleMouseMove` -> *Calculates the mouse movement relative to a target element's center and updates state using React's transition API.*
+- Line 81: `handleMouseMove` -> *Updates the coordinates of a tracked element based on mouse movement relative to the center point.*
+- Line 89: `handleMouseLeave` -> *Executes logic for function handleMouseLeave*
+- Line 123: `InteractiveGlassCard` -> *Renders a visually interactive glass card component that reacts to mouse movement by creating dynamic glow effects based on the cursor's position relative to the element.*
+- Line 129: `handleMouseMove` -> *Calculates and sets the cursor's position relative to the element when a mouse move event occurs over it.*
+- Line 142: `InteractiveGlassCard` -> *Executes logic for function InteractiveGlassCard*
+- Line 143: `InteractiveGlassCard` -> *Executes logic for function InteractiveGlassCard*
+- Line 186: `anonymous_arrow` -> *Calculates and updates per-processor usage deltas by comparing the new CPU data against previous readings, and sets an average usage history based on these calculations.*
+- Line 192: `deltas` -> *Calculates the percentage changes for user, kernel, idle, and total processor usage between two states, returning zeroed values if the overall change is non-positive.*
+- Line 220: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 224: `avg` -> *Executes logic for function avg*
+- Line 227: `anonymous_arrow` -> *Updates a rolling history array by adding the new average and truncating it to maintain a maximum length of fifteen entries.*
+- Line 228: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 235: `initial` -> *Transforms an array of processor usage metrics into a structured array detailing normalized CPU utilization percentages for each core.*
+- Line 342: `anonymous_arrow` -> *Renders an interactive progress button array where the visual state and color of each button dynamically reflects its usage percentage, allowing users to select one.*
+- Line 354: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 582: `anonymous_arrow` -> *Renders a dynamic set of selectable buttons for various CPU features, updating the selection status when a button is clicked.*
+- Line 587: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 657: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 666: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 754: `anonymous_arrow` -> *Generates an array of 32 styled visual blocks whose color and styling dynamically reflect whether a calculated memory usage threshold has been met or exceeded.*
+- Line 783: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 808: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 833: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 
 ```typescript
 import React, { useState, useEffect, useRef, startTransition, useDeferredValue } from "react";
@@ -604,21 +663,50 @@ export const MagneticNode: React.FC<{
     active?: boolean;
 }> = ({ children, className = "", onClick, active = false })=>{
     const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>)=>{
-        '/* "Calculates the relative mouse position with respect to a target element\'s center during movement." */';
+        "/* \"Calculates the mouse movement relative to a target element's center and updates state using React's transition API.\" */";
     };
     const handleMouseLeave = ()=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function handleMouseLeave" */';
     };
-    '/* "Captures the user\'s mouse position relative to the component and animates a child element using spring physics towards that point while the cursor is over the button." */';
+    return (<button ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} onClick={onClick} className={`relative flex items-center justify-center cursor-pointer select-none outline-none rounded-full transition-colors duration-200 ${active ? "bg-white/[0.08]" : "hover:bg-white/[0.03]"} ${className}`} style={{
+        WebkitTapHighlightColor: "transparent"
+    }}>
+			<motion.div animate={{
+        x: springX,
+        y: springY
+    }} transition={{
+        type: "spring",
+        stiffness: 180,
+        damping: 12
+    }} whileTap={{
+        scale: 0.92
+    }}>
+				{children}
+			</motion.div>
+		</button>);
+    '/* "Captures the mouse movement relative to the button and animates its internal content using a spring physics model towards the cursor\'s position." */';
 };
 export const InteractiveGlassCard: React.FC<{
     children: React.ReactNode;
     className?: string;
 }> = ({ children, className = "" })=>{
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>)=>{
-        '/* "Calculates the mouse position relative to a specific reference element and updates corresponding state coordinates." */';
+        '/* "Calculates and sets the cursor\'s position relative to the element when a mouse move event occurs over it." */';
     };
-    '/* "The component wraps children in a container that tracks mouse movement and applies a dynamic radial glow effect to the border when hovered." */';
+    return (<div ref={cardRef} onMouseMove={handleMouseMove} onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)} className={`relative overflow-hidden backdrop-blur-md bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)] ${className}`}>
+			{}
+			{isHovered && (<div style={{
+        background: `radial-gradient(150px circle at ${coords.x}px ${coords.y}px, rgba(255,255,255,0.04), transparent 80%)`
+    }}/>)}
+			{}
+			{isHovered && (<div style={{
+        maskImage: `radial-gradient(100px circle at ${coords.x}px ${coords.y}px, black, transparent)`,
+        WebkitMaskImage: `radial-gradient(100px circle at ${coords.x}px ${coords.y}px, black, transparent)`,
+        border: "1px solid rgba(0, 224, 255, 0.4)"
+    }}/>)}
+			<div>{children}</div>
+		</div>);
+    '/* "Renders a visually interactive glass card component that reacts to mouse movement by creating dynamic glow effects based on the cursor\'s position relative to the element." */';
 };
 export default function TelemetryDashboard() {
     const [activeTab, setActiveTab] = useState<"core" | "registers" | "ram">("core");
@@ -631,7 +719,7 @@ export default function TelemetryDashboard() {
     const { data: freshData, error, isLoading } = useSystemUsage();
     const data = useDeferredValue(freshData);
     useEffect(()=>{
-        '/* "Calculates and updates CPU usage percentages for each core and sets the average usage history based on new telemetry data, calculating deltas when previous data exists or initial usage otherwise." */';
+        '/* "Calculates and updates per-processor usage deltas by comparing the new CPU data against previous readings, and sets an average usage history based on these calculations." */';
     }, [
         data
     ]);
@@ -698,7 +786,31 @@ export default function TelemetryDashboard() {
 
 								<div>
 									{coreDeltas.map((core)=>{
-        '/* "Renders a clickable progress indicator button for each core, visually representing its usage level and maintaining state based on selection status." */';
+        return (<motion.button key={core.coreIndex} whileHover={{
+            scale: 1.05
+        }} whileTap={{
+            scale: 0.95
+        }} onClick={()=>setSelectedCore(core.coreIndex)} className={`relative p-2.5 flex flex-col items-center justify-center rounded-xl transition-all duration-300 ${isSelected ? "bg-white/[0.08] border border-white/20 shadow-[0_0_12px_rgba(0,224,255,0.15)]" : "bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/10"}`}>
+												<div>
+													<svg>
+														<circle cx="20" cy="20" r={r} stroke="rgba(255,255,255,0.03)" strokeWidth="2.5" fill="transparent"/>
+														<motion.circle cx="20" cy="20" r={r} stroke={core.totalUsage > 75 ? "#FF2E63" : core.totalUsage > 40 ? "#8B5CF6" : "#00E0FF"} strokeWidth="2.5" fill="transparent" strokeDasharray={circ} animate={{
+            strokeDashoffset
+        }} transition={{
+            type: "spring",
+            stiffness: 70,
+            damping: 15
+        }}/>
+													</svg>
+													<span>
+														C{core.coreIndex}
+													</span>
+												</div>
+												<span>
+													{Math.round(core.totalUsage)}%
+												</span>
+											</motion.button>);
+        '/* "Renders an interactive progress button array where the visual state and color of each button dynamically reflects its usage percentage, allowing users to select one." */';
     })}
 								</div>
 							</InteractiveGlassCard>
@@ -824,7 +936,10 @@ export default function TelemetryDashboard() {
 									</span>
 									<div>
 										{cpuInfo?.features.map((flag)=>{
-        '/* "Generates a list of toggle buttons, rendering each CPU feature flag and handling selection state changes via click events." */';
+        return (<button key={flag} onClick={()=>setSelectedFlag(isSelected ? null : flag)} className={`text-[9px] font-mono px-2 py-1 rounded-md transition-all ${isSelected ? "bg-[#00E0FF] text-[#05050A] font-bold shadow-[0_0_8px_#00E0FF]" : "bg-white/[0.03] border border-white/[0.08] text-slate-300 hover:bg-white/[0.06]"}`}>
+													{flag.toUpperCase()}
+												</button>);
+        '/* "Renders a dynamic set of selectable buttons for various CPU features, updating the selection status when a button is clicked." */';
     })}
 									</div>
 
@@ -945,7 +1060,8 @@ export default function TelemetryDashboard() {
 									{[
         ...Array(32)
     ].map((_, idx)=>{
-        '/* "Generates an array of 32 visual blocks whose background color and style reflect whether the current memory usage exceeds a specific percentage threshold for that block." */';
+        return (<div key={idx} className={`aspect-square rounded-sm border transition-all duration-500 ${isActive ? "bg-linear-to-tr from-[#8B5CF6] to-[#FF2E63] border-[#FF2E63]/30 shadow-[0_0_6px_rgba(255,46,99,0.2)]" : "bg-white/[0.02] border-white/[0.04]"}`}/>);
+        '/* "Generates an array of 32 styled visual blocks whose color and styling dynamically reflect whether a calculated memory usage threshold has been met or exceeded." */';
     })}
 								</div>
 								<span>
@@ -1418,22 +1534,33 @@ export const toolsSchema = [
 - Line 51: `getActiveTabInfo` -> *1. Active Tab Information*
 - Line 62: `createNewTab` -> *2. Create New Tab*
 - Line 71: `browser_navigate` -> *3. Navigate Browser Current Tab*
+- Line 97: `anonymous_arrow` -> *Locates a specific DOM element by matching provided text against its content or attributes, or selects it using a CSS selector, and then programmatically simulates a complete mouse click interaction on the found element.*
+- Line 106: `walker` -> *Identifies if an HTML node should be kept based on whether the provided `sanitizedText` is present in its text content, value attribute, placeholder, or aria-label, while rejecting script and style tags.*
 - Line 85: `click_interactive_element` -> *4. Click Interactive Element
  * Walk the DOM to prevent XPath string parsing errors and dispatch custom bubbling MouseEvents.*
+- Line 190: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 - Line 183: `get_highlighted_text` -> *5. Get Highlighted Text*
 - Line 202: `web_search` -> *6. Web Search
  * Queries DuckDuckGo HTML version inside the background script to gather snippet results without API keys.*
+- Line 260: `anonymous_arrow` -> *Clones the document body, removes specified structural elements, and then sanitizes and truncates its textual content for processing.*
+- Line 280: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 281: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 - Line 253: `read_readable_content` -> *7. Read Readable Content
  * Pulls body text and cleans non-content tags.*
+- Line 307: `cookieString` -> *Executes logic for function cookieString*
 - Line 302: `export_session_auth` -> *8. Export Session Cookies*
+- Line 322: `normalizeUrl` -> *Extracts the hostname from a provided URL string, returning the original string if parsing fails.*
+- Line 335: `isTarget` -> *Executes logic for function isTarget*
 - Line 315: `organize_tabs` -> *9. Organize and Group Tabs*
-- Line 322: `arrow_function` -> *Extracts the hostname from a given URL string, falling back to the original string if parsing fails.*
 - Line 365: `get_system_metrics` -> *10. System Metrics*
 - Line 388: `create_monitoring_alarm` -> *11. Monitoring Alarms*
 - Line 408: `get_user_profile` -> *12. Get Stored User Autofill Profile*
+- Line 438: `sanitizedFields` -> *Transforms an array of raw input fields into a structured list by coercing all properties to non-null or default values.*
+- Line 448: `anonymous_arrow` -> *Fills form fields defined in an array by searching through CSS selectors, label text, or input attributes and reports which fields were successfully updated.*
 - Line 429: `fill_form_fields` -> *13. Fill Form Fields
  * Dynamically queries active DOM inputs and applies simulated input events
  * to bypass modern reactive framework state-locks.*
+- Line 545: `anonymous_arrow` -> *Maps an array of tab objects into a new array structure retaining the id, title, url, active status, and window ID for each tab.*
 - Line 535: `list_all_tabs` -> *14. List All Opened Tabs
  * Queries and gathers structured metadata for all open tabs in the browser.*
 
@@ -1522,7 +1649,7 @@ export async function organize_tabs(args: ToolArguments["organize_tabs"]): Promi
     closedCount: number;
 }> {
     const normalizeUrl = (u: string)=>{
-        '/* "Extracts the hostname from a given URL string, falling back to the original string if parsing fails." */';
+        '/* "Extracts the hostname from a provided URL string, returning the original string if parsing fails." */';
     };
 }
 export async function get_system_metrics(): Promise<{
@@ -1557,9 +1684,9 @@ export async function list_all_tabs(): Promise<Array<{
 **Function Summaries**:
 - Line 7: `compose_gmail_window` -> *1. Compose Gmail Window
  * Launches a pre-populated draft compose window in a new tab.*
+- Line 21: `formatTime` -> *Executes logic for function formatTime*
 - Line 18: `schedule_google_calendar` -> *2. Schedule Google Calendar
  * Populates an event draft onto Google Calendar's web interface.*
-- Line 21: `arrow_function` -> *Executes logic for function arrow_func*
 - Line 32: `create_google_workspace_file` -> *3. Create Google Workspace File
  * Directs the browser to Google's fast-creation workspace shortcuts.*
 
@@ -1576,29 +1703,25 @@ export async function create_google_workspace_file(args: ToolArguments["create_g
 ### File: `entrypoints/sidepanel/routes/Chat.tsx`
 
 **Function Summaries**:
-- Line 37: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 46: `arrow_function` -> *Creates an interactive magnetic button component that uses mouse movement data to subtly shift the internal content element toward a resting position when the user hovers over it.*
-- Line 58: `arrow_function` -> *Calculates the displacement of a mouse movement relative to a target element's center and updates spring physics values accordingly.*
-- Line 68: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 58: `arrow_function` -> *Calculates the displacement of a mouse movement relative to a target element's center and updates spring physics values accordingly.*
-- Line 68: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 94: `arrow_function` -> *Renders a dynamic button component that displays either provided children or an animated loading spinner based on the pending state.*
-- Line 116: `arrow_function` -> *Renders a submit button that visually indicates whether the form submission process is currently pending.*
-- Line 128: `arrow_function` -> *Renders a visual message bubble, dynamically styling and structuring the display based on whether the message is from the system, a tool execution, or the assistant.*
-- Line 228: `arrow_function` -> *Renders a comprehensive chat interface that manages user input, displays conversation history, and controls advanced features like tool mode, deep thinking, page context injection, and user settings.*
-- Line 246: `arrow_function` -> *Submits a message from the form field if provided, resetting the input and then calling an asynchronous message sending function.*
-- Line 316: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 317: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 375: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 376: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 422: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 422: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 422: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 457: `arrow_function` -> *Toggles the "thinking" state based on whether the tool mode is currently active.*
-- Line 461: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 496: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 496: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 496: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 37: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 46: `MagneticButton` -> *Magnets the button's internal content to follow the user's mouse cursor while displaying a standard interactive button interface.*
+- Line 58: `handleMouseMove` -> *Calculates the user's movement relative to the element center and updates spring physics variables for smooth animation.*
+- Line 68: `handleMouseLeave` -> *Executes logic for function handleMouseLeave*
+- Line 94: `AuroraButton` -> *Renders a customizable button that displays a loading spinner when the `pending` prop is true, otherwise it renders its children.*
+- Line 116: `FormSubmitButton` -> *Renders a button to submit a form, visually indicating a pending state when the submission process is active.*
+- Line 128: `MessageBubble` -> *Renders a message bubble component dynamically adapting the style and content display based on whether the message is from the system, a tool execution, or an AI assistant.*
+- Line 228: `ChatInterface` -> *Renders a customizable chat interface that allows users to interact with an LLM by toggling between standard inference and agentic tool mode while managing contextual inputs like browser data and deep thinking settings.*
+- Line 246: `ChatInterface` -> *Retrieves the message input value and asynchronously sends it along with contextual information if the input field contains text.*
+- Line 316: `ChatInterface` -> *Executes logic for function ChatInterface*
+- Line 317: `ChatInterface` -> *Executes logic for function ChatInterface*
+- Line 375: `ChatInterface` -> *Executes logic for function ChatInterface*
+- Line 376: `ChatInterface` -> *Executes logic for function ChatInterface*
+- Line 422: `ChatInterface` -> *Executes logic for function ChatInterface*
+- Line 422: `ChatInterface` -> *Executes logic for function ChatInterface*
+- Line 457: `ChatInterface` -> *Toggles the "thinking" status for the chat interface, enabling it if tool mode is active.*
+- Line 461: `ChatInterface` -> *Executes logic for function ChatInterface*
+- Line 496: `ChatInterface` -> *Executes logic for function ChatInterface*
+- Line 496: `ChatInterface` -> *Executes logic for function ChatInterface*
 
 ```typescript
 import { useRef, useState, useActionState, useDeferredValue, type ReactNode, type MouseEventHandler, startTransition, lazy } from "react";
@@ -1622,12 +1745,22 @@ interface ChatMagneticBtnProps {
 }
 const MagneticButton = ({ children, onClick, type = "button", className = "", disabled = false }: ChatMagneticBtnProps)=>{
     const handleMouseMove = (e: React.MouseEvent)=>{
-        '/* "Calculates the displacement of a mouse movement relative to a target element\'s center and updates spring physics values accordingly." */';
+        '/* "Calculates the user\'s movement relative to the element center and updates spring physics variables for smooth animation." */';
     };
     const handleMouseLeave = ()=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function handleMouseLeave" */';
     };
-    '/* "Creates an interactive magnetic button component that uses mouse movement data to subtly shift the internal content element toward a resting position when the user hovers over it." */';
+    return (<motion.button type={type} ref={ref} onClick={onClick} disabled={disabled} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} whileTap={!disabled ? {
+        scale: 0.95
+    } : undefined} className={`relative rounded-full flex items-center justify-center transition-all ease-[cubic-bezier(0.23,1,0.32,1)] duration-300 ${className}`}>
+			<motion.div style={{
+        x: xSpring,
+        y: ySpring
+    }}>
+				{children}
+			</motion.div>
+		</motion.button>);
+    "/* \"Magnets the button's internal content to follow the user's mouse cursor while displaying a standard interactive button interface.\" */";
 };
 const AuroraButton = ({ children, pending }: any)=>(<MagneticButton type="submit" disabled={pending} className={`w-10 h-10 bg-white/5 border border-white/20 hover:bg-white/10 relative overflow-hidden group ${pending ? "cursor-wait" : "cursor-pointer"}`}>
 		<div/>
@@ -1644,15 +1777,229 @@ const AuroraButton = ({ children, pending }: any)=>(<MagneticButton type="submit
 		</div>
 	</MagneticButton>);
 const FormSubmitButton = ()=>{
-    '/* "Renders a submit button that visually indicates whether the form submission process is currently pending." */';
+    return (<AuroraButton pending={pending} className={pending ? "cursor-wait" : "cursor-pointer"}>
+			<Send size={16}/>
+		</AuroraButton>);
+    '/* "Renders a button to submit a form, visually indicating a pending state when the submission process is active." */';
 };
 const MessageBubble = ({ message }: {
     message: Message;
 })=>{
-    '/* "Renders a visual message bubble, dynamically styling and structuring the display based on whether the message is from the system, a tool execution, or the assistant." */';
+    return (<motion.div initial={{
+        opacity: 0,
+        y: 15,
+        scale: 0.98
+    }} animate={{
+        opacity: 1,
+        y: 0,
+        scale: 1
+    }} className={`flex w-full mb-4 ${isAI ? "justify-start" : "justify-end"}`}>
+			<div className={`max-w-[85%] p-4 ${isAI ? "rounded-2xl rounded-tl-sm bg-[rgba(20,20,25,0.6)] border border-[rgba(255,255,255,0.08)] backdrop-blur-xl" : "rounded-2xl rounded-tr-sm bg-white/10 border border-white/20 backdrop-blur-md"} shadow-[0_8px_32px_rgba(139,92,246,0.08)]`}>
+				{isAI && message.thinking && (<motion.div>
+						<motion.div animate={{
+        rotate: 360
+    }} transition={{
+        repeat: Infinity,
+        duration: 2,
+        ease: "linear"
+    }}>
+							<Sparkles size={12}/>
+						</motion.div>
+						Synthesizing Space-Time...
+					</motion.div>)}
+
+				{message.content && (<p>
+						<ReactMarkdown>{message.content}</ReactMarkdown>
+					</p>)}
+
+				{isAI && message.toolsUsed && (<div>
+						<span>
+							Requested Actions
+						</span>
+						<code>
+							{message.toolsUsed}
+						</code>
+					</div>)}
+			</div>
+		</motion.div>);
+    '/* "Renders a message bubble component dynamically adapting the style and content display based on whether the message is from the system, a tool execution, or an AI assistant." */';
 };
 const ChatInterface = ()=>{
-    '/* "Renders a comprehensive chat interface that manages user input, displays conversation history, and controls advanced features like tool mode, deep thinking, page context injection, and user settings." */';
+    return (<div>
+			<div/>
+			<div/>
+			<div/>
+
+			{}
+			<div>
+				{}
+				<div>
+					<div>
+						<div>
+							<div>
+								<Bot size={18}/>
+							</div>
+						</div>
+						<div>
+							<h1>
+								Ollama Native
+							</h1>
+							<p>
+								{currenLLMModel}
+							</p>
+						</div>
+					</div>
+
+					{}
+					<div>
+						<div>
+							<Info size={14}/>
+						</div>
+
+						{}
+						<div>
+							<div>
+								<Sparkles size={12}/> Protocol Mode
+							</div>
+							<p>
+								Toggle between{" "}
+								<span>
+									Standard Inference
+								</span>{" "}
+								(streaming & thinking enabled) and{" "}
+								<span>
+									Agentic Access
+								</span>{" "}
+								for direct function calling.
+							</p>
+						</div>
+
+						<div onClick={()=>{
+        '/* "Executes logic for function ChatInterface" */';
+    }}>
+							<motion.div layout animate={{
+        x: isToolMode ? 38 : 0
+    }} transition={{
+        type: "spring",
+        stiffness: 400,
+        damping: 25
+    }}/>
+							<div>
+								<Sparkles size={14} className={!isToolMode ? "opacity-100" : "opacity-40 text-white"}/>
+							</div>
+							<div>
+								<Wrench size={14} className={isToolMode ? "opacity-100" : "opacity-40 text-white"}/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<AnimatePresence mode="wait">
+						{isSettingsOpen ? (<motion.div key="settings" initial={{
+        opacity: 0,
+        scale: 0.98,
+        y: 10
+    }} animate={{
+        opacity: 1,
+        scale: 1,
+        y: 0
+    }} exit={{
+        opacity: 0,
+        scale: 0.98,
+        y: 10
+    }}>
+								<ProfileSettingsView setModelState={setIsSettingsOpen}/>
+							</motion.div>) : messages.length === 0 ? (<motion.div key="empty" initial={{
+        opacity: 0
+    }} animate={{
+        opacity: 0.5
+    }} exit={{
+        opacity: 0
+    }}>
+								<Bot size={48}/>
+								<p>Initiate intelligence matrix.</p>
+							</motion.div>) : (<LegendList key="chat-list" data={messages} renderItem={({ item })=><MessageBubble message={item}/>} keyExtractor={(item: any)=>item.id} maintainScrollAtEnd recycleItems style={{
+        scrollbarWidth: "none"
+    }} ListFooterComponent={<div/>}/>)}
+					</AnimatePresence>
+				</div>
+				{}
+				<div className={`fixed bottom-5 shrink-0 h-14 left-4 right-4 bg-[rgba(20,20,25,0.45)] backdrop-blur-xl saturate-150 border border-[rgba(255,255,255,0.2)] rounded-full p-1.5 shadow-[0_8px_32px_rgba(139,92,246,0.15)] transition-all [&:hover,&:focus]:inset-shadow-sm ${isStreaming || isPending ? "hover:shadow-fuchsia-300 cursor-wait" : "hover:shadow-sky-300"}`}>
+					<form ref={formRef} action={submitAction}>
+						<div>
+							<div>
+								<div>
+									<Globe size={12}/> Webpage Context
+								</div>
+								<p>
+									{currentPageContext ? (<>
+											Inject the text content of:{" "}
+											<span>
+												{currentPageContext?.title || "Current Page"}
+											</span>
+										</>) : ("Attach the content of the active browser page as background instructions.")}
+								</p>
+							</div>
+
+							<div className={`absolute inset-0 rounded-full blur-md transition-opacity duration-300 pointer-events-none ${isPageContextEnabled ? "bg-[#8B5CF6]/25 opacity-100" : "bg-transparent opacity-0"}`}/>
+
+							{}
+							<button type="button" disabled={isStreaming || isPending} onClick={()=>setIsPageContextEnabled((prev)=>!prev)} className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300 cursor-pointer relative z-10 ${isPageContextEnabled ? "bg-[rgba(139,92,246,0.1)] border-[#8B5CF6]/40 text-[#8B5CF6] shadow-[0_0_15px_rgba(139,92,246,0.2)]" : "bg-white/5 border-white/10 text-[#64748B] hover:text-[#94A3B8] hover:bg-white/10"}`}>
+								<Globe size={18} className={`transition-transform duration-500 ${isPageContextEnabled ? "scale-110 rotate-12" : "scale-100"}`}/>
+							</button>
+						</div>
+
+						{}
+						<div>
+							<div>
+								<div>
+									<Brain size={12}/> Deep Thinking
+								</div>
+								<p>
+									Activate reasoning configurations.{" "}
+									<span>Note:</span>{" "}
+									Tool actions default to bypassing manual reasoning overrides.
+								</p>
+							</div>
+
+							<div className={`absolute inset-0 rounded-full blur-md transition-opacity duration-300 pointer-events-none ${isThinkingEnabled ? "bg-[#00E0FF]/25 opacity-100" : "bg-transparent opacity-0"}`}/>
+
+							{}
+							<button type="button" disabled={isToolMode || isStreaming || isPending} onClick={()=>{
+        '/* "Toggles the \\"thinking\\" status for the chat interface, enabling it if tool mode is active." */';
+    }} className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300 cursor-pointer relative z-10 ${isThinkingEnabled ? "bg-[rgba(0,224,255,0.1)] border-[#00E0FF]/40 text-[#00E0FF] shadow-[0_0_15px_rgba(0,224,255,0.2)]" : "bg-white/5 border-white/10 text-[#64748B] hover:text-[#94A3B8] hover:bg-white/10"}`}>
+								<BrainCircuit size={18} className={`transition-transform duration-500 ${isThinkingEnabled ? "scale-110 animate-pulse" : "scale-100"}`}/>
+							</button>
+						</div>
+
+						<div>
+							<div>
+								<div>
+									<UserCog size={12}/> Autofill
+									Profile
+								</div>
+								<p>
+									Edit the identity profile information used for programmatic
+									form-filling actions.
+								</p>
+							</div>
+
+							<div className={`absolute inset-0 rounded-full blur-md transition-opacity duration-300 pointer-events-none ${isSettingsOpen ? "bg-[#FF2E63]/25 opacity-100" : "bg-transparent opacity-0"}`}/>
+
+							<button type="button" disabled={isStreaming || isPending} onClick={()=>setIsSettingsOpen((prev)=>!prev)} className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300 cursor-pointer relative z-10 ${isSettingsOpen ? "bg-[rgba(255,46,99,0.1)] border-[#FF2E63]/40 text-[#FF2E63] shadow-[0_0_15px_rgba(255,46,99,0.2)]" : "bg-white/5 border-white/10 text-[#64748B] hover:text-[#94A3B8] hover:bg-white/10"}`}>
+								<UserCog size={18} className={`transition-transform duration-500 ${isSettingsOpen ? "scale-110 rotate-12" : "scale-100"}`}/>
+							</button>
+						</div>
+
+						<input type="text" name="message" placeholder={isToolMode ? "Instruct system logic..." : "Ask Ollama..."} autoComplete="off" required disabled={isStreaming || isPending}/>
+
+						<FormSubmitButton/>
+					</form>
+				</div>
+			</div>
+		</div>);
+    '/* "Renders a customizable chat interface that allows users to interact with an LLM by toggling between standard inference and agentic tool mode while managing contextual inputs like browser data and deep thinking settings." */';
 };
 export default ChatInterface;
 
@@ -1661,61 +2008,65 @@ export default ChatInterface;
 ### File: `entrypoints/sidepanel/routes/News.tsx`
 
 **Function Summaries**:
+- Line 48: `anonymous_arrow` -> *Cancels ongoing animations and resets associated state variables when the target text input is cleared.*
+- Line 60: `anonymous_arrow` -> *Animates text character by character from a starting state to the target string using requestAnimationFrame controlled by a specified delay per update.*
+- Line 63: `animate` -> *Animates text progression by incrementally increasing the displayed character count and setting a timer to update the text state at regular intervals until the target length is reached.*
+- Line 79: `animate` -> *Executes logic for function animate*
+- Line 97: `anonymous_arrow` -> *Cancels any existing animation frame request stored in `requestRef` to prevent memory leaks or duplicate execution.*
 - Line 38: `useSmoothTypewriter` -> *--- CUSTOM OLLAMA REACT-QUERY HOOK ---*
-- Line 48: `arrow_function` -> *Cancels pending animation frames and resets related state when the target text becomes unavailable.*
-- Line 60: `arrow_function` -> *Animates the `displayedText` by incrementally revealing characters of the `targetText` over time using requestAnimationFrame.*
-- Line 63: `arrow_function` -> *Animates text character by character over time, progressively revealing the full `targetText`.*
-- Line 79: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 97: `arrow_function` -> *Cancels any pending animation frame associated with the component's lifecycle to prevent memory leaks or unexpected execution.*
-- Line 63: `arrow_function` -> *Animates text character by character over time, progressively revealing the full `targetText`.*
+- Line 127: `handleMouseMove` -> *Calculates the user's offset from the center of a reference element based on mouse movement and updates state variables $x$ and $y$.*
+- Line 140: `handleMouseLeave` -> *Executes logic for function handleMouseLeave*
 - Line 114: `MagneticWrapper` -> *--- MAGNETIC PHYSICS WRAPPER ---*
-- Line 127: `arrow_function` -> *Calculates the displacement of a mouse movement relative to a target element's center and updates corresponding X and Y values.*
-- Line 140: `arrow_function` -> *Executes logic for function arrow_func*
 - Line 166: `AppleGlowBorder` -> *--- APPLE / SIRI INTELLIGENCE GLOW BORDER ---*
-- Line 203: `arrow_function` -> *Renders a fully functional, animated news card component displaying the article title, source-specific styling, publication date, and interactive controls for analysis and content preview.*
+- Line 203: `NewsCard` -> *Renders a dynamic news article card component that displays the title, source details, and provides interactive options for reading the link, initiating analysis, or toggling the preview of the description HTML content.*
+- Line 356: `displayMessages` -> *Composes the current message list by appending a streaming assistant message if the conversation is active or pending.*
+- Line 370: `anonymous_arrow` -> *Conditionally formats and submits a prompt to an AI API to generate a news summary, either for a single article or a limited bulk feed.*
+- Line 391: `formattedArticles` -> *Executes logic for function formattedArticles*
+- Line 407: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 410: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 419: `scrollToLastMessage` -> *Executes logic for function scrollToLastMessage*
+- Line 422: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 426: `handleSendMessage` -> *The function processes and validates a user's message, updates the local chat history, constructs a detailed contextual prompt including conversation logs and background information, and then calls an API to generate an assistant response.*
+- Line 437: `formattedHistory` -> *Executes logic for function formattedHistory*
+- Line 444: `contextualScope` -> *Executes logic for function contextualScope*
+- Line 459: `handleSendMessage` -> *Appends a successful assistant reply to the message list state.*
+- Line 460: `handleSendMessage` -> *Executes logic for function handleSendMessage*
+- Line 465: `handleSendMessage` -> *Executes logic for function handleSendMessage*
+- Line 556: `anonymous_arrow` -> *Renders a user message or system message within a chat interface, dynamically styling the container based on whether the message belongs to a regular user.*
+- Line 577: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 583: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 599: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 - Line 339: `OllamaChatDrawer` -> *--- CHAT SHEET / BOTTOM DRAWER FOR SINGLE OR BULK SUMMARIES ---*
-- Line 370: `arrow_function` -> *Conditionally generates a prompt based on the number of news items and then calls an external AI service to synthesize summaries or single-article abstracts.*
-- Line 391: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 407: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 410: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 422: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 426: `arrow_function` -> *Handles sending a new user message by updating the chat history, generating a comprehensive prompt based on application context and conversation logs, and then asynchronously calling an external AI service to receive an assistant response.*
-- Line 437: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 444: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 459: `arrow_function` -> *Updates the message history by appending the assistant's response upon a successful operation.*
-- Line 460: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 465: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 652: `arrow_function` -> *Refetches all associated Google, Yahoo, and BBC data queries simultaneously using Promises.*
-- Line 660: `arrow_function` -> *Aggregates and de-duplicates news items from multiple source queries (Google, Yahoo, BBC) into a single unified array.*
-- Line 661: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 666: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 671: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 678: `arrow_function` -> *Populates a map with unique items from an array using the item's ID or link as the key to prevent duplicates.*
-- Line 688: `arrow_function` -> *Filters and sorts a unique list of items based on an active source search term and a specified chronological order.*
-- Line 692: `arrow_function` -> *Filters a list of items, retaining only those whose source property contains the specified active source string after normalization.*
-- Line 700: `arrow_function` -> *Sorts the provided list either by the newest publication date descending or by the oldest ascending.*
-- Line 720: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 721: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 730: `arrow_function` -> *Sets the chat mode to "bulk" and activates the provided feed items if the feed is not empty.*
-- Line 736: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 823: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 824: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 825: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 830: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 854: `arrow_function` -> *Renders a clickable button component that displays a source label and updates the active filter state when clicked, applying visual styling based on selection status.*
-- Line 860: `arrow_function` -> *Updates the active source state within a transition block when the component is clicked.*
-- Line 861: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 879: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 880: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 880: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 910: `arrow_function` -> *Renders a list of placeholder component boxes using mapped array data.*
-- Line 954: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 962: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 963: `arrow_function` -> *Renders a news card component for each item, managing its expansion state and providing handlers to the parent component.*
-- Line 970: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 973: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 1020: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 1032: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 652: `handleRefetchAll` -> *It asynchronously re-fetches data for three different news sources: Google, Yahoo, and BBC.*
+- Line 660: `uniqueItems` -> *Aggregates news items from Google, Yahoo, and BBC sources, appending a source field to each item before filtering the results to ensure only unique entries are returned based on ID or link.*
+- Line 661: `rawGoogle` -> *Executes logic for function rawGoogle*
+- Line 666: `rawYahoo` -> *Executes logic for function rawYahoo*
+- Line 671: `rawBbc` -> *Executes logic for function rawBbc*
+- Line 678: `uniqueItems` -> *Aggregates a collection of items into a map based on a unique ID or link, retaining the first instance found for each key.*
+- Line 688: `filteredAndSortedBase` -> *Filters a unique set of items based on an active source and then sorts the result either by newest or oldest publication date.*
+- Line 692: `filteredAndSortedBase` -> *Filters a list of items, retaining only those whose source property includes the specified active source name regardless of case or surrounding whitespace.*
+- Line 700: `filteredAndSortedBase` -> *Sorts the provided list of items based on their publication date, allowing sorting by either newest or oldest first.*
+- Line 720: `finalFeedItems` -> *Executes logic for function finalFeedItems*
+- Line 721: `finalFeedItems` -> *Executes logic for function finalFeedItems*
+- Line 730: `handleSummarizeEntireFeed` -> *Sets the chat mode to "bulk" and populates active chat items with the feed data if the feed is not empty.*
+- Line 736: `handleSummarizeSingleCard` -> *Executes logic for function handleSummarizeSingleCard*
+- Line 823: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 824: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 825: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 830: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 854: `anonymous_arrow` -> *Creates a button component that displays a selectable filter label and updates the application state when clicked.*
+- Line 860: `anonymous_arrow` -> *Sets the active source state within a smooth browser transition when the element is clicked.*
+- Line 861: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 879: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 880: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 910: `anonymous_arrow` -> *Renders a list of placeholder elements using predefined styling attributes.*
+- Line 954: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 962: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 963: `anonymous_arrow` -> *Renders a dynamic news card component for each item, managing its expanded state and providing callbacks for analysis.*
+- Line 970: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 973: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 1020: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 1032: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 
 ```typescript
 import { useNewsInternationalFeeds, type NewsItem } from "@/hooks/query/useNewsInformations";
@@ -1737,15 +2088,15 @@ interface TypewriterOptions {
 }
 export function useSmoothTypewriter(targetText: string, options: TypewriterOptions = {}) {
     useEffect(()=>{
-        '/* "Cancels pending animation frames and resets related state when the target text becomes unavailable." */';
+        '/* "Cancels ongoing animations and resets associated state variables when the target text input is cleared." */';
     }, [
         targetText
     ]);
     useEffect(()=>{
         const animate = (timestamp: number)=>{
-            '/* "Animates text character by character over time, progressively revealing the full `targetText`." */';
+            '/* "Animates text progression by incrementally increasing the displayed character count and setting a timer to update the text state at regular intervals until the target length is reached." */';
         };
-        '/* "Animates the `displayedText` by incrementally revealing characters of the `targetText` over time using requestAnimationFrame." */';
+        '/* "Animates text character by character from a starting state to the target string using requestAnimationFrame controlled by a specified delay per update." */';
     }, [
         targetText,
         speedMs
@@ -1757,25 +2108,126 @@ interface MagneticWrapperProps {
 }
 export function MagneticWrapper({ children, className = "" }: MagneticWrapperProps) {
     const handleMouseMove = (e: React.MouseEvent)=>{
-        '/* "Calculates the displacement of a mouse movement relative to a target element\'s center and updates corresponding X and Y values." */';
+        '/* "Calculates the user\'s offset from the center of a reference element based on mouse movement and updates state variables $x$ and $y$." */';
     };
     const handleMouseLeave = ()=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function handleMouseLeave" */';
     };
+    return (<div ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className={`relative cursor-pointer select-none ${className}`}>
+			<motion.div style={{
+        x: springX,
+        y: springY
+    }} whileTap={{
+        scale: 0.95
+    }}>
+				{children}
+			</motion.div>
+		</div>);
 }
 interface AppleGlowBorderProps {
     children: React.ReactNode;
     isActive: boolean;
     className?: string;
 }
-export function AppleGlowBorder({ children, isActive, className = "" }: AppleGlowBorderProps) {}
+export function AppleGlowBorder({ children, isActive, className = "" }: AppleGlowBorderProps) {
+    return (<div className={`relative rounded-full p-px transition-all duration-300 ${className}`}>
+			<AnimatePresence>
+				{isActive && (<>
+						<motion.div initial={{
+        opacity: 0
+    }} animate={{
+        opacity: 0.65
+    }} exit={{
+        opacity: 0
+    }} style={{
+        animation: "rotate-glow 5s linear infinite"
+    }}/>
+						<motion.div initial={{
+        opacity: 0
+    }} animate={{
+        opacity: 1
+    }} exit={{
+        opacity: 0
+    }} style={{
+        animation: "rotate-glow 4s linear infinite"
+    }}/>
+					</>)}
+			</AnimatePresence>
+			<div>
+				{children}
+			</div>
+		</div>);
+}
 const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
     item: NewsItem;
     isExpanded: boolean;
     onToggleExpand: () => void;
     onAnalyze: () => void;
 })=>{
-    '/* "Renders a fully functional, animated news card component displaying the article title, source-specific styling, publication date, and interactive controls for analysis and content preview." */';
+    return (<motion.article layout="position" initial={{
+        opacity: 0,
+        y: 12
+    }} animate={{
+        opacity: 1,
+        y: 0
+    }} exit={{
+        opacity: 0,
+        scale: 0.95
+    }}>
+			<div>
+				<span className={`rounded-full border px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider uppercase ${sourceColorClass}`}>
+					{item.source}
+				</span>
+				<span>
+					{formattedDate}
+				</span>
+			</div>
+
+			<h2>
+				{item.title}
+			</h2>
+
+			<div>
+				<div>
+					<a href={item.link} target="_blank" rel="noopener noreferrer">
+						<span>Read</span>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+							<path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+						</svg>
+					</a>
+
+					<button onClick={onAnalyze}>
+						<span>
+							<span></span>
+							<span></span>
+						</span>
+						<span>Analyze</span>
+					</button>
+				</div>
+
+				{item.descHTML && (<button onClick={onToggleExpand}>
+						<span>{isExpanded ? "Hide" : "Preview"}</span>
+						<motion.svg animate={{
+        rotate: isExpanded ? 180 : 0
+    }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+							<path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+						</motion.svg>
+					</button>)}
+			</div>
+
+			{item.descHTML && (<motion.div initial={false} animate={{
+        height: isExpanded ? "auto" : 0,
+        opacity: isExpanded ? 1 : 0
+    }} transition={{
+        duration: 0.25,
+        ease: "easeInOut"
+    }}>
+					<div dangerouslySetInnerHTML={{
+        __html: item.descHTML
+    }}/>
+				</motion.div>)}
+		</motion.article>);
+    '/* "Renders a dynamic news article card component that displays the title, source details, and provides interactive options for reading the link, initiating analysis, or toggling the preview of the description HTML content." */';
 };
 interface OllamaChatDrawerProps {
     newsItems: NewsItem[];
@@ -1784,20 +2236,118 @@ interface OllamaChatDrawerProps {
 }
 function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
     useEffect(()=>{
-        '/* "Conditionally generates a prompt based on the number of news items and then calls an external AI service to synthesize summaries or single-article abstracts." */';
+        '/* "Conditionally formats and submits a prompt to an AI API to generate a news summary, either for a single article or a limited bulk feed." */';
     }, [
         newsItems,
         mode,
         askOllama
     ]);
     useEffect(()=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function anonymous_arrow" */';
     }, [
         displayMessages
     ]);
     const handleSendMessage = (e: React.FormEvent)=>{
-        '/* "Handles sending a new user message by updating the chat history, generating a comprehensive prompt based on application context and conversation logs, and then asynchronously calling an external AI service to receive an assistant response." */';
+        '/* "The function processes and validates a user\'s message, updates the local chat history, constructs a detailed contextual prompt including conversation logs and background information, and then calls an API to generate an assistant response." */';
     };
+    return (<motion.div initial={{
+        y: "100%"
+    }} animate={{
+        y: 0
+    }} exit={{
+        y: "100%"
+    }} transition={{
+        type: "spring",
+        stiffness: 220,
+        damping: 22
+    }}>
+			<div>
+				<div/>
+				<div/>
+			</div>
+
+			<header>
+				<div>
+					<span>
+						{mode === "single" ? "Single Update Briefing" : "Consolidated Stream Synthesis"}
+					</span>
+					<h3>
+						{mode === "single" ? newsItems[0]?.title : `Synthesizing ${newsItems.length} active stream items`}
+					</h3>
+				</div>
+
+				<MagneticWrapper>
+					<button onClick={onClose}>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+							<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+					</button>
+				</MagneticWrapper>
+			</header>
+
+			{isPending && (<div>
+					<motion.div initial={{
+        left: "-100%"
+    }} animate={{
+        left: "100%"
+    }} transition={{
+        repeat: Infinity,
+        duration: 1.5,
+        ease: "linear"
+    }}/>
+				</div>)}
+
+			<div>
+				{displayMessages.length === 0 && !apiError && (<div>
+						<span>
+							<span></span>
+							<span></span>
+						</span>
+						<p>
+							{mode === "single" ? "Initiating single update summary..." : "Analyzing and compiling active news stream..."}
+						</p>
+					</div>)}
+
+				{apiError && (<div>
+						<p>Local Model Error</p>
+						<p>{apiError}</p>
+					</div>)}
+
+				<LegendList data={displayMessages} renderItem={({ item })=>{
+        return (<motion.div initial={{
+            opacity: 0,
+            y: 8
+        }} animate={{
+            opacity: 1,
+            y: 0
+        }} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+								<div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed border ${isUser ? "bg-[#8B5CF6]/15 border-[#8B5CF6]/30 text-white" : "bg-white/3 border-white/8 text-slate-200"}`}>
+									<ReactMarkdown>{msg.content}</ReactMarkdown>
+								</div>
+							</motion.div>);
+        '/* "Renders a user message or system message within a chat interface, dynamically styling the container based on whether the message belongs to a regular user." */';
+    }} keyExtractor={(item, idx)=>idx + item.role} maintainScrollAtEnd showsVerticalScrollIndicator={true} recycleItems style={{
+        scrollbarWidth: "none"
+    }} ItemSeparatorComponent={()=><div/>} ListFooterComponent={<div/>}/>
+
+				<div ref={threadEndRef}/>
+			</div>
+
+			<form onSubmit={handleSendMessage}>
+				<AppleGlowBorder isActive={input.length > 0}>
+					<div>
+						<input type="text" value={input} onChange={(e)=>setInput(e.target.value)} placeholder={isPending ? "Generating..." : "Ask regarding updates..."} disabled={isPending}/>
+						<MagneticWrapper>
+							<button type="submit" disabled={!input.trim() || isPending}>
+								<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+									<path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+								</svg>
+							</button>
+						</MagneticWrapper>
+					</div>
+				</AppleGlowBorder>
+			</form>
+		</motion.div>);
 }
 export default function NewsDashboard() {
     const queryResults = useNewsInternationalFeeds();
@@ -1811,17 +2361,17 @@ export default function NewsDashboard() {
     const [activeChatItems, setActiveChatItems] = useState<NewsItem[]>([]);
     const [googleQuery, yahooQuery, bbcQuery] = queryResults;
     const handleRefetchAll = async ()=>{
-        '/* "Refetches all associated Google, Yahoo, and BBC data queries simultaneously using Promises." */';
+        '/* "It asynchronously re-fetches data for three different news sources: Google, Yahoo, and BBC." */';
     };
     const uniqueItems = useMemo(()=>{
-        '/* "Aggregates and de-duplicates news items from multiple source queries (Google, Yahoo, BBC) into a single unified array." */';
+        '/* "Aggregates news items from Google, Yahoo, and BBC sources, appending a source field to each item before filtering the results to ensure only unique entries are returned based on ID or link." */';
     }, [
         googleQuery.data,
         yahooQuery.data,
         bbcQuery.data
     ]);
     const filteredAndSortedBase = useMemo(()=>{
-        '/* "Filters and sorts a unique list of items based on an active source search term and a specified chronological order." */';
+        '/* "Filters a unique set of items based on an active source and then sorts the result either by newest or oldest publication date." */';
     }, [
         uniqueItems,
         activeSource,
@@ -1840,7 +2390,7 @@ export default function NewsDashboard() {
     });
     const finalFeed = useDeferredValue(freshFeed);
     const finalFeedItems = useMemo(()=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function finalFeedItems" */';
     }, [
         finalFeed
     ]);
@@ -1848,10 +2398,10 @@ export default function NewsDashboard() {
     const isInitialLoading = googleQuery.isLoading && yahooQuery.isLoading && bbcQuery.isLoading;
     const isError = googleQuery.isError && yahooQuery.isError && bbcQuery.isError;
     const handleSummarizeEntireFeed = ()=>{
-        '/* "Sets the chat mode to \\"bulk\\" and activates the provided feed items if the feed is not empty." */';
+        '/* "Sets the chat mode to \\"bulk\\" and populates active chat items with the feed data if the feed is not empty." */';
     };
     const handleSummarizeSingleCard = (item: NewsItem)=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function handleSummarizeSingleCard" */';
     };
     const ollamaLLMActive = useOllamaSelectedModelRead();
     return (<div>
@@ -1916,7 +2466,12 @@ export default function NewsDashboard() {
         "Yahoo News",
         "BBC News"
     ] as const).map((source)=>{
-        '/* "Renders a clickable button component that displays a source label and updates the active filter state when clicked, applying visual styling based on selection status." */';
+        return (<button key={source} onClick={()=>{
+            '/* "Sets the active source state within a smooth browser transition when the element is clicked." */';
+        }} className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-200 cursor-pointer ${isSelected ? "bg-white/[0.08] text-white shadow-sm border-white/[0.04] border" : "hover:text-slate-200 hover:bg-white/[0.02]"}`}>
+										{label}
+									</button>);
+        '/* "Creates a button component that displays a selectable filter label and updates the application state when clicked." */';
     })}
 					</div>
 
@@ -1973,7 +2528,8 @@ export default function NewsDashboard() {
 					{!isInitialLoading && finalFeed?.length > 0 && (<LegendList data={finalFeed} keyExtractor={({ item })=>`${item.id ?? item.link}-${expandedItemId === (item.id ?? item.link) ? "expanded" : "collapsed"}`} style={{
         height: "100%"
     }} extraData={expandedItemId} contentContainerClassName="pb-[80px] pt-2" recycleItems={true} ItemSeparatorComponent={()=><div/>} renderItem={({ item: news })=>{
-        '/* "Renders a news card component for each item, managing its expansion state and providing handlers to the parent component." */';
+        return (<NewsCard item={item} isExpanded={expandedItemId === idKey} onToggleExpand={()=>setExpandedItemId(expandedItemId === idKey ? null : idKey)} onAnalyze={()=>handleSummarizeSingleCard(item)}/>);
+        '/* "Renders a dynamic news card component for each item, managing its expanded state and providing callbacks for analysis." */';
     }}/>)}
 				</AnimatePresence>
 			</div>
@@ -2029,29 +2585,24 @@ export default function NewsDashboard() {
 **Function Summaries**:
 - Line 44: `saveUserProfile` -> *Saves the provided user profile data either to browser storage or local storage, depending on environment availability.*
 - Line 52: `getUserProfile` -> *Retrieves the user's stored profile data either from browser sync storage or local storage, falling back to a default profile if no data is found.*
-- Line 63: `arrow_function` -> *Renders a profile settings form that allows users to input and manage personal and address details, including handling the asynchronous saving process.*
-- Line 74: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 78: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 79: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 82: `arrow_function` -> *Schedules the saving of a user profile, followed by setting and then resetting an 'isSaved' state while also asynchronously updating another application state after two-point delays.*
-- Line 83: `arrow_function` -> *Schedules asynchronous profile saving and subsequent timed state updates for UI feedback.*
-- Line 85: `arrow_function` -> *Sets a saving status to true during an animation, then sets it back to false after two seconds and the model state to false after two point five seconds.*
-- Line 87: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 90: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 87: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 90: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 134: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 155: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 176: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 196: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 217: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 238: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 259: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 279: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 300: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 74: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 78: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 82: `arrow_function` -> *Schedules the saving of a user profile, followed by setting and then resetting an 'isSaved' state while also asynchronously updating another application state after two-point delays.*
+- Line 63: `ProfileSettingsView` -> *Renders and manages a form allowing the user to view, edit, and save their personal profile details, including name, contact information, and addresses.*
+- Line 74: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 78: `handleChange` -> *Executes logic for function handleChange*
+- Line 79: `handleChange` -> *Executes logic for function handleChange*
+- Line 82: `handleSave` -> *Saves the user profile and subsequently manages a time-based display state for tracking save status.*
+- Line 83: `handleSave` -> *Schedules the saving of a user profile and manages the visual state transition by setting save status and model visibility delays.*
+- Line 85: `handleSave` -> *Sets a loading state and schedules subsequent state changes to manage the UI feedback during data persistence.*
+- Line 87: `handleSave` -> *Executes logic for function handleSave*
+- Line 90: `handleSave` -> *Executes logic for function handleSave*
+- Line 134: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 155: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 176: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 196: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 217: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 238: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 259: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 279: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
+- Line 300: `ProfileSettingsView` -> *Executes logic for function ProfileSettingsView*
 
 ```typescript
 import React, { useEffect, useState, useTransition } from "react";
@@ -2086,15 +2637,189 @@ const ProfileSettingsView = ({ setModelState }: {
     setModelState: React.Dispatch<React.SetStateAction<boolean>>;
 })=>{
     useEffect(()=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function ProfileSettingsView" */';
     }, []);
     const handleChange = (key: keyof UserProfile, val: string)=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function handleChange" */';
     };
     const handleSave = ()=>{
-        "/* \"Schedules the saving of a user profile, followed by setting and then resetting an 'isSaved' state while also asynchronously updating another application state after two-point delays.\" */";
+        '/* "Saves the user profile and subsequently manages a time-based display state for tracking save status." */';
     };
-    '/* "Renders a profile settings form that allows users to input and manage personal and address details, including handling the asynchronous saving process." */';
+    return (<div>
+			{}
+			<div>
+				<div>
+					<h2>
+						Autofill Identity Settings
+					</h2>
+					<p>
+						Your credentials remain stored locally and privately on your
+						machine.
+					</p>
+				</div>
+				<div>
+					<ShieldCheck size={10}/>
+					<span>
+						Local
+					</span>
+				</div>
+			</div>
+
+			{}
+			<div>
+				{}
+				<div>
+					<label>
+						Full Name
+					</label>
+					<div>
+						<User size={12}/>
+						<input type="text" value={profile.fullName} autoComplete="name" onChange={(e)=>handleChange("fullName", e.target.value)} placeholder="e.g. Sanjaiyan Parthipan"/>
+					</div>
+				</div>
+
+				{}
+				<div>
+					<label>
+						Email
+					</label>
+					<div>
+						<Mail size={12}/>
+						<input type="email" value={profile.email} autoComplete="email" onChange={(e)=>handleChange("email", e.target.value)} placeholder="name@email.com"/>
+					</div>
+				</div>
+
+				{}
+				<div>
+					<label>
+						Phone
+					</label>
+					<div>
+						<Phone size={12}/>
+						<input type="text" value={profile.phone} autoComplete="tel" onChange={(e)=>handleChange("phone", e.target.value)}/>
+					</div>
+				</div>
+
+				{}
+				<div>
+					<label>
+						Address Line 1
+					</label>
+					<div>
+						<MapPin size={12}/>
+						<input type="text" value={profile.addressLine1} autoComplete="street-address" onChange={(e)=>handleChange("addressLine1", e.target.value)} placeholder="eg: Selva Sannithi Murugan, Thondaimanaru"/>
+					</div>
+				</div>
+
+				{}
+				<div>
+					<label>
+						Address Line 2 (Suite, Apt)
+					</label>
+					<div>
+						<Compass size={12}/>
+						<input type="text" value={profile.addressLine2} autoComplete="address-line2" onChange={(e)=>handleChange("addressLine2", e.target.value)} placeholder="eg: Jaffna, Sri Lanka"/>
+					</div>
+				</div>
+
+				{}
+				<div>
+					<label>
+						City
+					</label>
+					<div>
+						<Building size={12}/>
+						<input type="text" value={profile.city} autoComplete="address-level2" onChange={(e)=>handleChange("city", e.target.value)} placeholder="eg: Point Pedro"/>
+					</div>
+				</div>
+
+				{}
+				<div>
+					<label>
+						ZIP Code
+					</label>
+					<div>
+						<Hash size={12}/>
+						<input type="text" value={profile.zipCode} autoComplete="postal-code" onChange={(e)=>handleChange("zipCode", e.target.value)} placeholder="eg: 40000"/>
+					</div>
+				</div>
+
+				{}
+				<div>
+					<label>
+						State / Province
+					</label>
+					<div>
+						<MapPin size={12}/>
+						<input type="text" value={profile.state} onChange={(e)=>handleChange("state", e.target.value)} placeholder="eg: Jaffna"/>
+					</div>
+				</div>
+
+				{}
+				<div>
+					<label>
+						Country
+					</label>
+					<div>
+						<Flag size={12}/>
+						<input type="text" value={profile.country} autoComplete="address-level1" onChange={(e)=>handleChange("country", e.target.value)} placeholder="eg: Sri Lanka"/>
+					</div>
+				</div>
+			</div>
+
+			{}
+			<motion.button onClick={handleSave} disabled={isPending} whileTap={{
+        scale: 0.98
+    }} className={`w-full mt-4 rounded-xl py-3 text-xs font-bold tracking-widest uppercase font-mono transition-all cursor-pointer flex items-center justify-center gap-2 relative overflow-hidden group shadow-[0_4px_20px_rgba(0,0,0,0.2)] ${isSaved ? "bg-[rgba(16,185,129,0.15)] border border-emerald-500/40 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]" : "bg-linear-to-r from-[#FF2E63] via-[#8a5cf665] to-[#FF2E63] text-white border border-transparent"}`}>
+				{}
+				{!isSaved && (<div/>)}
+
+				<AnimatePresence mode="wait">
+					{isPending ? (<motion.div key="loading" initial={{
+        rotate: 0,
+        scale: 0.8
+    }} animate={{
+        rotate: 360,
+        scale: 1
+    }} exit={{
+        opacity: 0
+    }} transition={{
+        repeat: Infinity,
+        duration: 1.2,
+        ease: "linear"
+    }}>
+							<Loader2 size={13}/>
+						</motion.div>) : isSaved ? (<motion.span key="saved" initial={{
+        opacity: 0,
+        scale: 0.6
+    }} animate={{
+        opacity: 1,
+        scale: 1
+    }} exit={{
+        opacity: 0
+    }} transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 15
+    }}>
+							<Check size={12}/> Profile Details
+							Secured
+						</motion.span>) : (<motion.span key="idle" initial={{
+        opacity: 0,
+        y: 5
+    }} animate={{
+        opacity: 1,
+        y: 0
+    }} exit={{
+        opacity: 0,
+        y: -5
+    }}>
+							<Save size={12}/> Save Form Identity
+						</motion.span>)}
+				</AnimatePresence>
+			</motion.button>
+		</div>);
+    '/* "Renders and manages a form allowing the user to view, edit, and save their personal profile details, including name, contact information, and addresses." */';
 };
 export default ProfileSettingsView;
 
@@ -2103,20 +2828,29 @@ export default ProfileSettingsView;
 ### File: `entrypoints/sidepanel/layout/Navigation.tsx`
 
 **Function Summaries**:
-- Line 22: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 30: `MagneticButton` -> *Provides a responsive, magnetic interactive effect to a standard button by calculating mouse displacement from its center and applying dynamic positional transformation.*
+- Line 22: `OllamaQuickQuestionPopover` -> *Executes logic for function OllamaQuickQuestionPopover*
 - Line 40: `handleMouseMove` -> *Updates internal x and y state variables based on the mouse position relative to the button's center point.*
 - Line 49: `handleMouseLeave` -> *Executes logic for function handleMouseLeave*
+- Line 30: `MagneticButton` -> *Provides a responsive, magnetic interactive effect to a standard button by calculating mouse displacement from its center and applying dynamic positional transformation.*
+- Line 108: `currentTab` -> *Executes logic for function currentTab*
+- Line 110: `anonymous_arrow` -> *Registers a global event listener that collapses the component when a click occurs outside its designated container element.*
+- Line 111: `handleClickOutside` -> *Determines if a click originated outside of the component's container and collapses it if true.*
+- Line 121: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 124: `anonymous_arrow` -> *When the component is expanded, this effect schedules a focus call to the input element after a 300ms delay and cleans up the timer when re-running.*
+- Line 126: `timer` -> *Executes logic for function timer*
+- Line 129: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 136: `handleSendQuery` -> *Sets the popover query state with the trimmed input value and opens the popover while unfocusing the current element.*
+- Line 138: `handleSendQuery` -> *Executes logic for function handleSendQuery*
+- Line 200: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 229: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 239: `anonymous_arrow` -> *Renders a list of navigable button components, styling them based on the active tab state and applying animations when selected.*
+- Line 247: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 341: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 342: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 343: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 344: `anonymous_arrow` -> *Triggers the query submission process when the user presses the Enter key.*
+- Line 385: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 - Line 99: `BottomNav` -> *Renders a dynamic, interactive bottom navigation bar that allows users to switch between predefined topics and input questions for an AI assistant.*
-- Line 110: `arrow_function` -> *Listens for clicks outside the component and collapses it if the click originates outside its designated container element.*
-- Line 111: `handleClickOutside` -> *Determines if a click originated outside of the component's container and collapses it if true.*
-- Line 121: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 111: `handleClickOutside` -> *Determines if a click originated outside of the component's container and collapses it if true.*
-- Line 124: `arrow_function` -> *When the component's expanded state changes to true, it schedules focusing the input element after a delay and cleans up that timer when the dependency changes.*
-- Line 126: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 129: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 136: `arrow_function` -> *It processes user input by setting a popover query and opening the popover if the input field is not empty.*
-- Line 138: `arrow_function` -> *Executes logic for function arrow_func*
 
 ```typescript
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
@@ -2134,6 +2868,14 @@ interface MagneticButtonProps {
 function MagneticButton({ children, className = "", onClick }: MagneticButtonProps) {
     function handleMouseMove(e: React.MouseEvent<HTMLButtonElement>) {}
     function handleMouseLeave() {}
+    return (<motion.button onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} style={{
+        x: mouseX,
+        y: mouseY
+    }} onClick={onClick} className={`${className} outline-none cursor-pointer`} whileTap={{
+        scale: 0.92
+    }}>
+			{children}
+		</motion.button>);
 }
 const navItems = [
     {
@@ -2168,16 +2910,181 @@ const navItems = [
 export function BottomNav() {
     useEffect(()=>{
         function handleClickOutside(event: MouseEvent) {}
-        '/* "Listens for clicks outside the component and collapses it if the click originates outside its designated container element." */';
+        '/* "Registers a global event listener that collapses the component when a click occurs outside its designated container element." */';
     }, []);
     useEffect(()=>{
-        '/* "When the component\'s expanded state changes to true, it schedules focusing the input element after a delay and cleans up that timer when the dependency changes." */';
+        '/* "When the component is expanded, this effect schedules a focus call to the input element after a 300ms delay and cleans up the timer when re-running." */';
     }, [
         isExpanded
     ]);
     const handleSendQuery = ()=>{
-        '/* "It processes user input by setting a popover query and opening the popover if the input field is not empty." */';
+        '/* "Sets the popover query state with the trimmed input value and opens the popover while unfocusing the current element." */';
     };
+    return (<div className={`bg-[#05050A] flex items-center justify-center relative overflow-hidden font-sans`}>
+			<div/>
+			<div/>
+			<div/>
+
+			<motion.div transition={{
+        type: "spring",
+        stiffness: 220,
+        damping: 24
+    }} className={`fixed bottom-8 left-1/2 -translate-x-1/2 w-full  ${isExpanded ? "max-w-115" : "max-w-30"} px-4 z-50 flex justify-center`}>
+				<motion.div ref={containerRef} layout transition={{
+        type: "spring",
+        stiffness: 220,
+        damping: 24
+    }} style={{
+        width: isExpanded ? "100%" : "76px",
+        height: "76px"
+    }} className={`
+						relative flex items-center 
+						bg-[#121218]/70 backdrop-blur-3xl 
+						border border-white/10 
+						shadow-[0_24px_48px_-12px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.08)]
+						overflow-hidden
+						transition-all duration-500
+						${isExpanded ? "rounded-[2.5rem] p-3" : "rounded-full p-3 justify-center"}
+						${isFocused ? "bg-[#0f0f14]/90 border-white/25 shadow-[0_24px_48px_rgba(139,92,246,0.15)]" : ""}
+					`}>
+					<div style={{
+        animation: "shine 6s infinite linear"
+    }}/>
+
+					<AnimatePresence mode="wait">
+						{!isExpanded ? (<motion.div key="fab-state" initial={{
+        opacity: 0,
+        scale: 0.8
+    }} animate={{
+        opacity: 1,
+        scale: 1
+    }} exit={{
+        opacity: 0,
+        scale: 0.8
+    }} transition={{
+        duration: 0.2
+    }}>
+								<MagneticButton onClick={()=>setIsExpanded(true)}>
+									<div style={{
+        background: "rgba(139, 92, 246, 0.12)",
+        boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08), 0 0 20px rgba(139, 92, 246, 0.3)"
+    }}/>
+									<Sparkles style={{
+        filter: "drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))"
+    }}/>
+								</MagneticButton>
+							</motion.div>) : (<motion.div key="expanded-state" initial={{
+        opacity: 0
+    }} animate={{
+        opacity: 1
+    }} exit={{
+        opacity: 0
+    }} transition={{
+        duration: 0.25,
+        delay: 0.1
+    }}>
+								<MagneticButton onClick={()=>{
+        '/* "Executes logic for function anonymous_arrow" */';
+    }}>
+									<X/>
+								</MagneticButton>
+
+								<div>
+									{navItems.map((item)=>{
+        return (<Link key={item.id} to={item.to} prefetch="render">
+												<MagneticButton key={item.id} onClick={()=>setActiveTab(item.id)}>
+													{isActive && (<motion.div layoutId="wowActiveIndicator" style={{
+            background: "rgba(255, 255, 255, 0.08)",
+            boxShadow: `inset 0 1px 1px rgba(255,255,255,0.1), 0 0 20px ${item.glow}`
+        }} transition={{
+            type: "spring",
+            bounce: 0.22,
+            duration: 0.6
+        }}/>)}
+
+													<Icon strokeWidth={isActive ? 2.5 : 1.5} className={`relative z-10 w-5 h-5 transition-all duration-300 
+														${isActive ? "scale-110" : "text-[#64748B] hover:text-[#94A3B8]"}`} style={{
+            color: isActive ? item.color : undefined,
+            filter: isActive ? `drop-shadow(0 0 8px ${item.glow})` : undefined
+        }}/>
+
+													{isActive && (<motion.div layoutId="activeTabDot" style={{
+            backgroundColor: item.color
+        }} transition={{
+            type: "spring",
+            bounce: 0.2,
+            duration: 0.6
+        }}/>)}
+												</MagneticButton>
+											</Link>);
+        '/* "Renders a list of navigable button components, styling them based on the active tab state and applying animations when selected." */';
+    })}
+								</div>
+
+								<div/>
+
+								<motion.div layout className={`
+										relative flex items-center flex-1 h-13 rounded-full overflow-hidden shrink-0 group
+										${isFocused ? "bg-black/50" : "bg-black/30 border border-white/5"}
+										transition-colors duration-300
+									`}>
+									{isFocused && (<div style={{
+        background: "linear-gradient(90deg, #00E0FF, #8B5CF6, #FF2E63, #00E0FF)",
+        backgroundSize: "200% auto",
+        animation: "borderFlow 3s linear infinite",
+        WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+        WebkitMaskComposite: "xor",
+        maskComposite: "exclude"
+    }}/>)}
+
+									<motion.div whileHover={{
+        rotate: 90,
+        scale: 1.1
+    }} transition={{
+        type: "spring",
+        stiffness: 200,
+        damping: 10
+    }}>
+										<Sparkles className={`w-4 h-4 transition-colors duration-300 ${isFocused ? "text-[#8B5CF6]" : "text-[#64748B]"}`}/>
+									</motion.div>
+
+									<input required ref={inputRef} type="text" value={inputValue} onChange={(e)=>setInputValue(e.target.value)} onFocus={()=>setIsFocused(true)} onBlur={()=>setIsFocused(false)} onKeyDown={(e)=>{
+        '/* "Triggers the query submission process when the user presses the Enter key." */';
+    }} placeholder="Ask Ollama..."/>
+
+									<AnimatePresence>
+										{(isFocused || inputValue) && (<motion.button initial={{
+        opacity: 0,
+        scale: 0.6,
+        rotate: -90
+    }} animate={{
+        opacity: 1,
+        scale: 1,
+        rotate: 0
+    }} exit={{
+        opacity: 0,
+        scale: 0.6,
+        rotate: 90
+    }} whileHover={{
+        scale: 1.05
+    }} whileTap={{
+        scale: 0.95
+    }} onClick={handleSendQuery}>
+												<div style={{
+        backgroundColor: currentTab?.color
+    }}/>
+												<div/>
+												<ArrowUp strokeWidth={2.5}/>
+											</motion.button>)}
+									</AnimatePresence>
+								</motion.div>
+							</motion.div>)}
+					</AnimatePresence>
+				</motion.div>
+			</motion.div>
+
+			<OllamaQuickQuestionPopover isOpen={isPopoverOpen} onClose={()=>setIsPopoverOpen(false)} query={popoverQuery}/>
+		</div>);
 }
 
 ```
@@ -2185,27 +3092,123 @@ export function BottomNav() {
 ### File: `entrypoints/sidepanel/layout/Status.tsx`
 
 **Function Summaries**:
-- Line 3: `arrow_function` -> *Renders a full-screen loading interface featuring dynamic visual elements and placeholders for pipeline calibration status.*
-- Line 47: `arrow_function` -> *Generates a sequence of four visually pulsing placeholder div elements to indicate loading content.*
-- Line 66: `arrow_function` -> *Renders a user interface that displays configuration details and provides a functional button to copy a specified manifest command into the clipboard.*
-- Line 76: `arrow_function` -> *Copies the manifest content to the clipboard and displays a temporary success state for two seconds.*
-- Line 79: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 79: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 76: `arrow_function` -> *Copies the manifest content to the clipboard and displays a temporary success state for two seconds.*
-- Line 79: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 79: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 3: `LoadingUI` -> *Renders a stylized loading screen interface featuring dynamic elements and displaying customizable titles and instructions.*
+- Line 47: `LoadingUI` -> *Generates a loading placeholder screen consisting of four pulsing, stylized placeholder divs.*
+- Line 66: `ErrorUI` -> *Displays a system interface decoupled error message, provides configuration details in a code block, and offers a button to copy the necessary permission manifest command.*
+- Line 76: `handleCopyManifest` -> *Copies the manifest text to the clipboard and sets a temporary state indicating a successful copy operation.*
+- Line 79: `handleCopyManifest` -> *Executes logic for function handleCopyManifest*
 
 ```typescript
 import { motion } from "framer-motion";
 export const LoadingUI = ({ headerTxt = "Calibrating Pipeline Interface", headerTxt2 = "Resolving physical silicon vectors...", footerTxt = "CONNECTING KERNEL MEMORY DRIVERS" })=>{
-    '/* "Renders a full-screen loading interface featuring dynamic visual elements and placeholders for pipeline calibration status." */';
+    return (<div>
+			{}
+			<div/>
+
+			<div>
+				{}
+				<div>
+					{}
+					<div/>
+					<div/>
+					<div>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+						</svg>
+					</div>
+				</div>
+
+				<div>
+					<h2>
+						{headerTxt}
+					</h2>
+					<p>
+						{headerTxt2}
+					</p>
+				</div>
+
+				{}
+				<div>
+					{[
+        ...Array(4)
+    ].map((_, i)=>(<div key={i} style={{
+            animationDelay: `${i * 150}ms`
+        }}/>))}
+				</div>
+			</div>
+
+			<div>
+				<span>
+					{footerTxt}
+				</span>
+			</div>
+		</div>);
+    '/* "Renders a stylized loading screen interface featuring dynamic elements and displaying customizable titles and instructions." */';
 };
 export const ErrorUI = ({ headerDescTxt = "The real-time telemetry pipeline requires runtime binding. Ensure this window resides in a Chrome extension popup configured with permission parameters.", copyTextCommand = 'OLLAMA_ORIGINS="*" ollama serve', copyTagTxt = "MV3", copyHeaderTxt = "Manifest Interface Schema", copiedButtonTxt = "Copied Configuration", copyButtonTxt = "Copy Permission Manifest" })=>{
     const handleCopyManifest = ()=>{
         setTimeout(()=>setCopyState(false), 2000);
-        '/* "Copies the manifest content to the clipboard and displays a temporary success state for two seconds." */';
+        '/* "Copies the manifest text to the clipboard and sets a temporary state indicating a successful copy operation." */';
     };
-    '/* "Renders a user interface that displays configuration details and provides a functional button to copy a specified manifest command into the clipboard." */';
+    return (<div>
+			{}
+			<div/>
+			<div/>
+
+			<div>
+				<div>
+					<div/>
+					<span>
+						Diagnostics Status: Telemetry Offline
+					</span>
+				</div>
+
+				<div>
+					<h1>
+						System Interface Decoupled
+					</h1>
+					<p>
+						{headerDescTxt}
+					</p>
+				</div>
+
+				{}
+				<div>
+					<div>
+						<span>
+							{copyHeaderTxt}
+						</span>
+						<div>
+							<button className={`text-[9px] font-mono px-2 py-1 rounded-md transition-all bg-[#8B5CF6] text-white`}>
+								{copyTagTxt}
+							</button>
+						</div>
+					</div>
+
+					<pre>
+						<span>
+							<code>{copyTextCommand}</code>
+						</span>
+					</pre>
+
+					<motion.button whileTap={{
+        scale: 0.95
+    }} onClick={handleCopyManifest}>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							{copyState ? (<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/>) : (<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>)}
+						</svg>
+						<span>{copyButtonTxtNode}</span>
+					</motion.button>
+				</div>
+			</div>
+
+			<div>
+				<span>
+					Ollama Web Browser v1.0.0
+				</span>
+			</div>
+		</div>);
+    '/* "Displays a system interface decoupled error message, provides configuration details in a code block, and offers a button to copy the necessary permission manifest command." */';
 };
 
 ```
@@ -2213,26 +3216,27 @@ export const ErrorUI = ({ headerDescTxt = "The real-time telemetry pipeline requ
 ### File: `entrypoints/sidepanel/layout/QuickQuestionPopOver.tsx`
 
 **Function Summaries**:
+- Line 36: `anonymous_arrow` -> *Maps bold markdown segments to strong HTML elements and processes remaining content by splitting it into inline code tokens wrapped in code elements.*
+- Line 45: `anonymous_arrow` -> *Transforms a list of code tokens into JSX elements, wrapping those that are delimited by backticks in specialized `<code>` components.*
 - Line 33: `parseInline` -> *Splits the input string by markdown formatting (bold and inline code) and maps the resulting segments into React elements (`<strong>` or `<code>`) while stripping the surrounding markup.*
-- Line 94: `arrow_function` -> *Updates both the edited and submitted query states whenever a new query value is available.*
-- Line 117: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 122: `arrow_function` -> *Validates and saves the non-empty submitted query into state if the editing field is populated.*
+- Line 94: `anonymous_arrow` -> *Updates the edited and submitted query state whenever the input query value changes.*
+- Line 117: `handleRefreshPageContent` -> *Executes logic for function handleRefreshPageContent*
+- Line 122: `handleQuerySubmit` -> *Stores the non-empty user query into state if it has been edited.*
+- Line 131: `anonymous_arrow` -> *Updates the internal mouse coordinates by calculating the difference between the event client position and the element's bounding rectangle.*
 - Line 128: `handleMouseMove` -> *Custom refresh trigger for page scrapers*
-- Line 139: `arrow_function` -> *Copies the text stored in responseText to the clipboard and then resets a copy status indicator after two seconds.*
-- Line 143: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 143: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 146: `arrow_function` -> *Converts raw text response into structured React components, distinguishing and rendering markdown code blocks, headings, and list items.*
-- Line 150: `arrow_function` -> *Renders an array of content chunks into structured React components by processing markdown formatting like headers and lists, while displaying code blocks along with a functionality to copy the contents.*
-- Line 166: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 181: `arrow_function` -> *Renders markdown lines as HTML elements, converting headers, list items, and paragraphs accordingly.*
-- Line 369: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 370: `arrow_function` -> *Prevents the default form submission when the Enter key is pressed unless Shift is also held, triggering a query submission instead.*
-- Line 436: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 449: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 452: `arrow_function` -> *Maps a list of models to clickable buttons, allowing the user to select one and automatically closing the dropdown after selection.*
-- Line 455: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 455: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 489: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 139: `handleCopy` -> *Copies the current response text to the clipboard and briefly displays a success indicator before resetting it.*
+- Line 143: `handleCopy` -> *Executes logic for function handleCopy*
+- Line 146: `parsedMarkup` -> *Parses raw markdown text into a structured array of React components, rendering plain paragraphs, headers (H1-H4), and code blocks with copy functionality.*
+- Line 150: `parsedMarkup` -> *Converts an array of pre-processed content segments, interpreting markdown syntax like headers and lists or fenced code blocks, into corresponding styled React elements.*
+- Line 166: `parsedMarkup` -> *Executes logic for function parsedMarkup*
+- Line 181: `parsedMarkup` -> *Converts raw markdown lines into corresponding React elements, distinguishing between paragraphs, headings, and list items.*
+- Line 369: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 370: `anonymous_arrow` -> *Prevents the default form behavior and executes a query submission if the Enter key is pressed without Shift.*
+- Line 436: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 449: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 452: `anonymous_arrow` -> *Renders a list of interactive buttons, allowing the user to select and display a specific model name while managing styling based on selection status.*
+- Line 455: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 489: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 
 ```typescript
 import { useBrowserCurrentActiveTab } from "@/hooks/query/useBrowserActiveTab";
@@ -2267,7 +3271,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
     });
     const mouseCoords = useDeferredValue(freshCoord);
     useEffect(()=>{
-        '/* "Updates both the edited and submitted query states whenever a new query value is available." */';
+        '/* "Updates the edited and submitted query state whenever the input query value changes." */';
     }, [
         query
     ]);
@@ -2278,18 +3282,18 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
     });
     const isGenerating = isPending || isFetching;
     const handleRefreshPageContent = async ()=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function handleRefreshPageContent" */';
     };
     const handleQuerySubmit = ()=>{
-        '/* "Validates and saves the non-empty submitted query into state if the editing field is populated." */';
+        '/* "Stores the non-empty user query into state if it has been edited." */';
     };
     function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {}
     const handleCopy = ()=>{
         setTimeout(()=>setCopied(false), 2000);
-        '/* "Copies the text stored in responseText to the clipboard and then resets a copy status indicator after two seconds." */';
+        '/* "Copies the current response text to the clipboard and briefly displays a success indicator before resetting it." */';
     };
     const parsedMarkup = useMemo(()=>{
-        '/* "Converts raw text response into structured React components, distinguishing and rendering markdown code blocks, headings, and list items." */';
+        '/* "Parses raw markdown text into a structured array of React components, rendering plain paragraphs, headers (H1-H4), and code blocks with copy functionality." */';
     }, [
         responseText
     ]);
@@ -2403,7 +3407,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 									</span>
 									<div>
 										<textarea value={editedQuery} onChange={(e)=>setEditedQuery(e.target.value)} onKeyDown={(e)=>{
-        '/* "Prevents the default form submission when the Enter key is pressed unless Shift is also held, triggering a query submission instead." */';
+        '/* "Prevents the default form behavior and executes a query submission if the Enter key is pressed without Shift." */';
     }} rows={2} placeholder="Tweak or enter your question here..."/>
 										{editedQuery !== submittedQuery && (<button onClick={handleQuerySubmit}>
 												Apply
@@ -2455,7 +3459,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 											<div onClick={()=>setIsDropdownOpen(false)}/>
 											<div>
 												{localModels?.map?.((item)=>(<button key={item.name} onClick={()=>{
-            '/* "Executes logic for function arrow_func" */';
+            '/* "Executes logic for function anonymous_arrow" */';
         }} className={`w-full text-left px-3 py-1.5 text-xs font-semibold uppercase hover:bg-white/5 transition-colors ${selectedModel === item.name ? "text-[#8B5CF6]" : "text-[#94A3B8]"}`}>
 														{item.name}
 													</button>))}
@@ -2492,7 +3496,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 ### File: `wxt.config.ts`
 
 **Function Summaries**:
-- Line 9: `arrow_function` -> *Configures Vite to use Tailwind CSS and Babel with the React Compiler preset for processing frontend assets.*
+- Line 9: `anonymous_arrow` -> *Configures Vite to include Tailwind CSS and necessary Babel presets for React compilation.*
 
 ```typescript
 import { defineConfig } from "wxt";
@@ -2536,8 +3540,8 @@ export default defineConfig({
 ### File: `hooks/query/useOllamaModels.ts`
 
 **Function Summaries**:
-- Line 6: `arrow_function` -> *Fetches a list of available models from the Ollama endpoint using React Query.*
-- Line 14: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 6: `useOllamaListModels` -> *Fetches a list of available models from the Ollama API endpoint using React Query.*
+- Line 14: `useOllamaListModels` -> *Executes logic for function useOllamaListModels*
 
 ```typescript
 import { useQuery } from "@tanstack/react-query";
@@ -2545,7 +3549,7 @@ import { OLLAMA_BROWSER_EXT_REACTQUERY_KEY } from ".";
 import { useOllamaEndPointRead } from "../store";
 import axios from "axios";
 const useOllamaListModels = ()=>{
-    '/* "Fetches a list of available models from the Ollama endpoint using React Query." */';
+    '/* "Fetches a list of available models from the Ollama API endpoint using React Query." */';
 };
 export { useOllamaListModels };
 
@@ -2554,9 +3558,9 @@ export { useOllamaListModels };
 ### File: `hooks/query/index.ts`
 
 **Function Summaries**:
-- Line 12: `arrow_function` -> *Retrieves a specific item from local storage and returns it as a string, or null if the item is missing or not a string.*
-- Line 17: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 20: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 12: `chromeStorageAdapter` -> *Retrieves a specific item from the local browser storage, returning it as a string or null if not found.*
+- Line 17: `chromeStorageAdapter` -> *Executes logic for function chromeStorageAdapter*
+- Line 20: `chromeStorageAdapter` -> *Executes logic for function chromeStorageAdapter*
 
 ```typescript
 import { useBrowserCurrentActiveTab } from "./useBrowserActiveTab";
@@ -2568,13 +3572,13 @@ export { useOllamaListModels, useSystemUsage, useBrowserCurrentActiveTab };
 export const OLLAMA_BROWSER_EXT_REACTQUERY_KEY = "OLLAMA_BROWSER_EXT_REACTQUERY_KEY";
 export const chromeStorageAdapter = {
     getItem: async (key: string): Promise<string | null> =>{
-        '/* "Retrieves a specific item from local storage and returns it as a string, or null if the item is missing or not a string." */';
+        '/* "Retrieves a specific item from the local browser storage, returning it as a string or null if not found." */';
     },
     setItem: async (key: string, value: string)=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function chromeStorageAdapter" */';
     },
     removeItem: async (key: string)=>{
-        '/* "Executes logic for function arrow_func" */';
+        '/* "Executes logic for function chromeStorageAdapter" */';
     }
 };
 export const persister = createAsyncStoragePersister({
@@ -2588,20 +3592,12 @@ export const persister = createAsyncStoragePersister({
 ### File: `hooks/query/useCpuUsage.ts`
 
 **Function Summaries**:
-- Line 29: `arrow_function` -> *Fetches the current CPU and memory usage statistics of the host environment using browser APIs.*
-- Line 32: `arrow_function` -> *Asynchronously retrieves the current CPU and memory status of the host environment, bundling them with a creation timestamp.*
-- Line 44: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 45: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 45: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 46: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 47: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 47: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 44: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 45: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 45: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 46: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 47: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 47: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 29: `useSystemUsage` -> *Retrieves the current CPU and memory usage information from the browser's system API, refetching the data periodically.*
+- Line 32: `useSystemUsage` -> *Asynchronously retrieves detailed information regarding the CPU and memory usage of the host system along with a generation timestamp.*
+- Line 44: `getCpuInfo` -> *Executes logic for function getCpuInfo*
+- Line 45: `getCpuInfo` -> *Executes logic for function getCpuInfo*
+- Line 46: `getMemoryInfo` -> *Executes logic for function getMemoryInfo*
+- Line 47: `getMemoryInfo` -> *Executes logic for function getMemoryInfo*
 
 ```typescript
 import { useQuery } from "@tanstack/react-query";
@@ -2628,7 +3624,7 @@ interface MemoryInfo {
     capacity: number;
 }
 export const useSystemUsage = ()=>{
-    '/* "Fetches the current CPU and memory usage statistics of the host environment using browser APIs." */';
+    '/* "Retrieves the current CPU and memory usage information from the browser\'s system API, refetching the data periodically." */';
 };
 
 ```
@@ -2637,9 +3633,9 @@ export const useSystemUsage = ()=>{
 
 **Function Summaries**:
 - Line 17: `streamAIResponse` -> *Fetches a streaming response from an Ollama AI model, yielding parsed JSON chunks as they arrive in the data stream.*
-- Line 80: `arrow_function` -> *Retrieves and streams a synthetically generated, markdown-formatted technical answer from an Ollama LLM by feeding it a user query alongside the current web page's title, URL, and truncated content context.*
-- Line 155: `arrow_function` -> *It streams an AI response after validating that a question and model name have been provided.*
-- Line 169: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 80: `useOllamaQuickAnswer` -> *Asynchronously executes an AI query against a local Ollama instance, feeding the user's question and relevant web page content to generate a structured technical answer.*
+- Line 155: `useOllamaQuickAnswer` -> *Initiates an AI response streaming process using Ollama based on defined prompts and model specifications.*
+- Line 169: `useOllamaQuickAnswer` -> *Executes logic for function useOllamaQuickAnswer*
 
 ```typescript
 import { experimental_streamedQuery, useQuery } from "@tanstack/react-query";
@@ -2662,7 +3658,7 @@ export const useOllamaQuickAnswer = ({ question, thinking = false, trigger }: {
     thinking?: boolean;
     trigger: boolean;
 })=>{
-    '/* "Retrieves and streams a synthetically generated, markdown-formatted technical answer from an Ollama LLM by feeding it a user query alongside the current web page\'s title, URL, and truncated content context." */';
+    '/* "Asynchronously executes an AI query against a local Ollama instance, feeding the user\'s question and relevant web page content to generate a structured technical answer." */';
 };
 
 ```
@@ -2671,9 +3667,10 @@ export const useOllamaQuickAnswer = ({ question, thinking = false, trigger }: {
 
 **Function Summaries**:
 - Line 15: `isRestrictedUrl` -> *Determines if a given URL is restricted by checking if it starts with specific proprietary scheme prefixes or contains certain substrings.*
+- Line 33: `results` -> *Retrieves the current document title, body text content, and a trimmed portion of the HTML structure.*
 - Line 27: `fetchTabContent` -> *Executes a script within the specified browser tab to asynchronously extract the document's title, text body, and initial HTML content.*
-- Line 52: `arrow_function` -> *Fetches content from a specific browser tab using React Query after validating that the tab exists and is not a restricted URL.*
-- Line 61: `arrow_function` -> *Checks for an active tab and content restrictions before asynchronously retrieving the designated tab's content using a dedicated function.*
+- Line 52: `useBrowserCurrentActiveTab` -> *Retrieves and caches the content of the browser's active tab by fetching it if it is not a restricted URL.*
+- Line 61: `useBrowserCurrentActiveTab` -> *Checks if the current active tab's URL is restricted before fetching and returning its content.*
 
 ```typescript
 "use memo";
@@ -2686,10 +3683,12 @@ export interface ExtractedContent {
     text: string;
     html: string;
 }
-export function isRestrictedUrl(url?: string): boolean {}
+export function isRestrictedUrl(url?: string): boolean {
+    return (url.startsWith("chrome://") || url.startsWith("chrome-extension://") || url.startsWith("devtools://") || url.startsWith("edge://") || url.startsWith("about:") || url.includes("chromewebstore.google.com"));
+}
 export async function fetchTabContent(tabId: number): Promise<ExtractedContent> {}
 export const useBrowserCurrentActiveTab = ()=>{
-    '/* "Fetches content from a specific browser tab using React Query after validating that the tab exists and is not a restricted URL." */';
+    '/* "Retrieves and caches the content of the browser\'s active tab by fetching it if it is not a restricted URL." */';
 };
 
 ```
@@ -2698,10 +3697,18 @@ export const useBrowserCurrentActiveTab = ()=>{
 
 **Function Summaries**:
 - Line 21: `fetchXmlDoc` -> *Map human-readable topics to Google News RSS Topic IDs*
+- Line 71: `anonymous_arrow` -> *Transforms a collection of raw item elements into structured objects containing processed metadata including title cleanup and HTML sanitization.*
+- Line 91: `decodeHTMLEntities` -> *Decodes HTML entities within a given string by leveraging the browser's DOM parsing mechanism.*
 - Line 62: `fetchGoogleNews` -> *Parses an XML feed fetched from a URL into an array of structured news items, cleaning and transforming fields like title and description.*
+- Line 132: `anonymous_arrow` -> *Extracts comprehensive metadata for each item, including title cleanup, source identification, and media details.*
 - Line 122: `fetchYahooNews` -> *Parses an XML document fetched from a URL to extract and structure details for multiple news items, including titles, links, publication dates, and associated media metadata.*
+- Line 204: `anonymous_arrow` -> *Parses a collection of structured XML items, extracting metadata such as title, description, links, and thumbnail dimensions to create standardized data objects.*
 - Line 194: `fetchBbcTechNews` -> *Parses an XML document fetched from a URL to extract and structure various fields for BBC technology news items.*
+- Line 252: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 - Line 246: `useNewsInternationalFeed` -> *Fetches the latest international news articles from Google News using a React Query hook.*
+- Line 278: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 289: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 300: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 - Line 259: `useNewsInternationalFeeds` -> *Establishes preconnect hints for multiple international news sources and executes asynchronous queries to fetch data from Google News, Yahoo, and BBC Technology feeds.*
 
 ```typescript
@@ -2788,29 +3795,30 @@ export async function* fetchOllamaStream(messages: {
 - Line 30: `generateTimestampId` -> *Executes logic for function generateTimestampId*
 - Line 34: `generateToolResponseId` -> *Executes logic for function generateToolResponseId*
 - Line 188: `runLocalTool` -> *Execute extension APIs on the client locally based on LLM parameters*
+- Line 223: `anonymous_arrow` -> *Sets a ref to track component mounting status and cleans up by setting it to false when the component unmounts.*
+- Line 225: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 240: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
+- Line 245: `anonymous_arrow` -> *Resets the tracked URL to null if the navigation history is empty.*
+- Line 254: `executeAgentTurn` -> *Executes a single agent turn by streaming the model response to the UI, and recursively handles tool calls by running local tools before continuing the assistant's turn.*
+- Line 263: `executeAgentTurn` -> *Adds a new thinking message from the assistant to an existing array of messages associated with a specific query.*
+- Line 277: `apiMessages` -> *Transforms a list of internal message objects into the format required by the Ollama API, including parsing JSON tool calls where applicable.*
+- Line 294: `stream` -> *Executes logic for function stream*
+- Line 309: `executeAgentTurn` -> *Updates a specific agent message within the query state by replacing its content and setting a thinking status based on the length of new data.*
+- Line 323: `executeAgentTurn` -> *Replaces a specific message object within an array by updating its content and setting the thinking status based on text length.*
+- Line 339: `executeAgentTurn` -> *Updates a specific message within the conversation state with the current turn's content and tool usage details, or updates all messages belonging to the agent if necessary.*
+- Line 353: `executeAgentTurn` -> *Executes logic for function executeAgentTurn*
+- Line 383: `executeAgentTurn` -> *Executes logic for function executeAgentTurn*
+- Line 394: `executeAgentTurn` -> *Sets the `thinking` status of a specific message in the state from `true` to `false`.*
+- Line 402: `executeAgentTurn` -> *Executes logic for function executeAgentTurn*
+- Line 413: `executeAgentTurn` -> *Updates a specific message in the existing conversation array to reflect an error state if the latest message is not already that ID.*
+- Line 426: `executeAgentTurn` -> *Replaces a specific message object within an array by setting its content to an error message and disabling its thinking state.*
+- Line 439: `sendMessage` -> *Sends a user message along with optional webpage context and then executes the agent's turn against the updated conversation history.*
+- Line 443: `sendMessage` -> *Asynchronously sends a message by first creating and storing system and user messages derived from the current browser context, then executes the agent turn with the updated history.*
+- Line 444: `sendMessage` -> *Prepares and queues a sequence containing system instructions derived from the current webpage context and the user's message, then executes the agent turn to respond.*
+- Line 474: `sendMessage` -> *Executes logic for function sendMessage*
+- Line 475: `sendMessage` -> *Executes the agent's turn using updated history and resolves upon completion.*
+- Line 477: `sendMessage` -> *Executes logic for function sendMessage*
 - Line 209: `useOllamaChatStream` -> *Manages the complete lifecycle of an AI conversation, handling user input, integrating browser context, streaming model responses via Ollama API, and recursively executing chained tool calls before resolving the chat turn.*
-- Line 223: `arrow_function` -> *Sets and clears a mount status flag for the component lifecycle.*
-- Line 225: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 245: `arrow_function` -> *Resets the last sent URL reference to null if the history array is empty.*
-- Line 254: `arrow_function` -> *Executes a complete agent turn by streaming the LLM response to the UI, handling detected tool calls by executing them sequentially, and managing state transitions until the conversation concludes or an error occurs.*
-- Line 263: `arrow_function` -> *Appends a new placeholder message representing an assistant's response to the existing array of messages within the query cache.*
-- Line 277: `arrow_function` -> *Converts an array of application messages into a structured format suitable for the Ollama API, including parsing tool usage data when available.*
-- Line 294: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 309: `arrow_function` -> *Updates a specific message in the query data by replacing its content and updating the thinking status based on the current text length.*
-- Line 323: `arrow_function` -> *Updates a specific message within an array by replacing its content and setting a boolean status based on the length of the new text.*
-- Line 339: `arrow_function` -> *Updates a specific existing message in the state array by merging it with new content and tool usage details if that message matches the target ID.*
-- Line 353: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 383: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 394: `arrow_function` -> *Updates the message list by setting the `thinking` state to false for a specific assistant message identified by ID.*
-- Line 402: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 413: `arrow_function` -> *Updates a specific message within a client-cached array of messages by setting its content to a predefined error message and marking the thinking state as false.*
-- Line 426: `arrow_function` -> *Replaces a specific message within an array with an error state representation if its ID matches the target assistant message ID.*
-- Line 439: `arrow_function` -> *Asynchronously sends a message by first incorporating the current browser page context into a system instruction and then executing the agent turn with the user's input.*
-- Line 443: `arrow_function` -> *Processes a user message by conditionally appending current webpage context as a system instruction, and then executes the agent turn to update conversation history.*
-- Line 444: `arrow_function` -> *Wraps the agent's turn by constructing and storing system and user messages, then executes the AI response using the combined message history.*
-- Line 474: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 475: `arrow_function` -> *Initiates an asynchronous process that executes the agent's turn and then signals completion.*
-- Line 477: `arrow_function` -> *Executes logic for function arrow_func*
 
 ```typescript
 import { useState, useRef, useEffect, useTransition } from "react";
@@ -2985,22 +3993,22 @@ export function useOllamaChatStream({ isToolMode }: {
     isToolMode: boolean;
 }) {
     useEffect(()=>{
-        '/* "Sets and clears a mount status flag for the component lifecycle." */';
+        '/* "Sets a ref to track component mounting status and cleans up by setting it to false when the component unmounts." */';
     }, []);
     useEffect(()=>{
-        '/* "Resets the last sent URL reference to null if the history array is empty." */';
+        '/* "Resets the tracked URL to null if the navigation history is empty." */';
     }, [
         history.length
     ]);
     const executeAgentTurn = async (currentMessages: Message[]): Promise<void> =>{
-        '/* "Executes a complete agent turn by streaming the LLM response to the UI, handling detected tool calls by executing them sequentially, and managing state transitions until the conversation concludes or an error occurs." */';
+        '/* "Executes a single agent turn by streaming the model response to the UI, and recursively handles tool calls by running local tools before continuing the assistant\'s turn." */';
     };
     const sendMessage = async (text: string, pageContext?: {
         url: string;
         title: string;
         enabled: boolean;
     }): Promise<void> =>{
-        '/* "Asynchronously sends a message by first incorporating the current browser page context into a system instruction and then executing the agent turn with the user\'s input." */';
+        '/* "Sends a user message along with optional webpage context and then executes the agent\'s turn against the updated conversation history." */';
     };
 }
 
@@ -3009,11 +4017,12 @@ export function useOllamaChatStream({ isToolMode }: {
 ### File: `hooks/query/useOllamaNewsAgent.ts`
 
 **Function Summaries**:
+- Line 26: `anonymous_arrow` -> *Cleans up any active asynchronous operations by calling `abort()` on the stored abort controller when the component unmounts.*
+- Line 27: `anonymous_arrow` -> *Cancels an operation by calling the abort method on the stored AbortController instance.*
+- Line 34: `anonymous_arrow` -> *Configures cache duration and staleness settings for a specific React Query key using the global query client.*
+- Line 50: `mutation` -> *Fetches and streams a response from the Ollama API, utilizing caching if available and handling various network or streaming errors.*
+- Line 195: `cancel` -> *Aborts an ongoing operation if a stored abort controller exists, then resets the reference.*
 - Line 17: `useOllamaNewsAgent` -> *Manages and executes a server-side large language model generation request to an Ollama endpoint, handling caching, streaming the response, and providing mechanisms for cancellation and state tracking.*
-- Line 26: `arrow_function` -> *Cleans up any active asynchronous operations by aborting the associated controller when the component unmounts.*
-- Line 27: `arrow_function` -> *Cancels any ongoing asynchronous operation managed by the abort controller reference.*
-- Line 34: `arrow_function` -> *Sets global query defaults for a specific news agent using the React Query client.*
-- Line 195: `arrow_function` -> *Aborts the associated asynchronous operation if an abort controller is currently active and sets the reference to null.*
 
 ```typescript
 import { useState, useRef, useEffect, useDeferredValue } from "react";
@@ -3029,15 +4038,15 @@ interface OllamaGeneratePayload {
 const CACHE_DURATION_MS = 7 * 60 * 60 * 1000;
 export function useOllamaNewsAgent() {
     useEffect(()=>{
-        '/* "Cleans up any active asynchronous operations by aborting the associated controller when the component unmounts." */';
+        '/* "Cleans up any active asynchronous operations by calling `abort()` on the stored abort controller when the component unmounts." */';
     }, []);
     useEffect(()=>{
-        '/* "Sets global query defaults for a specific news agent using the React Query client." */';
+        '/* "Configures cache duration and staleness settings for a specific React Query key using the global query client." */';
     }, [
         queryClient
     ]);
     const cancel = ()=>{
-        '/* "Aborts the associated asynchronous operation if an abort controller is currently active and sets the reference to null." */';
+        '/* "Aborts an ongoing operation if a stored abort controller exists, then resets the reference." */';
     };
 }
 
@@ -3046,36 +4055,36 @@ export function useOllamaNewsAgent() {
 ### File: `hooks/store/useOllamaOptions.ts`
 
 **Function Summaries**:
-- Line 8: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 11: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 19: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 22: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 27: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 30: `arrow_function` -> *Executes logic for function arrow_func*
+- Line 8: `useOllamaEndPointRead` -> *Executes logic for function useOllamaEndPointRead*
+- Line 11: `useOllamaEndPointState` -> *Executes logic for function useOllamaEndPointState*
+- Line 19: `useOllamaSelectedModelState` -> *Executes logic for function useOllamaSelectedModelState*
+- Line 22: `useOllamaSelectedModelRead` -> *Executes logic for function useOllamaSelectedModelRead*
+- Line 27: `useOllamaQuickQuestionState` -> *Executes logic for function useOllamaQuickQuestionState*
+- Line 30: `useOllamaQuickQuestionRead` -> *Executes logic for function useOllamaQuickQuestionRead*
 
 ```typescript
 import { atom, useAtom, useAtomValue } from "jotai";
 import { atomWxtStorage } from ".";
 export const ollamaEndPointAtom = atomWxtStorage("local:ollamaEndPointAtom", "http://localhost:11434");
 export const useOllamaEndPointRead = ()=>{
-    '/* "Executes logic for function arrow_func" */';
+    '/* "Executes logic for function useOllamaEndPointRead" */';
 };
 export const useOllamaEndPointState = ()=>{
-    '/* "Executes logic for function arrow_func" */';
+    '/* "Executes logic for function useOllamaEndPointState" */';
 };
 export const ollamaSelectedModelAtom = atomWxtStorage<string | null>("local:ollamaSelectedModelAtom", "gemma:latest");
 export const useOllamaSelectedModelState = ()=>{
-    '/* "Executes logic for function arrow_func" */';
+    '/* "Executes logic for function useOllamaSelectedModelState" */';
 };
 export const useOllamaSelectedModelRead = ()=>{
-    '/* "Executes logic for function arrow_func" */';
+    '/* "Executes logic for function useOllamaSelectedModelRead" */';
 };
 export const ollamaQuickQuestionAtom = atom<string>("");
 export const useOllamaQuickQuestionState = ()=>{
-    '/* "Executes logic for function arrow_func" */';
+    '/* "Executes logic for function useOllamaQuickQuestionState" */';
 };
 export const useOllamaQuickQuestionRead = ()=>{
-    '/* "Executes logic for function arrow_func" */';
+    '/* "Executes logic for function useOllamaQuickQuestionRead" */';
 };
 
 ```
@@ -3083,8 +4092,13 @@ export const useOllamaQuickQuestionRead = ()=>{
 ### File: `hooks/store/index.ts`
 
 **Function Summaries**:
+- Line 36: `getValidKey` -> *Ensures that a provided key string contains a valid storage area prefix, defaulting to a local scope if the original key is incomplete.*
+- Line 49: `customStorage` -> *Retrieves an item from storage using a given key, falling back to an provided default value if the item does not exist.*
+- Line 54: `customStorage` -> *Executes logic for function customStorage*
+- Line 57: `customStorage` -> *Executes logic for function customStorage*
+- Line 61: `customStorage` -> *Allows external consumers to subscribe to a specific data key by executing a callback function whenever the stored value changes.*
+- Line 62: `customStorage` -> *Executes logic for function customStorage*
 - Line 35: `atomWxtStorage` -> *Configures and returns a reactive storage accessor by validating the provided key prefix before wrapping it in `atomWithStorage`.*
-- Line 36: `arrow_function` -> *Ensures that the provided key string contains a valid storage scope prefix, defaulting to 'local:' if none is found.*
 
 ```typescript
 import { storage } from "#imports";
@@ -3096,7 +4110,7 @@ export { ollamaEndPointAtom, ollamaSelectedModelAtom, ollamaQuickQuestionAtom };
 type ValidWxtKey = `local:${string}` | `session:${string}` | `sync:${string}` | `managed:${string}`;
 export function atomWxtStorage<T>(key: string, initialValue: T) {
     const getValidKey = (key: string): ValidWxtKey =>{
-        "/* \"Ensures that the provided key string contains a valid storage scope prefix, defaulting to 'local:' if none is found.\" */";
+        '/* "Ensures that a provided key string contains a valid storage area prefix, defaulting to a local scope if the original key is incomplete." */';
     };
 }
 
@@ -3105,13 +4119,13 @@ export function atomWxtStorage<T>(key: string, initialValue: T) {
 ### File: `hooks/mutation/useOllamaQuickAnswer.ts`
 
 **Function Summaries**:
-- Line 4: `arrow_function` -> *Registers a mutation hook for integrating quick answers from Ollama into the application state management.*
+- Line 4: `useOllamaQuickAnswer` -> *Defines a React Query mutation hook for executing quick answers using Ollama.*
 
 ```typescript
 import { useMutation } from "@tanstack/react-query";
 import { OLLAMA_BROWSER_EXT_REACTQUERY_KEY } from "../query";
 const useOllamaQuickAnswer = ()=>{
-    '/* "Registers a mutation hook for integrating quick answers from Ollama into the application state management." */';
+    '/* "Defines a React Query mutation hook for executing quick answers using Ollama." */';
 };
 
 ```
@@ -3127,15 +4141,12 @@ export { useActiveTab };
 ### File: `hooks/utils/useActiveTabs.ts`
 
 **Function Summaries**:
+- Line 23: `anonymous_arrow` -> *Manages and updates the currently active browser tab's information by listening to tab activation and update events.*
+- Line 24: `initTab` -> *Asynchronously queries and sets the currently active browser tab's ID and URL.*
+- Line 39: `handleActivated` -> *Retrieves the active browser tab details and sets them if valid information is available.*
+- Line 50: `handleUpdated` -> *Sets the active tab state if the provided tab is active and its status within the change information is complete.*
+- Line 63: `anonymous_arrow` -> *Executes logic for function anonymous_arrow*
 - Line 20: `useActiveTab` -> *Retrieves and monitors the currently active browser tab, updating the state whenever a tab is switched or updated.*
-- Line 23: `arrow_function` -> *This function initializes, monitors, and maintains the current active browser tab's unique ID and URL by responding to activation and update events.*
-- Line 24: `arrow_function` -> *Asynchronously retrieves the currently focused browser tab and sets it as the active tab if found.*
-- Line 39: `arrow_function` -> *Retrieves and sets the active browser tab's ID and URL if the current tab is available.*
-- Line 50: `arrow_function` -> *Updates the active tab state when a specified tab completion status is received and all necessary identifying information is present.*
-- Line 63: `arrow_function` -> *Executes logic for function arrow_func*
-- Line 24: `arrow_function` -> *Asynchronously retrieves the currently focused browser tab and sets it as the active tab if found.*
-- Line 39: `arrow_function` -> *Retrieves and sets the active browser tab's ID and URL if the current tab is available.*
-- Line 50: `arrow_function` -> *Updates the active tab state when a specified tab completion status is received and all necessary identifying information is present.*
 
 ```typescript
 import { useEffect, useState } from "react";
@@ -3152,15 +4163,15 @@ type TabType = Parameters<OnUpdatedListener>[2];
 export function useActiveTab() {
     useEffect(()=>{
         const initTab = async ()=>{
-            '/* "Asynchronously retrieves the currently focused browser tab and sets it as the active tab if found." */';
+            '/* "Asynchronously queries and sets the currently active browser tab\'s ID and URL." */';
         };
         const handleActivated = async (activeInfo: TabActiveInfo)=>{
-            '/* "Retrieves and sets the active browser tab\'s ID and URL if the current tab is available." */';
+            '/* "Retrieves the active browser tab details and sets them if valid information is available." */';
         };
         const handleUpdated = (_tabId: number, changeInfo: TabChangeInfo, tab: TabType)=>{
-            '/* "Updates the active tab state when a specified tab completion status is received and all necessary identifying information is present." */';
+            '/* "Sets the active tab state if the provided tab is active and its status within the change information is complete." */';
         };
-        '/* "This function initializes, monitors, and maintains the current active browser tab\'s unique ID and URL by responding to activation and update events." */';
+        '/* "Manages and updates the currently active browser tab\'s information by listening to tab activation and update events." */';
     }, []);
 }
 

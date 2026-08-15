@@ -43,7 +43,7 @@ impl<'a> VisitMut for ReactJsxPruner<'a> {
                                 if let Some(JSXAttrValue::Str(ref s)) = jsx_attr.value {
                                     let raw_str = s.value.as_str().unwrap_or_default().to_string();
                                     let summary = if raw_str.len() > self.tailwind_threshold {
-                                        let summary = if let Some(ollama) = self.ollama {
+                                        if let Some(ollama) = self.ollama {
                                             ollama
                                                 .summarize_tailwind_classes(&raw_str)
                                                 .unwrap_or_else(|_| {
@@ -54,8 +54,7 @@ impl<'a> VisitMut for ReactJsxPruner<'a> {
                                                 "/* Style: {} classes */",
                                                 raw_str.split_whitespace().count()
                                             )
-                                        };
-                                        summary
+                                        }
                                     } else {
                                         format!(
                                             "/* Style: {} classes */",

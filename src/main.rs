@@ -1,7 +1,13 @@
 use ast::TailwindMode;
 use clap::{Parser, Subcommand, ValueHint};
+use ignore::WalkBuilder;
 use serde::Deserialize;
-use std::{fs, path::PathBuf, sync::Arc};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    sync::Arc,
+};
+use tiktoken::CoreBpe;
 
 mod ast;
 mod markdown;
@@ -272,4 +278,75 @@ fn main() {
         "✅ [urai-ecma] Prompt successfully generated at: {}",
         ctx.output_filename.display()
     );
+    if let Ok(content) = fs::read_to_string(&ctx.output_filename) {
+        if let Some(bpe) = tiktoken::get_encoding("llama3") {
+            let token_count = bpe.encode(&content);
+            println!(
+                "📊 [urai-ecma] Estimated Tokens in {}: {} tokens",
+                ctx.output_filename.display(),
+                &token_count.len()
+            );
+        }
+    }
+
+    if let Some(bpe) = tiktoken::get_encoding("llama3") {
+        let output_tokens = fs::read_to_string(&ctx.output_filename)
+            .ok()
+            .map(|content| bpe.encode(&content).len())
+            .unwrap_or(0);
+
+        let raw_tokens = calculate_raw_project_tokens(&ctx.input_project, bpe);
+
+        if raw_tokens > 0 {
+            let saved_tokens = raw_tokens.saturating_sub(output_tokens);
+            let reduction_percentage = (saved_tokens as f64 / raw_tokens as f64) * 100.0;
+
+            println!("\n============================================================");
+            println!("📊 TOKEN SAVINGS & OPTIMIZATION REPORT");
+            println!("============================================================");
+            println!("📁 Raw Source Code (All JS/TS): {:>10} tokens", raw_tokens);
+            println!(
+                "⚡ Optimized Output (output.md): {:>10} tokens",
+                output_tokens
+            );
+            println!("------------------------------------------------------------");
+            if output_tokens <= raw_tokens {
+                println!(
+                    "🎉 Reduction: -{:.2}% tokens saved! (Saved ~{} tokens)",
+                    reduction_percentage, saved_tokens
+                );
+            } else {
+                println!(
+                    "ℹ️ Output expanded by +{:.2}% tokens due to added AST context/graphs.",
+                    ((output_tokens - raw_tokens) as f64 / raw_tokens as f64) * 100.0
+                );
+            }
+            println!("============================================================\n");
+        }
+    } else {
+        eprintln!("⚠️ Failed to load tiktoken encoding.");
+    }
+}
+
+fn calculate_raw_project_tokens(path: &Path, tokenizer: &CoreBpe) -> usize {
+    let mut total_tokens = 0;
+
+    for result in WalkBuilder::new(path).build() {
+        if let Ok(entry) = result {
+            let file_path = entry.path();
+
+            if file_path.is_file() && is_source_file(file_path) {
+                if let Ok(content) = fs::read_to_string(file_path) {
+                    let encoding = tokenizer.encode(content.as_str());
+                    total_tokens += encoding.len();
+                }
+            }
+        }
+    }
+
+    total_tokens
+}
+fn is_source_file(path: &Path) -> bool {
+    let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
+    matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs" | "json")
 }

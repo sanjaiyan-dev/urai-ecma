@@ -16,6 +16,7 @@ pub struct FunctionSummarizerVisitor<'a> {
     pub comments: SingleThreadedComments,
     pub line_threshold: usize,
     pub current_export_lo: Option<BytePos>,
+    pub fn_name_stack: Vec<String>,
 }
 
 impl<'a> FunctionSummarizerVisitor<'a> {
@@ -34,6 +35,7 @@ impl<'a> FunctionSummarizerVisitor<'a> {
             comments,
             line_threshold,
             current_export_lo: None,
+            fn_name_stack: Vec::new(),
         }
     }
 }
@@ -67,6 +69,17 @@ fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
             false
         }
 
+        Stmt::Return(ret_stmt) => {
+            if let Some(arg) = &ret_stmt.arg {
+                matches!(
+                    &**arg,
+                    Expr::JSXElement(_) | Expr::JSXFragment(_) | Expr::Paren(_)
+                )
+            } else {
+                false
+            }
+        }
+
         _ => false,
     }
 }
@@ -86,8 +99,26 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
         self.current_export_lo = prev;
     }
 
+    fn visit_mut_var_declarator(&mut self, decl: &mut VarDeclarator) {
+        let mut pushed = false;
+        if let Pat::Ident(binding_ident) = &decl.name {
+            self.fn_name_stack.push(binding_ident.id.sym.to_string());
+            pushed = true;
+        }
+
+        decl.visit_mut_children_with(self);
+
+        if pushed {
+            self.fn_name_stack.pop();
+        }
+    }
+
     fn visit_mut_arrow_expr(&mut self, node: &mut ArrowExpr) {
-        let fn_name = "arrow_func".to_string();
+        let fn_name = self
+            .fn_name_stack
+            .last()
+            .cloned()
+            .unwrap_or_else(|| "anonymous_arrow".to_string());
         let lo_pos = self.cm.lookup_char_pos(node.span.lo);
         let hi_pos = self.cm.lookup_char_pos(node.span.hi);
         let line_count = hi_pos.line.saturating_sub(lo_pos.line) + 1;
@@ -110,7 +141,7 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
         };
 
         self.summaries.push(FunctionSummary {
-            function_name: "arrow_function".to_string(),
+            function_name: fn_name,
             line_number: lo_pos.line,
             concise_summary: summary.to_owned(),
         });
@@ -128,10 +159,11 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
                 }))),
             }));
         }
-        node.visit_mut_children_with(self);
     }
 
     fn visit_mut_fn_decl(&mut self, fn_decl: &mut FnDecl) {
+        fn_decl.visit_mut_children_with(self);
+
         let fn_name = fn_decl.ident.sym.to_string();
         let lo_pos = self.cm.lookup_char_pos(fn_decl.function.span.lo);
         let hi_pos = self.cm.lookup_char_pos(fn_decl.function.span.hi);
@@ -164,8 +196,6 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
             line_number: lo_pos.line,
             concise_summary: summary,
         });
-
-        fn_decl.visit_mut_children_with(self);
     }
 }
 
