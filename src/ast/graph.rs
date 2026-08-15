@@ -1,4 +1,4 @@
-use anyhow::{Error, Result, bail};
+use anyhow::{Result, bail};
 use ignore::WalkBuilder;
 use petgraph::graph::UnGraph;
 use std::collections::HashMap;

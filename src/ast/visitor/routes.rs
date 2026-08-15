@@ -171,45 +171,43 @@ impl<'a> Visit for RouteVisitor<'a> {
                             false
                         };
 
-                        if is_express_or_fastify {
-                            if let Some(first_arg) = call.args.first() {
-                                let path = match &*first_arg.expr {
-                                    Expr::Lit(Lit::Str(s)) => {
-                                        s.value.as_str().unwrap_or_default().to_string()
-                                    }
-                                    Expr::Tpl(tpl) => {
-                                        let raw: String = tpl
-                                            .quasis
-                                            .iter()
-                                            .map(|q| q.raw.as_str().to_string())
-                                            .collect::<Vec<_>>()
-                                            .join("${...}");
-                                        raw
-                                    }
-                                    _ => "".to_string(),
-                                };
+                        if is_express_or_fastify && let Some(first_arg) = call.args.first() {
+                            let path = match &*first_arg.expr {
+                                Expr::Lit(Lit::Str(s)) => {
+                                    s.value.as_str().unwrap_or_default().to_string()
+                                }
+                                Expr::Tpl(tpl) => {
+                                    let raw: String = tpl
+                                        .quasis
+                                        .iter()
+                                        .map(|q| q.raw.as_str().to_string())
+                                        .collect::<Vec<_>>()
+                                        .join("${...}");
+                                    raw
+                                }
+                                _ => "".to_string(),
+                            };
 
-                                if !path.is_empty() {
-                                    let framework = if let Expr::Ident(obj) = &*member.obj {
-                                        if obj.sym.contains("fastify") {
-                                            "Fastify"
-                                        } else {
-                                            "Express"
-                                        }
+                            if !path.is_empty() {
+                                let framework = if let Expr::Ident(obj) = &*member.obj {
+                                    if obj.sym.contains("fastify") {
+                                        "Fastify"
                                     } else {
                                         "Express"
-                                    };
+                                    }
+                                } else {
+                                    "Express"
+                                };
 
-                                    let line = self.cm.lookup_char_pos(call.span.lo).line;
-                                    self.routes.push(RouteInfo {
-                                        framework: framework.to_string(),
-                                        method: method_name.to_uppercase(),
-                                        path,
-                                        handler_name: "anonymous_handler".to_string(),
-                                        file_path: self.file_path.to_string(),
-                                        line_number: line,
-                                    });
-                                }
+                                let line = self.cm.lookup_char_pos(call.span.lo).line;
+                                self.routes.push(RouteInfo {
+                                    framework: framework.to_string(),
+                                    method: method_name.to_uppercase(),
+                                    path,
+                                    handler_name: "anonymous_handler".to_string(),
+                                    file_path: self.file_path.to_string(),
+                                    line_number: line,
+                                });
                             }
                         }
                     }

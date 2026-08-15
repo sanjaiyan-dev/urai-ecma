@@ -1,13 +1,9 @@
 use swc_common::comments::{Comment, Comments, SingleThreadedComments};
-use swc_common::{BytePos, SourceMap};
+use swc_common::{BytePos, DUMMY_SP, SourceMap};
 use swc_ecma_ast::*;
-use swc_ecma_visit::{Visit, VisitWith};
+use swc_ecma_visit::{VisitMut, VisitMutWith};
 
-use jsdoc::{
-    Input as JsDocInput,
-    ast::{Tag, TagItem},
-    parse as parse_jsdoc,
-};
+use jsdoc::{Input as JsDocInput, ast::Tag, parse as parse_jsdoc};
 
 use crate::ast::FunctionSummary;
 use crate::ollama::OllamaUrai;
@@ -42,33 +38,63 @@ impl<'a> FunctionSummarizerVisitor<'a> {
     }
 }
 
-impl<'a> Visit for FunctionSummarizerVisitor<'a> {
-    fn visit_export_decl(&mut self, export_decl: &ExportDecl) {
+fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
+    match stmt {
+        Stmt::Decl(Decl::Fn(_)) => true,
+
+        Stmt::Decl(Decl::Var(var_decl)) => var_decl.decls.iter().any(|decl| {
+            if let Some(init) = &decl.init {
+                matches!(**init, Expr::Arrow(_) | Expr::Fn(_))
+            } else {
+                false
+            }
+        }),
+
+        Stmt::Expr(expr_stmt) => {
+            if let Expr::Call(call_expr) = &*expr_stmt.expr {
+                if let Callee::Expr(callee_expr) = &call_expr.callee {
+                    if let Expr::Ident(ident) = &**callee_expr {
+                        let name = ident.sym.as_ref();
+
+                        return name.starts_with("use")
+                            || name == "setTimeout"
+                            || name == "setInterval"
+                            || name.contains("addEventListener")
+                            || name.contains("requestIdleCallback");
+                    }
+                }
+            }
+            false
+        }
+
+        _ => false,
+    }
+}
+
+impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
+    fn visit_mut_export_decl(&mut self, export_decl: &mut ExportDecl) {
         let prev = self.current_export_lo;
         self.current_export_lo = Some(export_decl.span.lo);
-        export_decl.visit_children_with(self);
+        export_decl.visit_mut_children_with(self);
         self.current_export_lo = prev;
     }
 
-    fn visit_export_default_decl(&mut self, export_default: &ExportDefaultDecl) {
+    fn visit_mut_export_default_decl(&mut self, export_default: &mut ExportDefaultDecl) {
         let prev = self.current_export_lo;
         self.current_export_lo = Some(export_default.span.lo);
-        export_default.visit_children_with(self);
+        export_default.visit_mut_children_with(self);
         self.current_export_lo = prev;
     }
-    fn visit_fn_decl(&mut self, fn_decl: &FnDecl) {
-        let fn_name = fn_decl.ident.sym.to_string();
-        let lo_pos = self.cm.lookup_char_pos(fn_decl.function.span.lo);
-        let hi_pos = self.cm.lookup_char_pos(fn_decl.function.span.hi);
+
+    fn visit_mut_arrow_expr(&mut self, node: &mut ArrowExpr) {
+        let fn_name = "arrow_func".to_string();
+        let lo_pos = self.cm.lookup_char_pos(node.span.lo);
+        let hi_pos = self.cm.lookup_char_pos(node.span.hi);
         let line_count = hi_pos.line.saturating_sub(lo_pos.line) + 1;
 
         // First Preference: Check for JSDoc comments (@description, @param, @return)
-        let jsdoc_summary = self.extract_jsdoc_summary(fn_decl);
 
-        let summary = if let Some(jsdoc_text) = jsdoc_summary {
-            // Found JSDoc documentation -> Skip Ollama execution
-            jsdoc_text
-        } else if line_count >= self.line_threshold {
+        let summary = if line_count >= self.line_threshold {
             // Fallback to Ollama if no JSDoc is present AND line count >= threshold
             if let Some(ollama) = self.ollama {
                 let fn_snippet = extract_snippet(self.file_content, lo_pos.line, hi_pos.line);
@@ -84,12 +110,62 @@ impl<'a> Visit for FunctionSummarizerVisitor<'a> {
         };
 
         self.summaries.push(FunctionSummary {
+            function_name: "arrow_function".to_string(),
+            line_number: lo_pos.line,
+            concise_summary: summary.to_owned(),
+        });
+        node.visit_mut_children_with(self);
+
+        if let Some(function_body) = node.body.as_mut_block_stmt() {
+            function_body.stmts.retain(is_structural_stub_stmt);
+
+            function_body.stmts.push(Stmt::Expr(ExprStmt {
+                span: DUMMY_SP,
+                expr: Box::new(Expr::Lit(Lit::Str(Str {
+                    span: DUMMY_SP,
+                    value: format!("/* {:?} */", summary).into(),
+                    raw: None,
+                }))),
+            }));
+        }
+        node.visit_mut_children_with(self);
+    }
+
+    fn visit_mut_fn_decl(&mut self, fn_decl: &mut FnDecl) {
+        let fn_name = fn_decl.ident.sym.to_string();
+        let lo_pos = self.cm.lookup_char_pos(fn_decl.function.span.lo);
+        let hi_pos = self.cm.lookup_char_pos(fn_decl.function.span.hi);
+        let line_count = hi_pos.line.saturating_sub(lo_pos.line) + 1;
+
+        // First Preference: Check for JSDoc comments (@description, @param, @return)
+        let jsdoc_summary = self.extract_jsdoc_summary(fn_decl);
+
+        let summary = if let Some(jsdoc_text) = jsdoc_summary {
+            jsdoc_text
+        } else if line_count >= self.line_threshold {
+            if let Some(ollama) = self.ollama {
+                let fn_snippet = extract_snippet(self.file_content, lo_pos.line, hi_pos.line);
+                ollama
+                    .summarize_function(&fn_name, &fn_snippet)
+                    .unwrap_or_else(|_| format!("Executes logic for function {}", fn_name))
+            } else {
+                format!("Executes logic for function {}", fn_name)
+            }
+        } else {
+            format!("Executes logic for function {}", fn_name)
+        };
+
+        if let Some(function_body) = &mut fn_decl.function.body {
+            function_body.stmts.retain(is_structural_stub_stmt);
+        }
+
+        self.summaries.push(FunctionSummary {
             function_name: fn_name,
             line_number: lo_pos.line,
             concise_summary: summary,
         });
 
-        fn_decl.visit_children_with(self);
+        fn_decl.visit_mut_children_with(self);
     }
 }
 
@@ -196,7 +272,6 @@ fn parse_jsdoc_comment(raw_comment: &Comment) -> Option<JsDocInfo> {
         }
     }
 
-    // Manual line-by-line fallback parser for non-standard or line comments
     let mut description_lines = Vec::new();
     let mut params = Vec::new();
     let mut returns = None;

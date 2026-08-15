@@ -1,6 +1,6 @@
 {
     // Path to the project directory or single source file
-    "input_project": "../rspress-plugin-third-parties",
+    "input_project": "../ollama-web-browser",
 
     // Target output Markdown file path
     "output_file": "./output.md",
@@ -9,7 +9,7 @@
     "ollama_endpoint": "http://localhost:11434",
 
     // Ollama Model Name (e.g., "gemma4", "ornith")
-    "ollama_modelname": "gemma4",
+    "ollama_modelname": "gemma4:e4b-mlx",
 
     // Tailwind CSS / className pruning mode: "remove" | "remove_aggr" | "summarize" | "preserve"
     // "remove": strips static class strings exceeding threshold while keeping dynamic expressions.

@@ -1,7 +1,7 @@
 use crate::ast::graph::ProjectGraph;
 use std::fmt::Write;
 
-use crate::ast::{FileAnalysisResult, PackageJsonUrai, RouteInfo};
+use crate::ast::{FileAnalysisResult, RouteInfo};
 
 pub struct MarkdownContentBuilder {
     pub package_info: String,
@@ -31,7 +31,7 @@ impl MarkdownContentBuilder {
             if !graph.dependency_graph.is_empty() {
                 out.push_str("### Module Dependency Graph\n\n");
                 out.push_str(&graph.dependency_graph);
-                out.push_str("\n");
+                out.push('\n');
             }
             out.push_str("---\n\n");
         }
@@ -87,7 +87,7 @@ impl MarkdownContentBuilder {
                         fn_sum.line_number, fn_sum.function_name, fn_sum.concise_summary
                     ));
                 }
-                out.push_str("\n");
+                out.push('\n');
             }
 
             let lang = match file.file_path.extension().and_then(|e| e.to_str()) {

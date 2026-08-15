@@ -85,7 +85,7 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                             comments,
                             ctx.summarize_functions_threshold,
                         );
-                        module.visit_with(&mut fn_vis);
+                        module.visit_mut_with(&mut fn_vis);
                         fn_summaries = fn_vis.summaries;
                     }
 
@@ -94,6 +94,7 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                         let mut pruner = ReactJsxPruner {
                             mode: ctx.tailwind_mode,
                             ollama: ollama_ref,
+                            tailwind_threshold: ctx.tailwind_threshold,
                         };
                         module.visit_mut_with(&mut pruner);
                     }

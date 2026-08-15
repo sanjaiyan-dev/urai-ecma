@@ -66,10 +66,10 @@ impl OllamaUrai {
             .unwrap_or("gemma2");
 
         let cache_key = self.generate_cache_key(&prompt.to_string());
-        if let Ok(cached_response) = self.get_cache_res(&cache_key) {
-            if cached_response.response != "URAI_OLLAMA_CACHE_MISS" {
-                return Ok(cached_response.response);
-            }
+        if let Ok(cached_response) = self.get_cache_res(&cache_key)
+            && cached_response.response != "URAI_OLLAMA_CACHE_MISS"
+        {
+            return Ok(cached_response.response);
         }
 
         let payload = OllamaRequest {

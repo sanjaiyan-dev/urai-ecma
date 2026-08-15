@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -10,22 +10,16 @@ pub mod package_json;
 pub mod parser;
 pub mod visitor;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum TailwindMode {
+    #[default]
     Remove,
     #[serde(alias = "remove_aggressive", alias = "aggressive")]
     RemoveAggr,
     Summarize,
     Preserve,
 }
-
-impl Default for TailwindMode {
-    fn default() -> Self {
-        TailwindMode::Remove
-    }
-}
-
 pub struct PackageJsonUrai {
     pub ctx: Arc<UraiContext>,
 }
