@@ -1,5 +1,5 @@
 use swc_common::comments::{Comment, Comments, SingleThreadedComments};
-use swc_common::{BytePos, SourceMap};
+use swc_common::{BytePos, DUMMY_SP, SourceMap};
 use swc_ecma_ast::*;
 use swc_ecma_visit::{VisitMut, VisitMutWith};
 
@@ -57,15 +57,16 @@ fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
         Stmt::Expr(expr_stmt) => {
             if let Expr::Call(call_expr) = &*expr_stmt.expr
                 && let Callee::Expr(callee_expr) = &call_expr.callee
-                    && let Expr::Ident(ident) = &**callee_expr {
-                        let name = ident.sym.as_ref();
+                && let Expr::Ident(ident) = &**callee_expr
+            {
+                let name = ident.sym.as_ref();
 
-                        return name.starts_with("use")
-                            || name == "setTimeout"
-                            || name == "setInterval"
-                            || name.contains("addEventListener")
-                            || name.contains("requestIdleCallback");
-                    }
+                return name.starts_with("use")
+                    || name == "setTimeout"
+                    || name == "setInterval"
+                    || name.contains("addEventListener")
+                    || name.contains("requestIdleCallback");
+            }
             false
         }
 
@@ -189,6 +190,7 @@ impl<'a> VisitMut for ClassMethodSummarizerVisitor<'a> {
         } else if line_count >= self.line_threshold {
             if let Some(ollama) = self.ollama {
                 let fn_snippet = extract_snippet(self.file_content, lo_pos.line, hi_pos.line);
+
                 ollama
                     .summarize_function(&full_name, &fn_snippet)
                     .unwrap_or_else(|_| format!("Executes logic for method {}", full_name))
@@ -203,7 +205,18 @@ impl<'a> VisitMut for ClassMethodSummarizerVisitor<'a> {
             function_body.stmts.retain(is_structural_stub_stmt);
         }
 
-        println!("{:?}", summary);
+        if let Some(function_body) = class_method.function.body.as_mut() {
+            function_body.stmts.retain(is_structural_stub_stmt);
+
+            function_body.stmts.push(Stmt::Expr(ExprStmt {
+                span: DUMMY_SP,
+                expr: Box::new(Expr::Lit(Lit::Str(Str {
+                    span: DUMMY_SP,
+                    value: format!("/* {:?} */", summary).into(),
+                    raw: None,
+                }))),
+            }));
+        }
 
         self.summaries.push(FunctionSummary {
             function_name: full_name,
@@ -252,7 +265,18 @@ impl<'a> VisitMut for ClassMethodSummarizerVisitor<'a> {
             function_body.stmts.retain(is_structural_stub_stmt);
         }
 
-        println!("{:?}", summary);
+        if let Some(function_body) = private_method.function.body.as_mut() {
+            function_body.stmts.retain(is_structural_stub_stmt);
+
+            function_body.stmts.push(Stmt::Expr(ExprStmt {
+                span: DUMMY_SP,
+                expr: Box::new(Expr::Lit(Lit::Str(Str {
+                    span: DUMMY_SP,
+                    value: format!("/* {:?} */", summary).into(),
+                    raw: None,
+                }))),
+            }));
+        }
 
         self.summaries.push(FunctionSummary {
             function_name: full_name,
@@ -333,6 +357,7 @@ fn parse_jsdoc_comment(raw_comment: &Comment) -> Option<JsDocInfo> {
             match item.tag {
                 Tag::Description(d) => {
                     let desc = d.text.value.trim();
+
                     if !desc.is_empty() && !description_lines.contains(&desc.to_string()) {
                         description_lines.push(desc.to_string());
                     }

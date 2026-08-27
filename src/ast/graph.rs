@@ -106,17 +106,17 @@ fn build_petgraph_dependencies(root_path: &Path) -> Result<String> {
                 let trimmed = line.trim();
                 if (trimmed.starts_with("import ") || trimmed.starts_with("export "))
                     && trimmed.contains("from ")
-                    && let Some(import_spec) = trimmed.split("from ").nth(1) {
-                        let clean_spec = import_spec
-                            .trim()
-                            .trim_matches(';')
-                            .trim_matches('\'')
-                            .trim_matches('"');
-                        if clean_spec.starts_with('.') {
-                            dep_summary
-                                .push_str(&format!("    {} --> {};\n", source_rel, clean_spec));
-                        }
+                    && let Some(import_spec) = trimmed.split("from ").nth(1)
+                {
+                    let clean_spec = import_spec
+                        .trim()
+                        .trim_matches(';')
+                        .trim_matches('\'')
+                        .trim_matches('"');
+                    if clean_spec.starts_with('.') {
+                        dep_summary.push_str(&format!("    {} --> {};\n", source_rel, clean_spec));
                     }
+                }
             }
         }
     }
@@ -145,9 +145,9 @@ fn collect_js_ts_files(dir: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
                         || file_name == "dist"
                         || file_name == "build"
                         || file_name == "target")
-                    {
-                        return false;
-                    }
+                {
+                    return false;
+                }
                 true
             })
             .build()

@@ -132,15 +132,16 @@ impl<'a> Visit for ReactComponentAnalyzer<'a> {
             if let Pat::Ident(ident) = &decl.name {
                 let name = ident.id.sym.to_string();
                 if is_component_name(&name)
-                    && let Some(init) = &decl.init {
-                        if let Expr::Arrow(arrow) = &**init {
-                            let analysis = analyze_arrow_body(&name, arrow);
-                            self.components.push(analysis);
-                        } else if let Expr::Fn(fn_expr) = &**init {
-                            let analysis = analyze_function_body(&name, &fn_expr.function);
-                            self.components.push(analysis);
-                        }
+                    && let Some(init) = &decl.init
+                {
+                    if let Expr::Arrow(arrow) = &**init {
+                        let analysis = analyze_arrow_body(&name, arrow);
+                        self.components.push(analysis);
+                    } else if let Expr::Fn(fn_expr) = &**init {
+                        let analysis = analyze_function_body(&name, &fn_expr.function);
+                        self.components.push(analysis);
                     }
+                }
             }
         }
         var_decl.visit_children_with(self);
@@ -317,17 +318,18 @@ struct ComponentBodyInspector {
 impl Visit for ComponentBodyInspector {
     fn visit_call_expr(&mut self, call: &CallExpr) {
         if let Callee::Expr(callee_expr) = &call.callee
-            && let Expr::Ident(ident) = &**callee_expr {
-                let name = ident.sym.as_str();
-                if name.starts_with("use") {
-                    if !self.hooks_used.contains(&name.to_string()) {
-                        self.hooks_used.push(name.to_string());
-                    }
-                    if name == "useEffect" || name == "useLayoutEffect" {
-                        self.effect_count += 1;
-                    }
+            && let Expr::Ident(ident) = &**callee_expr
+        {
+            let name = ident.sym.as_str();
+            if name.starts_with("use") {
+                if !self.hooks_used.contains(&name.to_string()) {
+                    self.hooks_used.push(name.to_string());
+                }
+                if name == "useEffect" || name == "useLayoutEffect" {
+                    self.effect_count += 1;
                 }
             }
+        }
         call.visit_children_with(self);
     }
 
@@ -335,37 +337,38 @@ impl Visit for ComponentBodyInspector {
         for declarator in &decl.decls {
             if let Pat::Array(arr) = &declarator.name
                 && let Some(init) = &declarator.init
-                    && let Expr::Call(call) = &**init
-                        && let Callee::Expr(callee_expr) = &call.callee
-                            && let Expr::Ident(ident) = &**callee_expr
-                                && ident.sym == "useState" {
-                                    let state_name = arr
-                                        .elems
-                                        .first()
-                                        .and_then(|e| e.as_ref())
-                                        .and_then(|p| match p {
-                                            Pat::Ident(id) => Some(id.id.sym.to_string()),
-                                            _ => None,
-                                        })
-                                        .unwrap_or_else(|| "state".to_string());
+                && let Expr::Call(call) = &**init
+                && let Callee::Expr(callee_expr) = &call.callee
+                && let Expr::Ident(ident) = &**callee_expr
+                && ident.sym == "useState"
+            {
+                let state_name = arr
+                    .elems
+                    .first()
+                    .and_then(|e| e.as_ref())
+                    .and_then(|p| match p {
+                        Pat::Ident(id) => Some(id.id.sym.to_string()),
+                        _ => None,
+                    })
+                    .unwrap_or_else(|| "state".to_string());
 
-                                    let setter_name = arr
-                                        .elems
-                                        .get(1)
-                                        .and_then(|e| e.as_ref())
-                                        .and_then(|p| match p {
-                                            Pat::Ident(id) => Some(id.id.sym.to_string()),
-                                            _ => None,
-                                        })
-                                        .unwrap_or_else(|| "setState".to_string());
+                let setter_name = arr
+                    .elems
+                    .get(1)
+                    .and_then(|e| e.as_ref())
+                    .and_then(|p| match p {
+                        Pat::Ident(id) => Some(id.id.sym.to_string()),
+                        _ => None,
+                    })
+                    .unwrap_or_else(|| "setState".to_string());
 
-                                    self.state_vars.push(StateDetail {
-                                        state_name,
-                                        setter_name,
-                                        initial_value: None,
-                                        state_type: "any".to_string(),
-                                    });
-                                }
+                self.state_vars.push(StateDetail {
+                    state_name,
+                    setter_name,
+                    initial_value: None,
+                    state_type: "any".to_string(),
+                });
+            }
         }
         decl.visit_children_with(self);
     }

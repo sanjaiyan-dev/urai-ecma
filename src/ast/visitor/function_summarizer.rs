@@ -55,15 +55,16 @@ fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
         Stmt::Expr(expr_stmt) => {
             if let Expr::Call(call_expr) = &*expr_stmt.expr
                 && let Callee::Expr(callee_expr) = &call_expr.callee
-                    && let Expr::Ident(ident) = &**callee_expr {
-                        let name = ident.sym.as_ref();
+                && let Expr::Ident(ident) = &**callee_expr
+            {
+                let name = ident.sym.as_ref();
 
-                        return name.starts_with("use")
-                            || name == "setTimeout"
-                            || name == "setInterval"
-                            || name.contains("addEventListener")
-                            || name.contains("requestIdleCallback");
-                    }
+                return name.starts_with("use")
+                    || name == "setTimeout"
+                    || name == "setInterval"
+                    || name.contains("addEventListener")
+                    || name.contains("requestIdleCallback");
+            }
             false
         }
 
@@ -160,8 +161,6 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
     }
 
     fn visit_mut_fn_decl(&mut self, fn_decl: &mut FnDecl) {
-        fn_decl.visit_mut_children_with(self);
-
         let fn_name = fn_decl.ident.sym.to_string();
         let lo_pos = self.cm.lookup_char_pos(fn_decl.function.span.lo);
         let hi_pos = self.cm.lookup_char_pos(fn_decl.function.span.hi);
@@ -188,6 +187,7 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
         if let Some(function_body) = &mut fn_decl.function.body {
             function_body.stmts.retain(is_structural_stub_stmt);
         }
+        fn_decl.visit_mut_children_with(self);
 
         if let Some(function_body) = fn_decl.function.body.as_mut() {
             function_body.stmts.retain(is_structural_stub_stmt);

@@ -201,16 +201,15 @@ fn collect_source_files(path: &Path) -> Vec<PathBuf> {
                     || file_name == "dist"
                     || file_name == "build"
                     || file_name == "target")
-                {
-                    return false;
-                }
+            {
+                return false;
+            }
             true
         })
         .build()
         .filter_map(|entry| entry.ok())
         .filter(|entry| {
-            entry.file_type().is_some_and(|ft| ft.is_file())
-                && is_supported_extension(entry.path())
+            entry.file_type().is_some_and(|ft| ft.is_file()) && is_supported_extension(entry.path())
         })
         .map(|entry| entry.into_path())
         .collect()
@@ -219,9 +218,7 @@ fn collect_source_files(path: &Path) -> Vec<PathBuf> {
 pub fn is_supported_extension(path: &Path) -> bool {
     path.extension()
         .and_then(|e| e.to_str())
-        .is_some_and(|ext| {
-            matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs")
-        })
+        .is_some_and(|ext| matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs"))
 }
 
 fn emit_code(module: &swc_ecma_ast::Module, cm: Lrc<SourceMap>) -> String {
