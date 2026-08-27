@@ -191,6 +191,19 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
             function_body.stmts.retain(is_structural_stub_stmt);
         }
 
+         if let Some(function_body) = fn_decl.function.body.as_mut() {
+            function_body.stmts.retain(is_structural_stub_stmt);
+
+            function_body.stmts.push(Stmt::Expr(ExprStmt {
+                span: DUMMY_SP,
+                expr: Box::new(Expr::Lit(Lit::Str(Str {
+                    span: DUMMY_SP,
+                    value: format!("/* {:?} */", summary).into(),
+                    raw: None,
+                }))),
+            }));
+        }
+
         self.summaries.push(FunctionSummary {
             function_name: fn_name,
             line_number: lo_pos.line,
