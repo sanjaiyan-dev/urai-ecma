@@ -196,21 +196,20 @@ fn collect_source_files(path: &Path) -> Vec<PathBuf> {
         .ignore(true)
         .filter_entry(|entry| {
             // Prune heavy directories early before recursing into them
-            if let Some(file_name) = entry.file_name().to_str() {
-                if file_name == "node_modules"
+            if let Some(file_name) = entry.file_name().to_str()
+                && (file_name == "node_modules"
                     || file_name == "dist"
                     || file_name == "build"
-                    || file_name == "target"
+                    || file_name == "target")
                 {
                     return false;
                 }
-            }
             true
         })
         .build()
         .filter_map(|entry| entry.ok())
         .filter(|entry| {
-            entry.file_type().map_or(false, |ft| ft.is_file())
+            entry.file_type().is_some_and(|ft| ft.is_file())
                 && is_supported_extension(entry.path())
         })
         .map(|entry| entry.into_path())
@@ -220,7 +219,7 @@ fn collect_source_files(path: &Path) -> Vec<PathBuf> {
 pub fn is_supported_extension(path: &Path) -> bool {
     path.extension()
         .and_then(|e| e.to_str())
-        .map_or(false, |ext| {
+        .is_some_and(|ext| {
             matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs")
         })
 }

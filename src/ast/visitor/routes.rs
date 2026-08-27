@@ -26,11 +26,10 @@ impl<'a> RouteVisitor<'a> {
 impl<'a> Visit for RouteVisitor<'a> {
     fn visit_export_decl(&mut self, export: &ExportDecl) {
         // Next.js App Router API route check (export async function GET(req))
-        if self.file_path.contains("route.ts")
+        if (self.file_path.contains("route.ts")
             || self.file_path.contains("route.js")
-            || self.file_path.contains("/api/")
-        {
-            if let Decl::Fn(fn_decl) = &export.decl {
+            || self.file_path.contains("/api/"))
+            && let Decl::Fn(fn_decl) = &export.decl {
                 let fn_name = fn_decl.ident.sym.to_string();
                 let upper_name = fn_name.to_uppercase();
                 if matches!(
@@ -49,7 +48,6 @@ impl<'a> Visit for RouteVisitor<'a> {
                     });
                 }
             }
-        }
         export.visit_children_with(self);
     }
 
@@ -57,10 +55,10 @@ impl<'a> Visit for RouteVisitor<'a> {
         // NestJS Controller check
         let mut controller_prefix = None;
         for decorator in &class_decl.class.decorators {
-            if let Expr::Call(call) = &*decorator.expr {
-                if let Callee::Expr(callee_expr) = &call.callee {
-                    if let Expr::Ident(ident) = &**callee_expr {
-                        if ident.sym == "Controller" {
+            if let Expr::Call(call) = &*decorator.expr
+                && let Callee::Expr(callee_expr) = &call.callee
+                    && let Expr::Ident(ident) = &**callee_expr
+                        && ident.sym == "Controller" {
                             let prefix = if let Some(arg) = call.args.first() {
                                 match &*arg.expr {
                                     Expr::Lit(Lit::Str(s)) => {
@@ -73,9 +71,6 @@ impl<'a> Visit for RouteVisitor<'a> {
                             };
                             controller_prefix = Some(prefix);
                         }
-                    }
-                }
-            }
         }
 
         if let Some(ref base_path) = controller_prefix {
@@ -86,12 +81,12 @@ impl<'a> Visit for RouteVisitor<'a> {
             };
 
             for member in &class_decl.class.body {
-                if let ClassMember::Method(method) = member {
-                    if let PropName::Ident(method_ident) = &method.key {
+                if let ClassMember::Method(method) = member
+                    && let PropName::Ident(method_ident) = &method.key {
                         for decorator in &method.function.decorators {
-                            if let Expr::Call(call) = &*decorator.expr {
-                                if let Callee::Expr(callee_expr) = &call.callee {
-                                    if let Expr::Ident(ident) = &**callee_expr {
+                            if let Expr::Call(call) = &*decorator.expr
+                                && let Callee::Expr(callee_expr) = &call.callee
+                                    && let Expr::Ident(ident) = &**callee_expr {
                                         let http_method = ident.sym.to_string().to_uppercase();
                                         if matches!(
                                             http_method.as_str(),
@@ -134,11 +129,8 @@ impl<'a> Visit for RouteVisitor<'a> {
                                             });
                                         }
                                     }
-                                }
-                            }
                         }
                     }
-                }
             }
         }
 
@@ -147,9 +139,9 @@ impl<'a> Visit for RouteVisitor<'a> {
 
     fn visit_call_expr(&mut self, call: &CallExpr) {
         // Express & Fastify endpoint check
-        if let Callee::Expr(callee_expr) = &call.callee {
-            if let Expr::Member(member) = &**callee_expr {
-                if let MemberProp::Ident(prop_ident) = &member.prop {
+        if let Callee::Expr(callee_expr) = &call.callee
+            && let Expr::Member(member) = &**callee_expr
+                && let MemberProp::Ident(prop_ident) = &member.prop {
                     let method_name = prop_ident.sym.to_string().to_lowercase();
                     if matches!(
                         method_name.as_str(),
@@ -212,8 +204,6 @@ impl<'a> Visit for RouteVisitor<'a> {
                         }
                     }
                 }
-            }
-        }
 
         call.visit_children_with(self);
     }

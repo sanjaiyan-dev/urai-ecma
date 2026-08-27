@@ -278,16 +278,15 @@ fn main() {
         "✅ [urai-ecma] Prompt successfully generated at: {}",
         ctx.output_filename.display()
     );
-    if let Ok(content) = fs::read_to_string(&ctx.output_filename) {
-        if let Some(bpe) = tiktoken::get_encoding("llama3") {
+    if let Ok(content) = fs::read_to_string(&ctx.output_filename)
+        && let Some(bpe) = tiktoken::get_encoding("llama3") {
             let token_count = bpe.encode(&content);
             println!(
                 "📊 [urai-ecma] Estimated Tokens in {}: {} tokens",
                 ctx.output_filename.display(),
-                &token_count.len()
+                token_count.len()
             );
         }
-    }
 
     if let Some(bpe) = tiktoken::get_encoding("llama3") {
         let output_tokens = fs::read_to_string(&ctx.output_filename)
@@ -331,20 +330,17 @@ fn main() {
 fn calculate_raw_project_tokens(path: &Path, tokenizer: &CoreBpe) -> usize {
     let mut total_tokens = 0;
 
-    for result in WalkBuilder::new(path).build() {
-        if let Ok(entry) = result {
-            let file_path = entry.path();
+    for entry in WalkBuilder::new(path).build().flatten() {
+        let file_path = entry.path();
 
-            if file_path.is_file() && is_source_file(file_path) {
-                if let Ok(content) = fs::read_to_string(file_path) {
-                    let encoding = tokenizer.encode(content.as_str());
-                    if let Some(file_name) = file_path.file_name() {
-                        total_tokens += file_name.len();
-                    }
-                    total_tokens += encoding.len();
+        if file_path.is_file() && is_source_file(file_path)
+            && let Ok(content) = fs::read_to_string(file_path) {
+                let encoding = tokenizer.encode(content.as_str());
+                if let Some(file_name) = file_path.file_name() {
+                    total_tokens += file_name.len();
                 }
+                total_tokens += encoding.len();
             }
-        }
     }
 
     total_tokens

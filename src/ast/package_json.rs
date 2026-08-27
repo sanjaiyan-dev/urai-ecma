@@ -76,7 +76,7 @@ impl PackageJsonUrai {
 
         let mut pkg_json_content = String::with_capacity(pkg_json_content_est_size);
 
-        let _ = writeln!(pkg_json_content, "# Project Title: {} \n", &pkg_json.name);
+        let _ = writeln!(pkg_json_content, "# Project Title: {} \n", pkg_json.name);
 
         if let Some(desc) = &pkg_json.description {
             let _ = writeln!(pkg_json_content, "## Project Description\n\n{desc}\n");

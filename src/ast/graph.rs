@@ -106,8 +106,7 @@ fn build_petgraph_dependencies(root_path: &Path) -> Result<String> {
                 let trimmed = line.trim();
                 if (trimmed.starts_with("import ") || trimmed.starts_with("export "))
                     && trimmed.contains("from ")
-                {
-                    if let Some(import_spec) = trimmed.split("from ").nth(1) {
+                    && let Some(import_spec) = trimmed.split("from ").nth(1) {
                         let clean_spec = import_spec
                             .trim()
                             .trim_matches(';')
@@ -118,7 +117,6 @@ fn build_petgraph_dependencies(root_path: &Path) -> Result<String> {
                                 .push_str(&format!("    {} --> {};\n", source_rel, clean_spec));
                         }
                     }
-                }
             }
         }
     }
@@ -142,22 +140,21 @@ fn collect_js_ts_files(dir: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
             .ignore(true)
             .filter_entry(|entry| {
                 // Prune heavy directories early before recursing into them
-                if let Some(file_name) = entry.file_name().to_str() {
-                    if file_name == "node_modules"
+                if let Some(file_name) = entry.file_name().to_str()
+                    && (file_name == "node_modules"
                         || file_name == "dist"
                         || file_name == "build"
-                        || file_name == "target"
+                        || file_name == "target")
                     {
                         return false;
                     }
-                }
                 true
             })
             .build()
             .filter_map(|entry| entry.ok())
             .filter(|entry| {
-                entry.file_type().map_or(false, |ft| ft.is_file())
-                    && is_supported_extension(&entry.path())
+                entry.file_type().is_some_and(|ft| ft.is_file())
+                    && is_supported_extension(entry.path())
             })
             .map(|entry| entry.into_path())
             .collect();

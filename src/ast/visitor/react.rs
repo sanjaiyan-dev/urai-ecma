@@ -131,8 +131,8 @@ impl<'a> Visit for ReactComponentAnalyzer<'a> {
         for decl in &var_decl.decls {
             if let Pat::Ident(ident) = &decl.name {
                 let name = ident.id.sym.to_string();
-                if is_component_name(&name) {
-                    if let Some(init) = &decl.init {
+                if is_component_name(&name)
+                    && let Some(init) = &decl.init {
                         if let Expr::Arrow(arrow) = &**init {
                             let analysis = analyze_arrow_body(&name, arrow);
                             self.components.push(analysis);
@@ -141,7 +141,6 @@ impl<'a> Visit for ReactComponentAnalyzer<'a> {
                             self.components.push(analysis);
                         }
                     }
-                }
             }
         }
         var_decl.visit_children_with(self);
@@ -149,7 +148,7 @@ impl<'a> Visit for ReactComponentAnalyzer<'a> {
 }
 
 fn is_component_name(name: &str) -> bool {
-    name.chars().next().map_or(false, |c| c.is_uppercase())
+    name.chars().next().is_some_and(|c| c.is_uppercase())
 }
 
 fn analyze_function_body(name: &str, func: &Function) -> ReactComponentAnalysis {
@@ -317,8 +316,8 @@ struct ComponentBodyInspector {
 
 impl Visit for ComponentBodyInspector {
     fn visit_call_expr(&mut self, call: &CallExpr) {
-        if let Callee::Expr(callee_expr) = &call.callee {
-            if let Expr::Ident(ident) = &**callee_expr {
+        if let Callee::Expr(callee_expr) = &call.callee
+            && let Expr::Ident(ident) = &**callee_expr {
                 let name = ident.sym.as_str();
                 if name.starts_with("use") {
                     if !self.hooks_used.contains(&name.to_string()) {
@@ -329,18 +328,17 @@ impl Visit for ComponentBodyInspector {
                     }
                 }
             }
-        }
         call.visit_children_with(self);
     }
 
     fn visit_var_decl(&mut self, decl: &VarDecl) {
         for declarator in &decl.decls {
-            if let Pat::Array(arr) = &declarator.name {
-                if let Some(init) = &declarator.init {
-                    if let Expr::Call(call) = &**init {
-                        if let Callee::Expr(callee_expr) = &call.callee {
-                            if let Expr::Ident(ident) = &**callee_expr {
-                                if ident.sym == "useState" {
+            if let Pat::Array(arr) = &declarator.name
+                && let Some(init) = &declarator.init
+                    && let Expr::Call(call) = &**init
+                        && let Callee::Expr(callee_expr) = &call.callee
+                            && let Expr::Ident(ident) = &**callee_expr
+                                && ident.sym == "useState" {
                                     let state_name = arr
                                         .elems
                                         .first()
@@ -368,11 +366,6 @@ impl Visit for ComponentBodyInspector {
                                         state_type: "any".to_string(),
                                     });
                                 }
-                            }
-                        }
-                    }
-                }
-            }
         }
         decl.visit_children_with(self);
     }

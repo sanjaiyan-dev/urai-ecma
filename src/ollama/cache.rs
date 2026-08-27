@@ -40,7 +40,7 @@ impl OllamaUrai {
             .block_on(async { self.cache.get(cache_key).await })?;
 
         if let Some(entry) = cached_entry {
-            return Ok(entry.value().clone());
+            Ok(entry.value().clone())
         } else {
             bail!("Cache miss")
         }

@@ -53,9 +53,9 @@ fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
         }),
 
         Stmt::Expr(expr_stmt) => {
-            if let Expr::Call(call_expr) = &*expr_stmt.expr {
-                if let Callee::Expr(callee_expr) = &call_expr.callee {
-                    if let Expr::Ident(ident) = &**callee_expr {
+            if let Expr::Call(call_expr) = &*expr_stmt.expr
+                && let Callee::Expr(callee_expr) = &call_expr.callee
+                    && let Expr::Ident(ident) = &**callee_expr {
                         let name = ident.sym.as_ref();
 
                         return name.starts_with("use")
@@ -64,8 +64,6 @@ fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
                             || name.contains("addEventListener")
                             || name.contains("requestIdleCallback");
                     }
-                }
-            }
             false
         }
 
@@ -191,7 +189,7 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
             function_body.stmts.retain(is_structural_stub_stmt);
         }
 
-         if let Some(function_body) = fn_decl.function.body.as_mut() {
+        if let Some(function_body) = fn_decl.function.body.as_mut() {
             function_body.stmts.retain(is_structural_stub_stmt);
 
             function_body.stmts.push(Stmt::Expr(ExprStmt {

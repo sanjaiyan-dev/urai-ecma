@@ -1,5 +1,5 @@
 use swc_common::comments::{Comment, Comments, SingleThreadedComments};
-use swc_common::{BytePos, DUMMY_SP, SourceMap};
+use swc_common::{BytePos, SourceMap};
 use swc_ecma_ast::*;
 use swc_ecma_visit::{VisitMut, VisitMutWith};
 
@@ -55,9 +55,9 @@ fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
         }),
 
         Stmt::Expr(expr_stmt) => {
-            if let Expr::Call(call_expr) = &*expr_stmt.expr {
-                if let Callee::Expr(callee_expr) = &call_expr.callee {
-                    if let Expr::Ident(ident) = &**callee_expr {
+            if let Expr::Call(call_expr) = &*expr_stmt.expr
+                && let Callee::Expr(callee_expr) = &call_expr.callee
+                    && let Expr::Ident(ident) = &**callee_expr {
                         let name = ident.sym.as_ref();
 
                         return name.starts_with("use")
@@ -66,8 +66,6 @@ fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
                             || name.contains("addEventListener")
                             || name.contains("requestIdleCallback");
                     }
-                }
-            }
             false
         }
 
@@ -207,7 +205,6 @@ impl<'a> VisitMut for ClassMethodSummarizerVisitor<'a> {
 
         println!("{:?}", summary);
 
-
         self.summaries.push(FunctionSummary {
             function_name: full_name,
             line_number: lo_pos.line,
@@ -277,8 +274,7 @@ impl<'a> VisitMut for ClassMethodSummarizerVisitor<'a> {
             self.fn_name_stack.pop();
         }
     }
-
-    }
+}
 
 impl<'a> ClassMethodSummarizerVisitor<'a> {
     /// Extract and format JSDoc annotations by generic Spans, replacing strict FnDecl requirements
