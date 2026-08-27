@@ -1,5 +1,6 @@
 use swc_ecma_ast::{TsEntityName, TsKeywordTypeKind, TsType};
 
+pub mod class_summarizer;
 pub mod function_summarizer;
 pub mod react;
 pub mod routes;

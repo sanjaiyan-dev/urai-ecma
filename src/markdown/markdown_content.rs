@@ -79,17 +79,6 @@ impl MarkdownContentBuilder {
         for file in &self.file_results {
             out.push_str(&format!("### File: `{}`\n\n", file.relative_path));
 
-            if !file.function_summaries.is_empty() {
-                out.push_str("**Function Summaries**:\n");
-                for fn_sum in &file.function_summaries {
-                    out.push_str(&format!(
-                        "- Line {}: `{}` -> *{}*\n",
-                        fn_sum.line_number, fn_sum.function_name, fn_sum.concise_summary
-                    ));
-                }
-                out.push('\n');
-            }
-
             let lang = match file.file_path.extension().and_then(|e| e.to_str()) {
                 Some("ts") | Some("tsx") => "typescript",
                 Some("jsx") => "jsx",

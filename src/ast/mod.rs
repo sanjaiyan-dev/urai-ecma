@@ -77,7 +77,6 @@ pub struct FileAnalysisResult {
     pub processed_content: String,
     pub routes: Vec<RouteInfo>,
     pub react_components: Vec<ReactComponentAnalysis>,
-    pub function_summaries: Vec<FunctionSummary>,
 }
 
 #[derive(Debug, Clone)]

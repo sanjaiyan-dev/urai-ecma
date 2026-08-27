@@ -13,6 +13,7 @@ use crate::UraiContext;
 use crate::ast::PackageJsonUrai;
 use crate::ast::graph::generate_project_graph;
 use crate::ast::parser::parse_file;
+use crate::ast::visitor::class_summarizer::ClassMethodSummarizerVisitor;
 use crate::ast::visitor::function_summarizer::FunctionSummarizerVisitor;
 use crate::ast::visitor::react::{ReactComponentAnalyzer, ReactJsxPruner};
 use crate::ast::visitor::routes::RouteVisitor;
@@ -76,9 +77,20 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                     }
 
                     // Function Summaries
-                    let mut fn_summaries = Vec::new();
                     if ctx.summarize_functions {
                         let mut fn_vis = FunctionSummarizerVisitor::new(
+                            &cm,
+                            &raw_content,
+                            ollama_ref,
+                            comments.to_owned(),
+                            ctx.summarize_functions_threshold,
+                        );
+                        module.visit_mut_with(&mut fn_vis);
+                    }
+
+                    // Class Method Summaries
+                    if ctx.summarize_functions {
+                        let mut fn_vis = ClassMethodSummarizerVisitor::new(
                             &cm,
                             &raw_content,
                             ollama_ref,
@@ -86,7 +98,6 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                             ctx.summarize_functions_threshold,
                         );
                         module.visit_mut_with(&mut fn_vis);
-                        fn_summaries = fn_vis.summaries;
                     }
 
                     // JSX Pruning
@@ -108,7 +119,6 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                         processed_content: processed_code,
                         routes: Vec::new(),
                         react_components,
-                        function_summaries: fn_summaries,
                     };
 
                     Some((result, routes))
@@ -126,7 +136,6 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                         processed_content: raw_content,
                         routes: Vec::new(),
                         react_components: Vec::new(),
-                        function_summaries: Vec::new(),
                     };
 
                     Some((result, Vec::new()))

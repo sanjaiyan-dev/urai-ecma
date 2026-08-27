@@ -78,7 +78,15 @@ impl<'a> VisitMut for ReactJsxPruner<'a> {
                             TailwindMode::Preserve => {
                                 pruned_attrs.push(JSXAttrOrSpread::JSXAttr(jsx_attr));
                             }
-                            _ => {}
+                            TailwindMode::RemoveAggr => {
+                                if let Some(JSXAttrValue::JSXExprContainer(expr)) = jsx_attr.value {
+                                    pruned_attrs.push(JSXAttrOrSpread::JSXAttr(JSXAttr {
+                                        span: jsx_attr.span,
+                                        name: jsx_attr.name,
+                                        value: Some(JSXAttrValue::JSXExprContainer(expr)),
+                                    }));
+                                }
+                            }
                         }
                     } else {
                         pruned_attrs.push(JSXAttrOrSpread::JSXAttr(jsx_attr));
