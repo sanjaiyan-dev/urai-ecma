@@ -289,7 +289,7 @@ fn main() {
         );
     }
 
-    if let Some(bpe) = tiktoken::get_encoding("llama3") {
+    if let Some(bpe) = tiktoken::get_encoding("o200k_base") {
         let output_tokens = fs::read_to_string(&ctx.output_filename)
             .ok()
             .map(|content| bpe.encode(&content).len())

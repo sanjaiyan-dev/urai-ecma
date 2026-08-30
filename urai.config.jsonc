@@ -1,6 +1,6 @@
 {
     // Path to the project directory or single source file
-    "input_project": "../ollama-web-browser",
+    "input_project": "./test",
 
     // Target output Markdown file path
     "output_file": "./output.md",
@@ -25,7 +25,7 @@
     "summarize_functions": true,
 
     // Line count threshold to trigger function summarization (default: 5 lines)
-    "summarize_functions_threshold": 5,
+    "summarize_functions_threshold": 1,
 
     // Extract and generate Express/Fastify/Next.js/NestJS API Route Table
     "generate_route_table": true,

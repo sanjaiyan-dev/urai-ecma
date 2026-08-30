@@ -122,7 +122,6 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
         let hi_pos = self.cm.lookup_char_pos(node.span.hi);
         let line_count = hi_pos.line.saturating_sub(lo_pos.line) + 1;
 
-        // First Preference: Check for JSDoc comments (@description, @param, @return)
 
         let summary = if line_count >= self.line_threshold {
             // Fallback to Ollama if no JSDoc is present AND line count >= threshold
@@ -190,7 +189,6 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
         fn_decl.visit_mut_children_with(self);
 
         if let Some(function_body) = fn_decl.function.body.as_mut() {
-            function_body.stmts.retain(is_structural_stub_stmt);
 
             function_body.stmts.push(Stmt::Expr(ExprStmt {
                 span: DUMMY_SP,

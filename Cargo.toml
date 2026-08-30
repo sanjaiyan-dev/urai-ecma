@@ -26,6 +26,15 @@ swc_ecma_transforms_macros = "1.0.1"
 swc_ecma_transforms_react = "50.0.0"
 swc_ecma_transforms_typescript = { version = "50.0.0", features = ["concurrent"] }
 swc_ecma_visit = { version = "25.0.0", features = ["serde"] }
-tiktoken = { version = "3.5.1", features = ["rayon"] }
+tiktoken = { version = "4.1.2", features = ["rayon"] }
 tokenizers = "0.23.1"
 tokio = { version = "1.53.0", features = ["rt-multi-thread"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+overflow-checks = true
+

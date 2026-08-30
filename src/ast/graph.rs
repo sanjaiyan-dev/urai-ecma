@@ -92,7 +92,7 @@ fn build_petgraph_dependencies(root_path: &Path) -> Result<String> {
         node_indices.insert(rel_path, idx);
     }
 
-    let mut dep_summary = String::new();
+    let mut dep_summary = String::with_capacity(25 + (files.len() * 12));
     dep_summary.push_str("```mermaid\ngraph LR;\n");
 
     for file in &files {
