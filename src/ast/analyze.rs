@@ -71,7 +71,7 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                     // React Component Analysis
                     let mut react_components = Vec::new();
                     if ctx.analyze_react_components {
-                        let mut react_analyzer = ReactComponentAnalyzer::new(&cm);
+                        let mut react_analyzer = ReactComponentAnalyzer::new();
                         module.visit_with(&mut react_analyzer);
                         react_components = react_analyzer.components;
                     }

@@ -1,4 +1,3 @@
-use swc_common::SourceMap;
 use swc_ecma_ast::*;
 use swc_ecma_visit::{Visit, VisitMut, VisitMutWith, VisitWith};
 
@@ -103,21 +102,19 @@ impl<'a> VisitMut for ReactJsxPruner<'a> {
     }
 }
 
-pub struct ReactComponentAnalyzer<'a> {
-    pub cm: &'a SourceMap,
+pub struct ReactComponentAnalyzer {
     pub components: Vec<ReactComponentAnalysis>,
 }
 
-impl<'a> ReactComponentAnalyzer<'a> {
-    pub fn new(cm: &'a SourceMap) -> Self {
+impl ReactComponentAnalyzer {
+    pub fn new() -> Self {
         Self {
-            cm,
             components: Vec::new(),
         }
     }
 }
 
-impl<'a> Visit for ReactComponentAnalyzer<'a> {
+impl Visit for ReactComponentAnalyzer {
     fn visit_fn_decl(&mut self, fn_decl: &FnDecl) {
         let name = fn_decl.ident.sym.to_string();
         if is_component_name(&name) {

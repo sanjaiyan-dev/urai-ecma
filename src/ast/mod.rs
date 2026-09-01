@@ -24,12 +24,6 @@ pub struct PackageJsonUrai {
     pub ctx: Arc<UraiContext>,
 }
 
-pub struct CodeAnalyze {
-    pub ctx: Arc<UraiContext>,
-    pub file_name: String,
-    pub content: String,
-}
-
 #[derive(Debug, Clone)]
 pub struct RouteInfo {
     pub framework: String, // Express, Fastify, Next.js, NestJS

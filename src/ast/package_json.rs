@@ -13,13 +13,10 @@ pub struct PackageJson {
     pub name: String,
     pub version: String,
     pub description: Option<String>,
-    pub main: Option<String>,
-    pub scripts: Option<BTreeMap<String, String>>,
+
     pub dependencies: Option<BTreeMap<String, String>>,
     #[serde(rename = "devDependencies")]
     pub dev_dependencies: Option<BTreeMap<String, String>>,
-    pub author: Option<serde_json::Value>,
-    pub license: Option<String>,
 }
 
 impl PackageJsonUrai {

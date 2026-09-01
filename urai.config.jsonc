@@ -1,6 +1,6 @@
 {
     // Path to the project directory or single source file
-    "input_project": "./test",
+    "input_project": "../ollama-web-browser",
 
     // Target output Markdown file path
     "output_file": "./output.md",
@@ -16,7 +16,7 @@
     // "remove_aggr": aggressively removes class strings even if below character threshold.
     // "summarize": sends class strings exceeding threshold to Ollama for 1-line style descriptions.
     // "preserve": keeps classNames untouched.
-    "tailwind_mode": "remove",
+    "tailwind_mode": "summarize",
 
     // Character length threshold for Tailwind pruning (default: 96 characters)
     "tailwind_threshold": 96,
@@ -25,7 +25,7 @@
     "summarize_functions": true,
 
     // Line count threshold to trigger function summarization (default: 5 lines)
-    "summarize_functions_threshold": 1,
+    "summarize_functions_threshold": 5,
 
     // Extract and generate Express/Fastify/Next.js/NestJS API Route Table
     "generate_route_table": true,

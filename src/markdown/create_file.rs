@@ -8,8 +8,8 @@ use anyhow::{Context, Result};
 
 use crate::{UraiContext, markdown::MarkdownUrai};
 
-struct MarkdownFileData {
-    pub markdown_writer: File,
+pub struct MarkdownFileData {
+    markdown_writer: File,
 }
 
 impl MarkdownUrai {
