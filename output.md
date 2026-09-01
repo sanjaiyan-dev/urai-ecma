@@ -462,51 +462,51 @@ export default function OllamaSidePanel() {
     return (<div className="/* UI: Full screen layout with dark mode background and fixed typography. */">
 			{}
 			<header className="/* UI: Stuck banner with blurred background, dark theme, and centered content. */">
-				<div className="/* UI: /* Style: 3 classes */ */">
-					<div className="/* UI: /* Style: 5 classes */ */"/>
-					<h1 className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Flex container with evenly spaced centered items */">
+					<div className="/* UI: Small animated circular emerald button or indicator */"/>
+					<h1 className="/* UI: Small, semi-bold, uppercase text with wide tracking and gray color. */">
 						Local Models
 					</h1>
 				</div>
-				<span className="/* UI: /* Style: 8 classes */ */">
+				<span className="/* UI: Small text button with rounded borders and dark zinc color scheme */">
 					{endpoint}
 				</span>
 			</header>
 
 			{}
-			<div className="/* UI: /* Style: 2 classes */ */">
+			<div className="/* UI: Padded background with dark gray color */">
 				<div className="/* UI: /* Style: 1 classes */ */">
 					<input type="search" placeholder="Search models..." value={search} onChange={(e)=>setSearch(e.target.value)} className="/* UI: Full-width, dark-themed input field with defined borders and violet focus ring. */"/>
-					<svg className="/* UI: /* Style: 6 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<svg className="/* UI: Small square icon positioned absolutely with a gray tint. */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
 					</svg>
 				</div>
 			</div>
 
 			{}
-			<div className="/* UI: /* Style: 7 classes */ */">
-				{filteredModels.length === 0 ? (<div className="/* UI: /* Style: 4 classes */ */">
+			<div className="/* UI: Scrollable content container with uniform padding and vertical spacing. */">
+				{filteredModels.length === 0 ? (<div className="/* UI: Centered text, small size, with 8 units of vertical padding. */">
 						No matching models named '{deferredSearchTerm}' were found.
 					</div>) : (filteredModels.map((result, idx)=>{
         return (<div key={model.name} onClick={()=>selectActiveModel(model.name)} className={`group relative rounded-xl p-3.5 border transition-all cursor-pointer ${isActive ? "bg-zinc-900 border-violet-500/60 shadow-[0_4px_20px_-4px_rgba(139,92,246,0.15)]" : "bg-zinc-900/40 border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/60"}`}>
 								{}
-								{isActive && (<div className="/* UI: /* Style: 7 classes */ */"/>)}
+								{isActive && (<div className="/* UI: Full-height rounded violet banner positioned on the left side. */"/>)}
 
 								{}
-								<div className="/* UI: /* Style: 5 classes */ */">
-									<div className="/* UI: /* Style: 3 classes */ */">
-										<span className="/* UI: /* Style: 4 classes */ */">
+								<div className="/* UI: Flex container with items aligned to the start and justified between elements. */">
+									<div className="/* UI: Vertical flexible container with minimum content width */">
+										<span className="/* UI: Small, medium-weight text, truncated, light grey color */">
 											{model.name}
 										</span>
-										<span className="/* UI: /* Style: 5 classes */ */">
+										<span className="/* UI: Small gray monospace text, positioned closely with truncated content. */">
 											{model.details?.family} • {model.details?.parameter_size}
 										</span>
 									</div>
 
 									<button onClick={(e)=>{
             '/* "Stops the event propagation and subsequently handles copying and selecting the active model when the element is clicked." */';
-        }} className="/* UI: /* Style: 7 classes */ */" title="Copy model name" type="button">
-										{copiedIndex === idx ? (<svg className="/* UI: /* Style: 3 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        }} className="/* UI: Padded rounded text with hover transition and copy cursor */" title="Copy model name" type="button">
+										{copiedIndex === idx ? (<svg className="/* UI: Small emerald square icon */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/>
 											</svg>) : (<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
@@ -515,27 +515,27 @@ export default function OllamaSidePanel() {
 								</div>
 
 								{}
-								<div className="/* UI: /* Style: 10 classes */ */">
-									<div className="/* UI: /* Style: 2 classes */ */">
-										<span className="/* UI: /* Style: 4 classes */ */">
+								<div className="/* UI: Two-column grid list with thin top border and small text */">
+									<div className="/* UI: Vertical flex container */">
+										<span className="/* UI: Dark grey uppercase small text with wide tracking */">
 											Size
 										</span>
-										<span className="/* UI: /* Style: 2 classes */ */">
+										<span className="/* UI: Medium text in light gray tone */">
 											{formatSize(model.size)}
 										</span>
 									</div>
-									<div className="/* UI: /* Style: 2 classes */ */">
-										<span className="/* UI: /* Style: 4 classes */ */">
+									<div className="/* UI: Vertical flex container */">
+										<span className="/* UI: Dark grey uppercase small text with wide tracking */">
 											Quantization
 										</span>
-										<span className="/* UI: /* Style: 2 classes */ */">
+										<span className="/* UI: Monospaced font in light gray text color */">
 											{model.details?.quantization_level}
 										</span>
 									</div>
 								</div>
 
 								{}
-								<div className="/* UI: /* Style: 5 classes */ */">
+								<div className="/* UI: Top margin, flexible wrapping layout with gap and left padding. */">
 									{model.capabilities?.map?.((cap)=>{
             return (<span key={cap} className={`text-[9px] font-medium tracking-wider uppercase px-2 py-0.5 rounded-full border ${capClass}`}>
 												{cap}
@@ -545,7 +545,7 @@ export default function OllamaSidePanel() {
 								</div>
 
 								{}
-								<div className="/* UI: /* Style: 5 classes */ */">
+								<div className="/* UI: Top margin and right-aligned small gray text with padding */">
 									Modified: {formatDate(model?.modified_at)}
 								</div>
 							</div>);
@@ -627,7 +627,7 @@ export const MagneticNode: React.FC<{
         damping: 12
     }} whileTap={{
         scale: 0.92
-    }} className="/* UI: /* Style: 6 classes */ */">
+    }} className="/* UI: Full height centered flexible container with padding */">
 				{children}
 			</motion.div>
 		</button>);
@@ -642,16 +642,16 @@ export const InteractiveGlassCard: React.FC<{
     };
     return (<div ref={cardRef} onMouseMove={handleMouseMove} onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)} className={`relative overflow-hidden backdrop-blur-md bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)] ${className}`}>
 			{}
-			{isHovered && (<div className="/* UI: /* Style: 5 classes */ */" style={{
+			{isHovered && (<div className="/* UI: Full-page overlay with smooth fading transition and non-interactive pointer control */" style={{
         background: `radial-gradient(150px circle at ${coords.x}px ${coords.y}px, rgba(255,255,255,0.04), transparent 80%)`
     }}/>)}
 			{}
-			{isHovered && (<div className="/* UI: /* Style: 6 classes */ */" style={{
+			{isHovered && (<div className="/* UI: Full screen transition overlay with rounded edges. */" style={{
         maskImage: `radial-gradient(100px circle at ${coords.x}px ${coords.y}px, black, transparent)`,
         WebkitMaskImage: `radial-gradient(100px circle at ${coords.x}px ${coords.y}px, black, transparent)`,
         border: "1px solid rgba(0, 224, 255, 0.4)"
     }}/>)}
-			<div className="/* UI: /* Style: 2 classes */ */">{children}</div>
+			<div className="/* UI: Positions element relative to parent, ensuring it stays above other content. */">{children}</div>
 		</div>);
     '/* "Renders a visually interactive glass card component that reacts to mouse movement by creating dynamic glow effects based on the cursor\'s position relative to the element." */';
 };
@@ -684,7 +684,7 @@ export default function TelemetryDashboard() {
     const memoryPercentUsed = memoryInfo ? ((memoryInfo.capacity - memoryInfo.availableCapacity) / memoryInfo.capacity) * 100 : 0;
     return (<div className="/* UI: Full screen dark background container with flexible column layout and subtle border. */">
 			{}
-			<div className="/* UI: /* Style: 9 classes */ */" style={{
+			<div className="/* UI: Absolute floating circle background blur with bright blue color */" style={{
         animation: "pulseAurora 8s ease-in-out infinite"
     }}/>
 			<div className="/* UI: Absolute positioned large blurred purple circular decorative element. */" style={{
@@ -693,13 +693,13 @@ export default function TelemetryDashboard() {
 
 			{}
 			<div className="/* UI: /* Style: 1 classes */ */">
-				<div className="/* UI: /* Style: 3 classes */ */">
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<span className="/* UI: /* Style: 4 classes */ */">
-							<span className="/* UI: /* Style: 8 classes */ */"></span>
-							<span className="/* UI: /* Style: 6 classes */ */"></span>
+				<div className="/* UI: Horizontal flex container with centered items and spaced out alignment */">
+					<div className="/* UI: Horizontal flex layout for centered items with small spacing */">
+						<span className="/* UI: Small square element positioned relatively within a flex container */">
+							<span className="/* UI: Pulsing blue circle placeholder with full coverage. */"></span>
+							<span className="/* UI: Small round blue dot positioned over other elements */"></span>
 						</span>
-						<span className="/* UI: /* Style: 6 classes */ */">
+						<span className="/* UI: Small uppercase bold monospace text with wide tracking in cyan color */">
 							System Active
 						</span>
 					</div>
@@ -722,24 +722,24 @@ export default function TelemetryDashboard() {
     }} className="/* UI: /* Style: 1 classes */ */">
 							{}
 							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<div className="/* UI: /* Style: 3 classes */ */">
-									<h3 className="/* UI: /* Style: 6 classes */ */">
+								<div className="/* UI: Horizontal flex container with centered items and spaced out alignment */">
+									<h3 className="/* UI: Small, bold uppercase text with wide letter spacing. */">
 										Core Interconnect Map
 									</h3>
-									<span className="/* UI: /* Style: 3 classes */ */">
+									<span className="/* UI: Small monospace text in bright cyan color */">
 										{cpuInfo?.numOfProcessors} Compute Nodes
 									</span>
 								</div>
 
-								<div className="/* UI: /* Style: 3 classes */ */">
+								<div className="/* UI: Four-column grid layout with small spacing between items */">
 									{coreDeltas.map((core)=>{
         return (<motion.button key={core.coreIndex} whileHover={{
             scale: 1.05
         }} whileTap={{
             scale: 0.95
         }} onClick={()=>setSelectedCore(core.coreIndex)} className={`relative p-2.5 flex flex-col items-center justify-center rounded-xl transition-all duration-300 ${isSelected ? "bg-white/[0.08] border border-white/20 shadow-[0_0_12px_rgba(0,224,255,0.15)]" : "bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/10"}`}>
-												<div className="/* UI: /* Style: 6 classes */ */">
-													<svg className="/* UI: /* Style: 5 classes */ */">
+												<div className="/* UI: Small square container with centered content */">
+													<svg className="/* UI: Small rotated absolute positioned square element */">
 														<circle cx="20" cy="20" r={r} stroke="rgba(255,255,255,0.03)" strokeWidth="2.5" fill="transparent"/>
 														<motion.circle cx="20" cy="20" r={r} stroke={core.totalUsage > 75 ? "#FF2E63" : core.totalUsage > 40 ? "#8B5CF6" : "#00E0FF"} strokeWidth="2.5" fill="transparent" strokeDasharray={circ} animate={{
             strokeDashoffset
@@ -749,11 +749,11 @@ export default function TelemetryDashboard() {
             damping: 15
         }}/>
 													</svg>
-													<span className="/* UI: /* Style: 4 classes */ */">
+													<span className="/* UI: Small bold monospace white text */">
 														C{core.coreIndex}
 													</span>
 												</div>
-												<span className="/* UI: /* Style: 4 classes */ */">
+												<span className="/* UI: Small monochrome text in slate gray, with margin below */">
 													{Math.round(core.totalUsage)}%
 												</span>
 											</motion.button>);
@@ -764,24 +764,24 @@ export default function TelemetryDashboard() {
 
 							{}
 							{selectedCore !== null && coreDeltas[selectedCore] && (<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-									<div className="/* UI: /* Style: 6 classes */ */">
-										<span className="/* UI: /* Style: 6 classes */ */">
+									<div className="/* UI: Flexible layout with subtle bottom border and padding */">
+										<span className="/* UI: Small bold uppercase technical text in light gray. */">
 											Physical Core #{selectedCore} Execution Logic
 										</span>
-										<span className="/* UI: /* Style: 3 classes */ */">
+										<span className="/* UI: Small monospace text in bright cyan color */">
 											ACTIVE PIPELINE
 										</span>
 									</div>
 
 									{}
 									<div className="/* UI: Pale semi-transparent white card layout with internal flexible content area */">
-										<div className="/* UI: /* Style: 4 classes */ */">
-											<span className="/* UI: /* Style: 5 classes */ */">
+										<div className="/* UI: Vertical flex layout, centered items, occupying available space. */">
+											<span className="/* UI: Small neon cyan uppercase monospaced text. */">
 												Fetch
 											</span>
-											<div className="/* UI: /* Style: 6 classes */ */"/>
+											<div className="/* UI: Small blue circular indicator with a subtle glow effect */"/>
 										</div>
-										<div className="/* UI: /* Style: 4 classes */ */">
+										<div className="/* UI: Flex item that centers content both horizontally and vertically */">
 											<svg className="/* UI: /* Style: 2 classes */ */">
 												<line x1="0" y1="2" x2="100%" y2="2" stroke="rgba(0, 224, 255, 0.15)" strokeWidth="1" strokeDasharray="2 2"/>
 												<line x1="0" y1="2" x2="100%" y2="2" stroke="#00E0FF" strokeWidth="1.2" strokeDasharray="6 14" style={{
@@ -789,13 +789,13 @@ export default function TelemetryDashboard() {
     }}/>
 											</svg>
 										</div>
-										<div className="/* UI: /* Style: 4 classes */ */">
-											<span className="/* UI: /* Style: 5 classes */ */">
+										<div className="/* UI: Vertical flex layout, centered items, occupying available space. */">
+											<span className="/* UI: Small purple monochrome tracking uppercase text */">
 												Decode
 											</span>
-											<div className="/* UI: /* Style: 6 classes */ */"/>
+											<div className="/* UI: Small purple circular icon with a subtle glowing shadow and top margin */"/>
 										</div>
-										<div className="/* UI: /* Style: 4 classes */ */">
+										<div className="/* UI: Flex item that centers content both horizontally and vertically */">
 											<svg className="/* UI: /* Style: 2 classes */ */">
 												<line x1="0" y1="2" x2="100%" y2="2" stroke="rgba(139, 92, 246, 0.15)" strokeWidth="1" strokeDasharray="2 2"/>
 												<line x1="0" y1="2" x2="100%" y2="2" stroke="#8B5CF6" strokeWidth="1.2" strokeDasharray="6 14" style={{
@@ -803,50 +803,50 @@ export default function TelemetryDashboard() {
     }}/>
 											</svg>
 										</div>
-										<div className="/* UI: /* Style: 4 classes */ */">
-											<span className="/* UI: /* Style: 5 classes */ */">
+										<div className="/* UI: Vertical flex layout, centered items, occupying available space. */">
+											<span className="/* UI: Small uppercase monospaced text in bright pink */">
 												ALU
 											</span>
-											<div className="/* UI: /* Style: 6 classes */ */"/>
+											<div className="/* UI: Small circular button with pink glow and margin top */"/>
 										</div>
 									</div>
 
-									<div className="/* UI: /* Style: 4 classes */ */">
+									<div className="/* UI: Three-column grid layout with spacing and top padding */">
 										<div className="/* UI: /* Style: 1 classes */ */">
-											<div className="/* UI: /* Style: 3 classes */ */">
+											<div className="/* UI: Tiny mono text in slate gray. */">
 												User Space
 											</div>
-											<div className="/* UI: /* Style: 4 classes */ */">
+											<div className="/* UI: Small bold monospace white text typography */">
 												{Math.round(coreDeltas[selectedCore].userUsage)}%
 											</div>
-											<div className="/* UI: /* Style: 4 classes */ */">
-												<div className="/* UI: /* Style: 3 classes */ */" style={{
+											<div className="/* UI: Small rounded container with a translucent white background */">
+												<div className="/* UI: Full-height background with a bright cyan rounded pill shape */" style={{
         width: `${coreDeltas[selectedCore].userUsage}%`
     }}/>
 											</div>
 										</div>
 										<div className="/* UI: /* Style: 1 classes */ */">
-											<div className="/* UI: /* Style: 3 classes */ */">
+											<div className="/* UI: Tiny mono text in slate gray. */">
 												Kernel Overhead
 											</div>
-											<div className="/* UI: /* Style: 4 classes */ */">
+											<div className="/* UI: Small bold monospace white text typography */">
 												{Math.round(coreDeltas[selectedCore].kernelUsage)}%
 											</div>
-											<div className="/* UI: /* Style: 4 classes */ */">
-												<div className="/* UI: /* Style: 3 classes */ */" style={{
+											<div className="/* UI: Very short, rounded white element with clear overflow containment. */">
+												<div className="/* UI: Full height background with rounded pill shape */" style={{
         width: `${coreDeltas[selectedCore].kernelUsage}%`
     }}/>
 											</div>
 										</div>
 										<div className="/* UI: /* Style: 1 classes */ */">
-											<div className="/* UI: /* Style: 3 classes */ */">
+											<div className="/* UI: Tiny mono text in slate gray. */">
 												Idle Capacity
 											</div>
-											<div className="/* UI: /* Style: 4 classes */ */">
+											<div className="/* UI: Small bold monospace white text typography */">
 												{Math.round(coreDeltas[selectedCore].idleUsage)}%
 											</div>
-											<div className="/* UI: /* Style: 4 classes */ */">
-												<div className="/* UI: /* Style: 3 classes */ */" style={{
+											<div className="/* UI: Very short, rounded white element with clear overflow containment. */">
+												<div className="/* UI: Full height background with rounded edges */" style={{
         width: `${coreDeltas[selectedCore].idleUsage}%`
     }}/>
 											</div>
@@ -868,20 +868,20 @@ export default function TelemetryDashboard() {
 							{}
 							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
 								<div className="/* UI: /* Style: 1 classes */ */">
-									<span className="/* UI: /* Style: 7 classes */ */">
+									<span className="/* UI: Small monospaced uppercase text with wide tracking and bold weight. */">
 										Telemetry Engine Specification
 									</span>
-									<h4 className="/* UI: /* Style: 5 classes */ */">
+									<h4 className="/* UI: Small, bold white text using the Jakarta font. */">
 										{cpuInfo?.modelName}
 									</h4>
 								</div>
 
 								{}
 								<div className="/* UI: /* Style: 1 classes */ */">
-									<span className="/* UI: /* Style: 6 classes */ */">
+									<span className="/* UI: Small uppercase mono-spaced text in light gray. */">
 										Hardware Registers Decoded
 									</span>
-									<div className="/* UI: /* Style: 3 classes */ */">
+									<div className="/* UI: Flexible grid layout with spacing between items */">
 										{cpuInfo?.features.map((flag)=>{
         return (<button key={flag} onClick={()=>setSelectedFlag(isSelected ? null : flag)} className={`text-[9px] font-mono px-2 py-1 rounded-md transition-all ${isSelected ? "bg-[#00E0FF] text-[#05050A] font-bold shadow-[0_0_8px_#00E0FF]" : "bg-white/[0.03] border border-white/[0.08] text-slate-300 hover:bg-white/[0.06]"}`}>
 													{flag.toUpperCase()}
@@ -892,7 +892,7 @@ export default function TelemetryDashboard() {
 
 									{}
 									{selectedFlag && (<div className="/* UI: Small rounded glass-effect container holding tiny monotone monospace text. */">
-											<span className="/* UI: /* Style: 2 classes */ */">
+											<span className="/* UI: Bright blue bold text */">
 												{selectedFlag.toUpperCase()}:{" "}
 											</span>
 											{FLAG_DEFINITIONS[selectedFlag] || "Dynamic architectural hardware feature register."}
@@ -902,19 +902,19 @@ export default function TelemetryDashboard() {
 
 							{}
 							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<div className="/* UI: /* Style: 3 classes */ */">
-									<span className="/* UI: /* Style: 6 classes */ */">
+								<div className="/* UI: Horizontal flex container with centered items and spaced out alignment */">
+									<span className="/* UI: Small bold uppercase monospace text in slate gray. */">
 										Silicon Signals Sparkline
 									</span>
-									<span className="/* UI: /* Style: 3 classes */ */">
+									<span className="/* UI: Small purple monospace text. */">
 										Avg: {Math.round(averageUsage)}%
 									</span>
 								</div>
 
-								<div className="/* UI: /* Style: 4 classes */ */">
-									{averageHistory.length < 2 ? (<div className="/* UI: /* Style: 6 classes */ */">
+								<div className="/* UI: Tall full-width flex container aligned to the bottom. */">
+									{averageHistory.length < 2 ? (<div className="/* UI: Full width centered text in monospace with small grey font. */">
 											Calibrating system telemetry arrays...
-										</div>) : (<svg className="/* UI: /* Style: 3 classes */ */">
+										</div>) : (<svg className="/* UI: Full-width 12-unit high container with visible overflow */">
 											<defs>
 												<linearGradient id="glowGrad" x1="0" y1="0" x2="0" y2="1">
 													<stop offset="0%" stopColor="#00E0FF" stopOpacity="0.3"/>
@@ -941,18 +941,18 @@ export default function TelemetryDashboard() {
     }} className="/* UI: /* Style: 1 classes */ */">
 							{}
 							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<div className="/* UI: /* Style: 3 classes */ */">
-									<span className="/* UI: /* Style: 6 classes */ */">
+								<div className="/* UI: Horizontal flex container with centered items and spaced out alignment */">
+									<span className="/* UI: Small bold uppercase monospace text in slate gray. */">
 										Physical RAM Allocation
 									</span>
-									<span className="/* UI: /* Style: 3 classes */ */">
+									<span className="/* UI: Tiny monospaced text in vibrant pink */">
 										{Math.round(memoryPercentUsed)}% Used
 									</span>
 								</div>
 
 								{}
-								<div className="/* UI: /* Style: 7 classes */ */">
-									<motion.div className="/* UI: /* Style: 8 classes */ */" animate={{
+								<div className="/* UI: Relative background element with translucent white border and rounded overflow. */">
+									<motion.div className="/* UI: Full-screen absolute background with a purple to pink gradient and rounded corners. */" animate={{
         width: `${memoryPercentUsed}%`
     }} transition={{
         type: "spring",
@@ -961,37 +961,37 @@ export default function TelemetryDashboard() {
     }}/>
 								</div>
 
-								<div className="/* UI: /* Style: 3 classes */ */">
+								<div className="/* UI: Two-column grid layout with uniform spacing */">
 									<div className="/* UI: /* Style: 1 classes */ */">
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Tiny monochrome text in slate gray block format. */">
 											Total Capacity
 										</span>
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Small bold white monochrome text typography */">
 											{totalMemoryGB} GB
 										</span>
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Small mono-spaced grey text block with monospace font */">
 											{memoryInfo?.capacity.toLocaleString()} Bytes
 										</span>
 									</div>
 									<div className="/* UI: /* Style: 1 classes */ */">
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Tiny monochrome text in slate gray block format. */">
 											Available Bounds
 										</span>
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Small bold monospace text with bright cyan color */">
 											{availableMemoryGB} GB
 										</span>
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Small mono-spaced grey text block with monospace font */">
 											{memoryInfo?.availableCapacity.toLocaleString()} Bytes
 										</span>
 									</div>
 									<div className="/* UI: /* Style: 1 classes */ */">
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Tiny monochrome text in slate gray block format. */">
 											Used Bounds
 										</span>
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Small bold monospace text in vibrant red. */">
 											{usedMemoryGB} GB
 										</span>
-										<span className="/* UI: /* Style: 4 classes */ */">
+										<span className="/* UI: Small mono-spaced grey text block with monospace font */">
 											{(+usedMemoryGB * 1024 * 1024).toLocaleString()} bytes
 										</span>
 									</div>
@@ -1000,10 +1000,10 @@ export default function TelemetryDashboard() {
 
 							{}
 							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<span className="/* UI: /* Style: 7 classes */ */">
+								<span className="/* UI: Small, bold, uppercase mono-spaced text with wide letter spacing. */">
 									Memory Register Capacitor Matrix
 								</span>
-								<div className="/* UI: /* Style: 3 classes */ */">
+								<div className="/* UI: Grid layout dividing into eight columns with slight gaps. */">
 									{[
         ...Array(32)
     ].map((_, idx)=>{
@@ -1011,7 +1011,7 @@ export default function TelemetryDashboard() {
         '/* "Generates an array of 32 styled visual blocks whose color and styling dynamically reflect whether a calculated memory usage threshold has been met or exceeded." */';
     })}
 								</div>
-								<span className="/* UI: /* Style: 6 classes */ */">
+								<span className="/* UI: Tiny mono text, centered and centered in a block element. */">
 									Matrix elements map live capacity state boundaries.
 								</span>
 							</InteractiveGlassCard>
@@ -1021,34 +1021,34 @@ export default function TelemetryDashboard() {
 
 			<div className="/* UI: /* Style: 2 classes */ */">
 				<div className="/* UI: Frosted glass effect containing content with centered layout and subtle drop shadow. */">
-					<MagneticNode active={activeTab === "core"} onClick={()=>setActiveTab("core")} className="/* UI: /* Style: 2 classes */ */">
-						<div className="/* UI: /* Style: 3 classes */ */">
+					<MagneticNode active={activeTab === "core"} onClick={()=>setActiveTab("core")} className="/* UI: Takes up available space, clickable area. */">
+						<div className="/* UI: Vertical centered flex container */">
 							<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/>
 							</svg>
-							<span className="/* UI: /* Style: 6 classes */ */">
+							<span className="/* UI: Small bold uppercase monospaced text with extra spacing */">
 								ALU Core
 							</span>
 						</div>
 					</MagneticNode>
 
 					<MagneticNode active={activeTab === "registers"} onClick={()=>setActiveTab("registers")} className="/* UI: /* Style: 1 classes */ */">
-						<div className="/* UI: /* Style: 3 classes */ */">
+						<div className="/* UI: Vertical centered flex container */">
 							<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 							</svg>
-							<span className="/* UI: /* Style: 6 classes */ */">
+							<span className="/* UI: Small bold uppercase monospaced text with extra spacing */">
 								Registers
 							</span>
 						</div>
 					</MagneticNode>
 
 					<MagneticNode active={activeTab === "ram"} onClick={()=>setActiveTab("ram")} className="/* UI: /* Style: 1 classes */ */">
-						<div className="/* UI: /* Style: 3 classes */ */">
+						<div className="/* UI: Vertical centered flex container */">
 							<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
 							</svg>
-							<span className="/* UI: /* Style: 6 classes */ */">
+							<span className="/* UI: Small bold uppercase monospaced text with extra spacing */">
 								RAM Bus
 							</span>
 						</div>
@@ -1671,7 +1671,7 @@ const MagneticButton = ({ children, onClick, type = "button", className = "", di
 			<motion.div style={{
         x: xSpring,
         y: ySpring
-    }} className="/* UI: /* Style: 5 classes */ */">
+    }} className="/* UI: Centered overlay component with high stacking order */">
 				{children}
 			</motion.div>
 		</motion.button>);
@@ -1679,7 +1679,7 @@ const MagneticButton = ({ children, onClick, type = "button", className = "", di
 };
 const AuroraButton = ({ children, pending }: any)=>(<MagneticButton type="submit" disabled={pending} className={`w-10 h-10 bg-white/5 border border-white/20 hover:bg-white/10 relative overflow-hidden group ${pending ? "cursor-wait" : "cursor-pointer"}`}>
 		<div className="/* UI: Absolute full-screen animated gradient overlay with subtle hover effect. */"/>
-		<div className="/* UI: /* Style: 3 classes */ */">
+		<div className="/* UI: Positioned foreground element with white text. */">
 			{pending ? (<motion.div animate={{
         rotate: 360
     }} transition={{
@@ -1687,7 +1687,7 @@ const AuroraButton = ({ children, pending }: any)=>(<MagneticButton type="submit
         duration: 1.5,
         ease: "linear"
     }}>
-					<Loader2 size={16} className="/* UI: /* Style: 1 classes */ */"/>
+					<Loader2 size={16} className="/* UI: Bright cyan text color */"/>
 				</motion.div>) : (children)}
 		</div>
 	</MagneticButton>);
@@ -1723,15 +1723,15 @@ const MessageBubble = ({ message }: {
 						Synthesizing Space-Time...
 					</motion.div>)}
 
-				{message.content && (<p className="/* UI: /* Style: 5 classes */ */">
+				{message.content && (<p className="/* UI: Sans serif text in light gray, fixed line spacing. */">
 						<ReactMarkdown>{message.content}</ReactMarkdown>
 					</p>)}
 
-				{isAI && message.toolsUsed && (<div className="/* UI: /* Style: 10 classes */ */">
+				{isAI && message.toolsUsed && (<div className="/* UI: Elevated semi-transparent dark card with internal content alignment. */">
 						<span className="/* UI: Small purple uppercase sans-serif text with wide tracking. */">
 							Requested Actions
 						</span>
-						<code className="/* UI: /* Style: 8 classes */ */">
+						<code className="/* UI: Small gray monospace text with limited height and auto-scrolling block. */">
 							{message.toolsUsed}
 						</code>
 					</div>)}
@@ -1746,13 +1746,13 @@ const ChatInterface = ()=>{
 			<div className="/* UI: Large, blurred pink background overlay positioned at center. */"/>
 
 			{}
-			<div className="/* UI: /* Style: 7 classes */ */">
+			<div className="/* UI: Full-size vertical container with padding and layering context */">
 				{}
 				<div className="/* UI: Centered flex container with blurred background and subtle purple shadow. */">
-					<div className="/* UI: /* Style: 3 classes */ */">
+					<div className="/* UI: A horizontal flex container with centered items and small spacing. */">
 						<div className="/* UI: Small circular badge with gradient glow and sharp blue effect */">
-							<div className="/* UI: /* Style: 7 classes */ */">
-								<Bot size={18} className="/* UI: /* Style: 1 classes */ */"/>
+							<div className="/* UI: Full-screen dark background circular centering container */">
+								<Bot size={18} className="/* UI: Bright cyan text color */"/>
 							</div>
 						</div>
 						<div>
@@ -1766,7 +1766,7 @@ const ChatInterface = ()=>{
 					</div>
 
 					{}
-					<div className="/* UI: /* Style: 5 classes */ */">
+					<div className="/* UI: Centered items layout with spacing and relative positioning context */">
 						<div className="/* UI: Pill-shaped button with subtle background and text hover effects. */">
 							<Info size={14}/>
 						</div>
@@ -1774,15 +1774,15 @@ const ChatInterface = ()=>{
 						{}
 						<div className="/* UI: Hidden hoverable tooltip positioned below the element with a frosted dark appearance. */">
 							<div className="/* UI: Flex container with bold small white text and bottom margin */">
-								<Sparkles size={12} className="/* UI: /* Style: 1 classes */ */"/> Protocol Mode
+								<Sparkles size={12} className="/* UI: Bright yellow text color */"/> Protocol Mode
 							</div>
-							<p className="/* UI: /* Style: 3 classes */ */">
+							<p className="/* UI: Small gray body text in a normal line height */">
 								Toggle between{" "}
-								<span className="/* UI: /* Style: 2 classes */ */">
+								<span className="/* UI: Bright cyan text in medium font weight */">
 									Standard Inference
 								</span>{" "}
 								(streaming & thinking enabled) and{" "}
-								<span className="/* UI: /* Style: 2 classes */ */">
+								<span className="/* UI: Vibrant pink text in a medium font weight */">
 									Agentic Access
 								</span>{" "}
 								for direct function calling.
@@ -1799,17 +1799,17 @@ const ChatInterface = ()=>{
         stiffness: 400,
         damping: 25
     }}/>
-							<div className="/* UI: /* Style: 5 classes */ */">
+							<div className="/* UI: Flexible center alignment with bright cyan text and high z-index */">
 								<Sparkles size={14} className={!isToolMode ? "opacity-100" : "opacity-40 text-white"}/>
 							</div>
-							<div className="/* UI: /* Style: 5 classes */ */">
+							<div className="/* UI: Flexible centered element with high z-index and bright pink text. */">
 								<Wrench size={14} className={isToolMode ? "opacity-100" : "opacity-40 text-white"}/>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Full-width, flexible container with minimum height and overflow control. */">
 					<AnimatePresence mode="wait">
 						{isSettingsOpen ? (<motion.div key="settings" initial={{
         opacity: 0,
@@ -1823,7 +1823,7 @@ const ChatInterface = ()=>{
         opacity: 0,
         scale: 0.98,
         y: 10
-    }} className="/* UI: /* Style: 3 classes */ */">
+    }} className="/* UI: Full height container with scrollable content and hidden scrollbar */">
 								<ProfileSettingsView setModelState={setIsSettingsOpen}/>
 							</motion.div>) : messages.length === 0 ? (<motion.div key="empty" initial={{
         opacity: 0
@@ -1832,25 +1832,25 @@ const ChatInterface = ()=>{
     }} exit={{
         opacity: 0
     }} className="/* UI: Centered full height layout with stacked content and sans-serif typography */">
-								<Bot size={48} className="/* UI: /* Style: 2 classes */ */"/>
+								<Bot size={48} className="/* UI: Purple text with bottom margin spacing */"/>
 								<p className="/* UI: /* Style: 1 classes */ */">Initiate intelligence matrix.</p>
-							</motion.div>) : (<LegendList key="chat-list" data={messages} renderItem={({ item })=><MessageBubble message={item}/>} keyExtractor={(item: any)=>item.id} maintainScrollAtEnd recycleItems className="/* UI: /* Style: 3 classes */ */" style={{
+							</motion.div>) : (<LegendList key="chat-list" data={messages} renderItem={({ item })=><MessageBubble message={item}/>} keyExtractor={(item: any)=>item.id} maintainScrollAtEnd recycleItems className="/* UI: Full height container with scrollable content and hidden scrollbar */" style={{
         scrollbarWidth: "none"
     }} ListFooterComponent={<div className="/* UI: /* Style: 2 classes */ */"/>}/>)}
 					</AnimatePresence>
 				</div>
 				{}
 				<div className={`fixed bottom-5 shrink-0 h-14 left-4 right-4 bg-[rgba(20,20,25,0.45)] backdrop-blur-xl saturate-150 border border-[rgba(255,255,255,0.2)] rounded-full p-1.5 shadow-[0_8px_32px_rgba(139,92,246,0.15)] transition-all [&:hover,&:focus]:inset-shadow-sm ${isStreaming || isPending ? "hover:shadow-fuchsia-300 cursor-wait" : "hover:shadow-sky-300"}`}>
-					<form ref={formRef} action={submitAction} className="/* UI: /* Style: 6 classes */ */">
-						<div className="/* UI: /* Style: 5 classes */ */">
+					<form ref={formRef} action={submitAction} className="/* UI: Full width flex container with centered items and spacing gap. */">
+						<div className="/* UI: Centered flex container with relative positioning */">
 							<div className="/* UI: Hidden hoverable overlay panel with translucent dark background and smooth transition. */">
 								<div className="/* UI: Small dark mode text in a centered flex container with spacing. */">
-									<Globe size={12} className="/* UI: /* Style: 1 classes */ */"/> Webpage Context
+									<Globe size={12} className="/* UI: Vivid purple text color */"/> Webpage Context
 								</div>
-								<p className="/* UI: /* Style: 4 classes */ */">
+								<p className="/* UI: Light gray text in a small sans-serif font. */">
 									{currentPageContext ? (<>
 											Inject the text content of:{" "}
-											<span className="/* UI: /* Style: 5 classes */ */">
+											<span className="/* UI: Bright blue text block with medium weight and defined spacing */">
 												{currentPageContext?.title || "Current Page"}
 											</span>
 										</>) : ("Attach the content of the active browser page as background instructions.")}
@@ -1866,14 +1866,14 @@ const ChatInterface = ()=>{
 						</div>
 
 						{}
-						<div className="/* UI: /* Style: 5 classes */ */">
+						<div className="/* UI: Centered flex container with relative positioning */">
 							<div className="/* UI: Hidden hover effect tooltip with frosted glass appearance. */">
 								<div className="/* UI: Small dark mode text in a centered flex container with spacing. */">
-									<Brain size={12} className="/* UI: /* Style: 1 classes */ */"/> Deep Thinking
+									<Brain size={12} className="/* UI: Bright cyan text color */"/> Deep Thinking
 								</div>
-								<p className="/* UI: /* Style: 4 classes */ */">
+								<p className="/* UI: Light gray text in a small sans-serif font. */">
 									Activate reasoning configurations.{" "}
-									<span className="/* UI: /* Style: 2 classes */ */">Note:</span>{" "}
+									<span className="/* UI: Purple semi-bold text color styling */">Note:</span>{" "}
 									Tool actions default to bypassing manual reasoning overrides.
 								</p>
 							</div>
@@ -1888,13 +1888,13 @@ const ChatInterface = ()=>{
 							</button>
 						</div>
 
-						<div className="/* UI: /* Style: 5 classes */ */">
+						<div className="/* UI: Centered flex container with relative positioning */">
 							<div className="/* UI: Hidden hover effect tooltip with frosted glass appearance. */">
 								<div className="/* UI: Small dark mode text in a centered flex container with spacing. */">
-									<UserCog size={12} className="/* UI: /* Style: 1 classes */ */"/> Autofill
+									<UserCog size={12} className="/* UI: Bright pink text color */"/> Autofill
 									Profile
 								</div>
-								<p className="/* UI: /* Style: 4 classes */ */">
+								<p className="/* UI: Light gray text in a small sans-serif font. */">
 									Edit the identity profile information used for programmatic
 									form-filling actions.
 								</p>
@@ -2009,7 +2009,7 @@ export function AppleGlowBorder({ children, isActive, className = "" }: AppleGlo
     }}/>
 					</>)}
 			</AnimatePresence>
-			<div className="/* UI: /* Style: 5 classes */ */">
+			<div className="/* UI: Full width blurred background with rounded edges. */">
 				{children}
 			</div>
 		</div>);
@@ -2031,21 +2031,21 @@ const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
         opacity: 0,
         scale: 0.95
     }} className="/* UI: Glassmorphic card with subtle transparency and a glowing hover effect. */">
-			<div className="/* UI: /* Style: 4 classes */ */">
+			<div className="/* UI: Horizontal layout with spacing between items and bottom margin */">
 				<span className={`rounded-full border px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider uppercase ${sourceColorClass}`}>
 					{item.source}
 				</span>
-				<span className="/* UI: /* Style: 3 classes */ */">
+				<span className="/* UI: Small slate grey monospaced text */">
 					{formattedDate}
 				</span>
 			</div>
 
-			<h2 className="/* UI: /* Style: 6 classes */ */">
+			<h2 className="/* UI: Small bold text, smooth hover transition from slate to white. */">
 				{item.title}
 			</h2>
 
-			<div className="/* UI: /* Style: 7 classes */ */">
-				<div className="/* UI: /* Style: 3 classes */ */">
+			<div className="/* UI: Layout with horizontal centering, top padding, and a subtle top border. */">
+				<div className="/* UI: A horizontal flex container with centered items and small spacing. */">
 					<a href={item.link} target="_blank" rel="noopener noreferrer" className="/* UI: Small interactive cyan button with smooth color change on hover. */">
 						<span>Read</span>
 						<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -2054,9 +2054,9 @@ const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
 					</a>
 
 					<button onClick={onAnalyze} className="/* UI: Small inline interactive link with vibrant purple coloring and subtle hover effect. */">
-						<span className="/* UI: /* Style: 5 classes */ */">
-							<span className="/* UI: /* Style: 8 classes */ */"></span>
-							<span className="/* UI: /* Style: 6 classes */ */"></span>
+						<span className="/* UI: Small positioned flex item with a small margin. */">
+							<span className="/* UI: Pulsing circular element with semi-transparent purple color. */"></span>
+							<span className="/* UI: Small purple rounded element with fixed size */"></span>
 						</span>
 						<span>Analyze</span>
 					</button>
@@ -2078,7 +2078,7 @@ const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
     }} transition={{
         duration: 0.25,
         ease: "easeInOut"
-    }} className="/* UI: /* Style: 1 classes */ */">
+    }} className="/* UI: Prevents content from spilling outside the container edges */">
 					<div className="/* UI: Top padding with subtle white top border and small gray descriptive text. */" dangerouslySetInnerHTML={{
         __html: item.descHTML
     }}/>
@@ -2118,17 +2118,17 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
         stiffness: 220,
         damping: 22
     }} className="/* UI: Fixed absolute positioning, dark blurred content area with a strong shadow. */">
-			<div className="/* UI: /* Style: 5 classes */ */">
+			<div className="/* UI: Full-screen absolute background layer with hidden pointer events */">
 				<div className="/* UI: Thin centering transparent purple gradient line overlaying the content. */"/>
-				<div className="/* UI: /* Style: 8 classes */ */"/>
+				<div className="/* UI: Large blurred purple circle positioned on the screen. */"/>
 			</div>
 
 			<header className="/* UI: Flex header with light background and thin bottom separator line. */">
 				<div className="/* UI: /* Style: 2 classes */ */">
-					<span className="/* UI: /* Style: 7 classes */ */">
+					<span className="/* UI: Small uppercase monospaced bold text in a muted blue-gray. */">
 						{mode === "single" ? "Single Update Briefing" : "Consolidated Stream Synthesis"}
 					</span>
-					<h3 className="/* UI: /* Style: 5 classes */ */">
+					<h3 className="/* UI: Small, bold, white truncated text confined to a narrow space */">
 						{mode === "single" ? newsItems[0]?.title : `Synthesizing ${newsItems.length} active stream items`}
 					</h3>
 				</div>
@@ -2142,7 +2142,7 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
 				</MagneticWrapper>
 			</header>
 
-			{isPending && (<div className="/* UI: /* Style: 6 classes */ */">
+			{isPending && (<div className="/* UI: Thin full-width transparent background element with clipped overflow. */">
 					<motion.div initial={{
         left: "-100%"
     }} animate={{
@@ -2151,23 +2151,23 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
         repeat: Infinity,
         duration: 1.5,
         ease: "linear"
-    }} className="/* UI: /* Style: 7 classes */ */"/>
+    }} className="/* UI: Full-height, third-width absolute positioning with a bright gradient background. */"/>
 				</div>)}
 
-			<div className="/* UI: /* Style: 6 classes */ */">
-				{displayMessages.length === 0 && !apiError && (<div className="/* UI: /* Style: 7 classes */ */">
-						<span className="/* UI: /* Style: 4 classes */ */">
-							<span className="/* UI: /* Style: 8 classes */ */"></span>
-							<span className="/* UI: /* Style: 6 classes */ */"></span>
+			<div className="/* UI: Flexible scrollable panel with structured padding and scrollbar. */">
+				{displayMessages.length === 0 && !apiError && (<div className="/* UI: Full height centered flex column with space-separated items */">
+						<span className="/* UI: Relative fixed-size container with a flex layout */">
+							<span className="/* UI: Pulsing blue circle placeholder with full coverage. */"></span>
+							<span className="/* UI: Small rounded blue circular indicator element */"></span>
 						</span>
-						<p className="/* UI: /* Style: 3 classes */ */">
+						<p className="/* UI: Small monochrome text in light gray. */">
 							{mode === "single" ? "Initiating single update summary..." : "Analyzing and compiling active news stream..."}
 						</p>
 					</div>)}
 
-				{apiError && (<div className="/* UI: /* Style: 7 classes */ */">
-						<p className="/* UI: /* Style: 2 classes */ */">Local Model Error</p>
-						<p className="/* UI: /* Style: 2 classes */ */">{apiError}</p>
+				{apiError && (<div className="/* UI: Soft rose-toned bordered container with text styling. */">
+						<p className="/* UI: Bold text with slight bottom margin */">Local Model Error</p>
+						<p className="/* UI: Light gray standard text font style */">{apiError}</p>
 					</div>)}
 
 				<LegendList data={displayMessages} renderItem={({ item })=>{
@@ -2183,16 +2183,16 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
 								</div>
 							</motion.div>);
         '/* "Renders a user message or system message within a chat interface, dynamically styling the container based on whether the message belongs to a regular user." */';
-    }} keyExtractor={(item, idx)=>idx + item.role} maintainScrollAtEnd showsVerticalScrollIndicator={true} recycleItems className="/* UI: /* Style: 3 classes */ */" style={{
+    }} keyExtractor={(item, idx)=>idx + item.role} maintainScrollAtEnd showsVerticalScrollIndicator={true} recycleItems className="/* UI: Full height container with scrollable content and hidden scrollbar */" style={{
         scrollbarWidth: "none"
     }} ItemSeparatorComponent={()=><div className="/* UI: /* Style: 2 classes */ */"/>} ListFooterComponent={<div className="/* UI: /* Style: 2 classes */ */"/>}/>
 
 				<div ref={threadEndRef}/>
 			</div>
 
-			<form onSubmit={handleSendMessage} className="/* UI: /* Style: 5 classes */ */">
+			<form onSubmit={handleSendMessage} className="/* UI: Padded dark background element with top white border. */">
 				<AppleGlowBorder isActive={input.length > 0}>
-					<div className="/* UI: /* Style: 6 classes */ */">
+					<div className="/* UI: Full-width flex container with centered items and padding. */">
 						<input type="text" value={input} onChange={(e)=>setInput(e.target.value)} placeholder={isPending ? "Generating..." : "Ask regarding updates..."} disabled={isPending} className="/* UI: Full-width transparent component with monospaced text and disabled state opacity. */"/>
 						<MagneticWrapper>
 							<button type="submit" disabled={!input.trim() || isPending} className="/* UI: Small circular button with hover state and pointer cursor. */">
@@ -2264,30 +2264,30 @@ export default function NewsDashboard() {
     const ollamaLLMActive = useOllamaSelectedModelRead();
     return (<div className="/* UI: Centered full-height flexible dark card with white border and subtle shadow. */">
 			{}
-			<div className="/* UI: /* Style: 5 classes */ */">
-				<div className="/* UI: /* Style: 8 classes */ */" style={{
+			<div className="/* UI: Full-size background layer positioned beneath other elements. */">
+				<div className="/* UI: Large blurred background circle positioned off-center. */" style={{
         animation: "pulse-mesh 12s ease-in-out infinite"
     }}/>
-				<div className="/* UI: /* Style: 8 classes */ */" style={{
+				<div className="/* UI: Floating, blurry, violet-toned circle element positioned in the top-right corner. */" style={{
         animation: "float-mesh 10s ease-in-out infinite"
     }}/>
-				<div className="/* UI: /* Style: 8 classes */ */" style={{
+				<div className="/* UI: Large, absolute, blurry background orb with oversized placement and transparency. */" style={{
         animation: "pulse-mesh 15s ease-in-out infinite"
     }}/>
 			</div>
 
 			<header className="/* UI: Padded blurred header with content alignment and bottom divider line. */">
 				<div>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<span className="/* UI: /* Style: 4 classes */ */">
-							<span className="/* UI: /* Style: 8 classes */ */"></span>
-							<span className="/* UI: /* Style: 6 classes */ */"></span>
+					<div className="/* UI: Centered flex layout with a small gap between items */">
+						<span className="/* UI: Small square element positioned relatively within a flex container */">
+							<span className="/* UI: Pulsing emerald circle overlay effect. */"></span>
+							<span className="/* UI: Small emerald-colored circular indicator badge */"></span>
 						</span>
-						<span className="/* UI: /* Style: 6 classes */ */">
+						<span className="/* UI: Small, bold, monochrome, uppercase text with wide letter spacing. */">
 							Ollama Agent UI
 						</span>
 					</div>
-					<h1 className="/* UI: /* Style: 7 classes */ */">
+					<h1 className="/* UI: Bold, tightly tracked white text with extra-large font size. */">
 						Intelligence Stream
 					</h1>
 				</div>
@@ -2303,12 +2303,12 @@ export default function NewsDashboard() {
 
 			<div className="/* UI: Sticky vertical content block with background blur and bottom border. */">
 				<AppleGlowBorder isActive={isSearchFocused}>
-					<div className="/* UI: /* Style: 6 classes */ */">
+					<div className="/* UI: Full-width flex container with centered items and padding. */">
 						<svg className={`h-4 w-4 transition-colors duration-300 ${isSearchFocused ? "text-[#00E0FF]" : "text-slate-400"}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
 						</svg>
-						<input type="text" inputMode="search" placeholder="Search intelligence updates..." value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} onFocus={()=>setIsSearchFocused(true)} onBlur={()=>setIsSearchFocused(false)} className="/* UI: /* Style: 7 classes */ */"/>
-						{searchTerm && (<button onClick={()=>setSearchTerm("")} className="/* UI: /* Style: 3 classes */ */">
+						<input type="text" inputMode="search" placeholder="Search intelligence updates..." value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} onFocus={()=>setIsSearchFocused(true)} onBlur={()=>setIsSearchFocused(false)} className="/* UI: Full width input field with monospace text and transparent background */"/>
+						{searchTerm && (<button onClick={()=>setSearchTerm("")} className="/* UI: Gray text that turns white when hovered, indicating clickability. */">
 								<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
 									<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
 								</svg>
@@ -2316,8 +2316,8 @@ export default function NewsDashboard() {
 					</div>
 				</AppleGlowBorder>
 
-				<div className="/* UI: /* Style: 5 classes */ */">
-					<div className="/* UI: /* Style: 7 classes */ */">
+				<div className="/* UI: Small text layout with items centered and content evenly distributed. */">
+					<div className="/* UI: Subtle glassmorphism card layout with rounded edges and thin border. */">
 						{([
         "all",
         "Google News",
@@ -2343,20 +2343,20 @@ export default function NewsDashboard() {
 			</div>
 
 			{}
-			<div className="/* UI: /* Style: 5 classes */ */" style={{
+			<div className="/* UI: Flexible content block with padding and minimum height defined. */" style={{
         height: "calc(600px - 210px)",
         minHeight: 0
     }}>
 				<AnimatePresence mode="popLayout">
-					{isInitialLoading && (<div className="/* UI: /* Style: 2 classes */ */">
+					{isInitialLoading && (<div className="/* UI: Vertical spacing between items with a small top margin */">
 							{[
         1,
         2,
         3
-    ].map((n)=>(<div key={n} className="/* UI: /* Style: 7 classes */ */">
-									<div className="/* UI: /* Style: 5 classes */ */"/>
-									<div className="/* UI: /* Style: 5 classes */ */"/>
-									<div className="/* UI: /* Style: 4 classes */ */"/>
+    ].map((n)=>(<div key={n} className="/* UI: Pulsing light container with a translucent white background and rounded borders. */">
+									<div className="/* UI: Small rounded white translucent box with bottom margin. */"/>
+									<div className="/* UI: Small rounded block with semi-transparent white background and margin bottom */"/>
+									<div className="/* UI: Small, half-width, rounded container with a semi-transparent white background. */"/>
 								</div>))}
 						</div>)}
 
@@ -2366,8 +2366,8 @@ export default function NewsDashboard() {
     }} animate={{
         opacity: 1,
         y: 0
-    }} className="/* UI: /* Style: 8 classes */ */">
-							<p className="/* UI: /* Style: 3 classes */ */">
+    }} className="/* UI: Rounded rose-themed card with a border and centered text. */">
+							<p className="/* UI: Small bold text in rose color */">
 								Unable to load feeds
 							</p>
 							<button onClick={handleRefetchAll} className="/* UI: Small rounded button with subtle white background and slight hover effect. */">
@@ -2379,13 +2379,13 @@ export default function NewsDashboard() {
         opacity: 0
     }} animate={{
         opacity: 1
-    }} className="/* UI: /* Style: 3 classes */ */">
-							<p className="/* UI: /* Style: 2 classes */ */">No results match filters</p>
+    }} className="/* UI: Centered text with generous vertical padding and muted slate gray color. */">
+							<p className="/* UI: Small, semi-bold text style. */">No results match filters</p>
 						</motion.div>)}
 
 					{!isInitialLoading && finalFeed?.length > 0 && (<LegendList data={finalFeed} keyExtractor={({ item })=>`${item.id ?? item.link}-${expandedItemId === (item.id ?? item.link) ? "expanded" : "collapsed"}`} style={{
         height: "100%"
-    }} extraData={expandedItemId} className="/* UI: /* Style: 1 classes */ */" contentContainerClassName="pb-[80px] pt-2" recycleItems={true} ItemSeparatorComponent={()=><div className="/* UI: /* Style: 2 classes */ */"/>} renderItem={({ item: news })=>{
+    }} extraData={expandedItemId} className="/* UI: Semi-transparent glass-like scrollbar design */" contentContainerClassName="pb-[80px] pt-2" recycleItems={true} ItemSeparatorComponent={()=><div className="/* UI: /* Style: 2 classes */ */"/>} renderItem={({ item: news })=>{
         return (<NewsCard item={item} isExpanded={expandedItemId === idKey} onToggleExpand={()=>setExpandedItemId(expandedItemId === idKey ? null : idKey)} onAnalyze={()=>handleSummarizeSingleCard(item)}/>);
         '/* "Renders a dynamic news card component for each item, managing its expanded state and providing callbacks for analysis." */';
     }}/>)}
@@ -2393,13 +2393,13 @@ export default function NewsDashboard() {
 			</div>
 
 			{}
-			<div className="/* UI: /* Style: 6 classes */ */">
+			<div className="/* UI: Fixed bottom notification bar with full width and z-index. */">
 				<div className="/* UI: Full height frosted glass panel with centered items and subtle shadows. */">
-					<div className="/* UI: /* Style: 3 classes */ */">
+					<div className="/* UI: Flex container with evenly spaced centered items */">
 						<span className="/* UI: Small animated pulsing circular badge with a bright emerald outline */"/>
-						<span className="/* UI: /* Style: 3 classes */ */">
+						<span className="/* UI: Small bold text in slate gray. */">
 							Ollama Feed Agent:{" "}
-							<span className="/* UI: /* Style: 4 classes */ */">
+							<span className="/* UI: Small uppercase monospace white text font */">
 								{ollamaLLMActive}
 							</span>
 						</span>
@@ -2426,7 +2426,7 @@ export default function NewsDashboard() {
         opacity: 1
     }} exit={{
         opacity: 0
-    }} onClick={()=>setActiveChatItems([])} className="/* UI: /* Style: 6 classes */ */"/>)}
+    }} onClick={()=>setActiveChatItems([])} className="/* UI: Full screen semi-transparent blurred dark overlay with active pointer events */"/>)}
 			</AnimatePresence>
 
 			{}
@@ -2487,121 +2487,121 @@ const ProfileSettingsView = ({ setModelState }: {
     };
     return (<div className="/* UI: Vertical content container with frosted glass effect and defined shadow. */">
 			{}
-			<div className="/* UI: /* Style: 7 classes */ */">
-				<div className="/* UI: /* Style: 3 classes */ */">
-					<h2 className="/* UI: /* Style: 8 classes */ */">
+			<div className="/* UI: Flexible container with spacing, border, and bottom padding */">
+				<div className="/* UI: Vertical column layout with small spacing between items */">
+					<h2 className="/* UI: Bold sans-serif text in light gray, centered with small spacing. */">
 						Autofill Identity Settings
 					</h2>
-					<p className="/* UI: /* Style: 5 classes */ */">
+					<p className="/* UI: Small medium-gray text with standard font styling */">
 						Your credentials remain stored locally and privately on your
 						machine.
 					</p>
 				</div>
 				<div className="/* UI: Pill-shaped button with glowing blue border and centered icon/text. */">
-					<ShieldCheck size={10} className="/* UI: /* Style: 1 classes */ */"/>
-					<span className="/* UI: /* Style: 5 classes */ */">
+					<ShieldCheck size={10} className="/* UI: Pulsating animation effect applied to the element */"/>
+					<span className="/* UI: Small bold uppercase tracking-wide sans-serif text */">
 						Local
 					</span>
 				</div>
 			</div>
 
 			{}
-			<div className="/* UI: /* Style: 4 classes */ */">
+			<div className="/* UI: Two-column grid layout with spacing and top margin */">
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Two-column vertical flex layout with spacing and hover effects */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						Full Name
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<User size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<User size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="text" value={profile.fullName} autoComplete="name" onChange={(e)=>handleChange("fullName", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="e.g. Sanjaiyan Parthipan"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Vertical flex container with a small gap and column span. */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						Email
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<Mail size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<Mail size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="email" value={profile.email} autoComplete="email" onChange={(e)=>handleChange("email", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="name@email.com"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Vertical flex container with a small gap and column span. */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						Phone
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<Phone size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<Phone size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="text" value={profile.phone} autoComplete="tel" onChange={(e)=>handleChange("phone", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Two-column vertical flex layout with spacing and hover effects */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						Address Line 1
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<MapPin size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<MapPin size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="text" value={profile.addressLine1} autoComplete="street-address" onChange={(e)=>handleChange("addressLine1", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Selva Sannithi Murugan, Thondaimanaru"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Two-column vertical flex layout with spacing and hover effects */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						Address Line 2 (Suite, Apt)
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<Compass size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<Compass size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="text" value={profile.addressLine2} autoComplete="address-line2" onChange={(e)=>handleChange("addressLine2", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Jaffna, Sri Lanka"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Vertical flex container with a small gap and column span. */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						City
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<Building size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<Building size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="text" value={profile.city} autoComplete="address-level2" onChange={(e)=>handleChange("city", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Point Pedro"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Vertical flex container with a small gap and column span. */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						ZIP Code
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<Hash size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<Hash size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="text" value={profile.zipCode} autoComplete="postal-code" onChange={(e)=>handleChange("zipCode", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: 40000"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Vertical flex container with a small gap and column span. */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						State / Province
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<MapPin size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<MapPin size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="text" value={profile.state} onChange={(e)=>handleChange("state", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Jaffna"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 5 classes */ */">
+				<div className="/* UI: Vertical flex container with a small gap and column span. */">
 					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
 						Country
 					</label>
-					<div className="/* UI: /* Style: 3 classes */ */">
-						<Flag size={12} className="/* UI: /* Style: 5 classes */ */"/>
+					<div className="/* UI: Centered items within a relative flex container. */">
+						<Flag size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
 						<input type="text" value={profile.country} autoComplete="address-level1" onChange={(e)=>handleChange("country", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Sri Lanka"/>
 					</div>
 				</div>
@@ -2628,7 +2628,7 @@ const ProfileSettingsView = ({ setModelState }: {
         duration: 1.2,
         ease: "linear"
     }}>
-							<Loader2 size={13} className="/* UI: /* Style: 1 classes */ */"/>
+							<Loader2 size={13} className="/* UI: Bright cyan text color */"/>
 						</motion.div>) : isSaved ? (<motion.span key="saved" initial={{
         opacity: 0,
         scale: 0.6
@@ -2641,8 +2641,8 @@ const ProfileSettingsView = ({ setModelState }: {
         type: "spring",
         stiffness: 300,
         damping: 15
-    }} className="/* UI: /* Style: 4 classes */ */">
-							<Check size={12} className="/* UI: /* Style: 1 classes */ */"/> Profile Details
+    }} className="/* UI: Centered flex layout with spacing and progress indicator cursor */">
+							<Check size={12} className="/* UI: Animated bouncing effect in place */"/> Profile Details
 							Secured
 						</motion.span>) : (<motion.span key="idle" initial={{
         opacity: 0,
@@ -2653,7 +2653,7 @@ const ProfileSettingsView = ({ setModelState }: {
     }} exit={{
         opacity: 0,
         y: -5
-    }} className="/* UI: /* Style: 6 classes */ */">
+    }} className="/* UI: Flexible layout with centered content, gap, and pointer cursor indicator */">
 							<Save size={12}/> Save Form Identity
 						</motion.span>)}
 				</AnimatePresence>
@@ -2745,7 +2745,7 @@ export function BottomNav() {
     return (<div className={`bg-[#05050A] flex items-center justify-center relative overflow-hidden font-sans`}>
 			<div className="/* UI: Full background coverage with subtle tiled dark noise pattern overlay. */"/>
 			<div className="/* UI: Large blurred purple screen blending abstract floating element positioned near the bottom center. */"/>
-			<div className="/* UI: /* Style: 9 classes */ */"/>
+			<div className="/* UI: Floating blurred glowing orb with transparent blue background */"/>
 
 			<motion.div transition={{
         type: "spring",
@@ -2785,13 +2785,13 @@ export function BottomNav() {
         scale: 0.8
     }} transition={{
         duration: 0.2
-    }} className="/* UI: /* Style: 5 classes */ */">
+    }} className="/* UI: Full size centered flex container */">
 								<MagneticButton onClick={()=>setIsExpanded(true)} className="/* UI: Small centered circular button with soft violet glow and interactive shadows. */">
-									<div className="/* UI: /* Style: 3 classes */ */" style={{
+									<div className="/* UI: Circular element positioned absolutely to fill parent container */" style={{
         background: "rgba(139, 92, 246, 0.12)",
         boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08), 0 0 20px rgba(139, 92, 246, 0.3)"
     }}/>
-									<Sparkles className="/* UI: /* Style: 6 classes */ */" style={{
+									<Sparkles className="/* UI: Small pulsing violet icon in the foreground */" style={{
         filter: "drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))"
     }}/>
 								</MagneticButton>
@@ -2804,18 +2804,18 @@ export function BottomNav() {
     }} transition={{
         duration: 0.25,
         delay: 0.1
-    }} className="/* UI: /* Style: 5 classes */ */">
+    }} className="/* UI: Full-sized flex container with centered items and spacing */">
 								<MagneticButton onClick={()=>{
         '/* "Executes logic for function anonymous_arrow" */';
     }} className="/* UI: Circular button with white background and subtle border, centered and sized. */">
-									<X className="/* UI: /* Style: 4 classes */ */"/>
+									<X className="/* UI: Small icon with light gray text and hover effect */"/>
 								</MagneticButton>
 
-								<div className="/* UI: /* Style: 4 classes */ */">
+								<div className="/* UI: Inline alignment with spacing and fixed size */">
 									{navItems.map((item)=>{
         return (<Link key={item.id} to={item.to} prefetch="render">
-												<MagneticButton key={item.id} onClick={()=>setActiveTab(item.id)} className="/* UI: /* Style: 8 classes */ */">
-													{isActive && (<motion.div layoutId="wowActiveIndicator" className="/* UI: /* Style: 5 classes */ */" style={{
+												<MagneticButton key={item.id} onClick={()=>setActiveTab(item.id)} className="/* UI: Centered circular fixed-size element with constrained dimensions */">
+													{isActive && (<motion.div layoutId="wowActiveIndicator" className="/* UI: Circular full-size element with a semi-transparent white border */" style={{
             background: "rgba(255, 255, 255, 0.08)",
             boxShadow: `inset 0 1px 1px rgba(255,255,255,0.1), 0 0 20px ${item.glow}`
         }} transition={{
@@ -2830,7 +2830,7 @@ export function BottomNav() {
             filter: isActive ? `drop-shadow(0 0 8px ${item.glow})` : undefined
         }}/>
 
-													{isActive && (<motion.div layoutId="activeTabDot" className="/* UI: /* Style: 5 classes */ */" style={{
+													{isActive && (<motion.div layoutId="activeTabDot" className="/* UI: Small absolute corner indicator dot or marker */" style={{
             backgroundColor: item.color
         }} transition={{
             type: "spring",
@@ -2843,14 +2843,14 @@ export function BottomNav() {
     })}
 								</div>
 
-								<div className="/* UI: /* Style: 6 classes */ */"/>
+								<div className="/* UI: Small, fixed-height, white translucent rounded spacer element. */"/>
 
 								<motion.div layout className={`
 										relative flex items-center flex-1 h-13 rounded-full overflow-hidden shrink-0 group
 										${isFocused ? "bg-black/50" : "bg-black/30 border border-white/5"}
 										transition-colors duration-300
 									`}>
-									{isFocused && (<div className="/* UI: /* Style: 5 classes */ */" style={{
+									{isFocused && (<div className="/* UI: Full screen positioned element with rounded shape and minimal padding. */" style={{
         background: "linear-gradient(90deg, #00E0FF, #8B5CF6, #FF2E63, #00E0FF)",
         backgroundSize: "200% auto",
         animation: "borderFlow 3s linear infinite",
@@ -2859,7 +2859,7 @@ export function BottomNav() {
         maskComposite: "exclude"
     }}/>)}
 
-									<motion.div className="/* UI: /* Style: 4 classes */ */" whileHover={{
+									<motion.div className="/* UI: Fixed position element offset slightly from the left with high clickability */" whileHover={{
         rotate: 90,
         scale: 1.1
     }} transition={{
@@ -2892,11 +2892,11 @@ export function BottomNav() {
     }} whileTap={{
         scale: 0.95
     }} onClick={handleSendQuery} className="/* UI: Small circular interactive button with purple glow and pointer cursor */">
-												<div className="/* UI: /* Style: 4 classes */ */" style={{
+												<div className="/* UI: Full-screen absolute positioning with smooth color transitions */" style={{
         backgroundColor: currentTab?.color
     }}/>
-												<div className="/* UI: /* Style: 7 classes */ */"/>
-												<ArrowUp strokeWidth={2.5} className="/* UI: /* Style: 4 classes */ */"/>
+												<div className="/* UI: Full-screen, semi-transparent, rounded modal overlay with a subtle white border. */"/>
+												<ArrowUp strokeWidth={2.5} className="/* UI: Small square element with white text, positioned high in the stack. */"/>
 											</motion.button>)}
 									</AnimatePresence>
 								</motion.div>
@@ -2921,40 +2921,40 @@ export const LoadingUI = ({ headerTxt = "Calibrating Pipeline Interface", header
 			{}
 			<div className="/* UI: Large blurred pulsing circle overlaying content in a specific corner. */"/>
 
-			<div className="/* UI: /* Style: 2 classes */ */">
+			<div className="/* UI: Vertical spacing between elements with margin at the top */">
 				{}
-				<div className="/* UI: /* Style: 7 classes */ */">
+				<div className="/* UI: Center-aligned square container with flexible content. */">
 					{}
 					<div className="/* UI: Spinner component overlayed with a dashed blue border animation */"/>
-					<div className="/* UI: /* Style: 7 classes */ */"/>
+					<div className="/* UI: Pulsing absolutely positioned rounded border outline animation. */"/>
 					<div className="/* UI: Centered, blurred banner with a semi-transparent gradient background. */">
-						<svg className="/* UI: /* Style: 4 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<svg className="/* UI: Small animated square icon in bright blue. */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
 						</svg>
 					</div>
 				</div>
 
-				<div className="/* UI: /* Style: 2 classes */ */">
-					<h2 className="/* UI: /* Style: 6 classes */ */">
+				<div className="/* UI: Centered text with vertical spacing between elements */">
+					<h2 className="/* UI: Base size bold white text with tight tracking and pulse animation */">
 						{headerTxt}
 					</h2>
-					<p className="/* UI: /* Style: 5 classes */ */">
+					<p className="/* UI: Small gray monochrome text with regular line spacing */">
 						{headerTxt2}
 					</p>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 4 classes */ */">
+				<div className="/* UI: Four-column responsive grid layout with spacing and padding */">
 					{[
         ...Array(4)
-    ].map((_, i)=>(<div key={i} className="/* UI: /* Style: 7 classes */ */" style={{
+    ].map((_, i)=>(<div key={i} className="/* UI: Pulsing placeholder UI element with frosted glass border and rounded edges */" style={{
             animationDelay: `${i * 150}ms`
         }}/>))}
 				</div>
 			</div>
 
-			<div className="/* UI: /* Style: 4 classes */ */">
-				<span className="/* UI: /* Style: 3 classes */ */">
+			<div className="/* UI: Adds top padding and subtle top border for a centered look */">
+				<span className="/* UI: Small monospaced text in a light gray color. */">
 					{footerTxt}
 				</span>
 			</div>
@@ -2972,29 +2972,29 @@ export const ErrorUI = ({ headerDescTxt = "The real-time telemetry pipeline requ
 			<div className="/* UI: Large blurred glowing purple element positioned off-screen. */"/>
 
 			<div className="/* UI: /* Style: 1 classes */ */">
-				<div className="/* UI: /* Style: 3 classes */ */">
-					<div className="/* UI: /* Style: 6 classes */ */"/>
-					<span className="/* UI: /* Style: 6 classes */ */">
+				<div className="/* UI: Horizontal alignment with spaced items for centered layout */">
+					<div className="/* UI: Small pulsing pink circular element with a soft glow. */"/>
+					<span className="/* UI: Small bold uppercase text in a mono-spaced tracking-wide hot pink. */">
 						Diagnostics Status: Telemetry Offline
 					</span>
 				</div>
 
 				<div className="/* UI: /* Style: 1 classes */ */">
-					<h1 className="/* UI: /* Style: 6 classes */ */">
+					<h1 className="/* UI: Large bold tight tracking white text style */">
 						System Interface Decoupled
 					</h1>
-					<p className="/* UI: /* Style: 3 classes */ */">
+					<p className="/* UI: Small gray text with relaxed line spacing */">
 						{headerDescTxt}
 					</p>
 				</div>
 
 				{}
-				<div className="/* UI: /* Style: 6 classes */ */">
-					<div className="/* UI: /* Style: 6 classes */ */">
-						<span className="/* UI: /* Style: 6 classes */ */">
+				<div className="/* UI: Semi-transparent white bordered box with padding and vertical spacing. */">
+					<div className="/* UI: Horizontal layout with a subtle separator line and padding */">
+						<span className="/* UI: Small, bold, monospace, uppercase text with wide tracking. */">
 							{copyHeaderTxt}
 						</span>
-						<div className="/* UI: /* Style: 6 classes */ */">
+						<div className="/* UI: Semi-transparent, large-bordered flex container with minimal padding. */">
 							<button className={`text-[9px] font-mono px-2 py-1 rounded-md transition-all bg-[#8B5CF6] text-white`}>
 								{copyTagTxt}
 							</button>
@@ -3018,8 +3018,8 @@ export const ErrorUI = ({ headerDescTxt = "The real-time telemetry pipeline requ
 				</div>
 			</div>
 
-			<div className="/* UI: /* Style: 4 classes */ */">
-				<span className="/* UI: /* Style: 4 classes */ */">
+			<div className="/* UI: Top padding, thin white border, centered text alignment. */">
+				<span className="/* UI: Small monospace text in gray with wide letter spacing */">
 					Ollama Web Browser v1.0.0
 				</span>
 			</div>
@@ -3095,7 +3095,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
         responseText
     ]);
     return (<AnimatePresence>
-			{isOpen && (<div className="/* UI: /* Style: 8 classes */ */">
+			{isOpen && (<div className="/* UI: Full screen centered overlay with padding and high z-index */">
 					<style dangerouslySetInnerHTML={{
         __html: `
             @keyframes appleIntelligenceSpin {
@@ -3117,10 +3117,10 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
         opacity: 1
     }} exit={{
         opacity: 0
-    }} onClick={onClose} className="/* UI: /* Style: 5 classes */ */"/>
+    }} onClick={onClose} className="/* UI: Full screen overlay with semi-transparent blur background. */"/>
 
 					{}
-					<div className="/* UI: /* Style: 5 classes */ */">
+					<div className="/* UI: Full width constrained box with fixed height and interactivity. */">
 						{}
 						<AnimatePresence>
 							{isGenerating && (<motion.div initial={{
@@ -3131,12 +3131,12 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
         opacity: 0
     }} style={{
         animation: "applePulseBorder 3s ease-in-out infinite"
-    }} className="/* UI: /* Style: 7 classes */ */">
+    }} className="/* UI: Zero-depth absolute positioned overlay with rounded corners and padding. */">
 									<div style={{
         background: "conic-gradient(from 0deg, #8B5CF6 0%, #00E0FF 25%, #FF2E63 50%, #FF8A00 75%, #8B5CF6 100%)",
         filter: "blur(18px)",
         animation: "appleIntelligenceSpin 6s linear infinite"
-    }} className="/* UI: /* Style: 4 classes */ */"/>
+    }} className="/* UI: Large absolutely positioned overlay element. */"/>
 								</motion.div>)}
 						</AnimatePresence>
 
@@ -3170,21 +3170,21 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
     }} className="/* UI: Full screen blurred absolute overlay with purple tint and rounded shape. */"/>
 
 							{}
-							<div className="/* UI: /* Style: 8 classes */ */">
-								<div className="/* UI: /* Style: 4 classes */ */">
+							<div className="/* UI: Flex container with a bottom border and elevated layout. */">
+								<div className="/* UI: Centered flex container with internal spacing and overflow control */">
 									<div className="/* UI: Small round icon container with faint white borders and soft shadow */">
-										<Sparkles className="/* UI: /* Style: 4 classes */ */"/>
+										<Sparkles className="/* UI: Small pulsing icon in cyan blue. */"/>
 									</div>
-									<div className="/* UI: /* Style: 4 classes */ */">
-										<div className="/* UI: /* Style: 3 classes */ */">
-											<span className="/* UI: /* Style: 5 classes */ */">
+									<div className="/* UI: Vertical flexible layout container with hidden overflow and left alignment */">
+										<div className="/* UI: Centered flex layout with a small gap between items */">
+											<span className="/* UI: Small, bold, wide-tracked, uppercase blue text. */">
 												Active Tab Context
 											</span>
-											<button onClick={handleRefreshPageContent} disabled={isFetchingPageContext || isGenerating} className="/* UI: /* Style: 4 classes */ */" title="Refetch web document context">
+											<button onClick={handleRefreshPageContent} disabled={isFetchingPageContext || isGenerating} className="/* UI: Text color with hover effect and disabled state opacity. */" title="Refetch web document context">
 												<RefreshCw className={`w-3 h-3 ${isFetchingPageContext ? "animate-spin" : ""}`}/>
 											</button>
 										</div>
-										<h3 className="/* UI: /* Style: 6 classes */ */">
+										<h3 className="/* UI: Small, bold, light text with tight leading and small top margin. */">
 											{pageContext?.title || activeTab?.url || "Secure Web Document"}
 										</h3>
 									</div>
@@ -3196,13 +3196,13 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 							</div>
 
 							{}
-							<div className="/* UI: /* Style: 8 classes */ */">
+							<div className="/* UI: Flexible scrollable container with subtle padding and scrollbar. */">
 								{}
 								<div className="/* UI: Semi-transparent white frosted glass effect card with subtle transitions. */">
-									<span className="/* UI: /* Style: 5 classes */ */">
+									<span className="/* UI: Small bold uppercase text in a muted gray tone. */">
 										Your Question
 									</span>
-									<div className="/* UI: /* Style: 4 classes */ */">
+									<div className="/* UI: Flex container aligning items to the bottom with a small gap. */">
 										<textarea value={editedQuery} onChange={(e)=>setEditedQuery(e.target.value)} onKeyDown={(e)=>{
         '/* "Prevents the default form behavior and executes a query submission if the Enter key is pressed without Shift." */';
     }} rows={2} className="/* UI: Transparent background small text medium icon layout with default focus styling. */" placeholder="Tweak or enter your question here..."/>
@@ -3214,27 +3214,27 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 
 								{}
 								<div className="/* UI: /* Style: 1 classes */ */">
-									<div className="/* UI: /* Style: 4 classes */ */">
-										<span className="/* UI: /* Style: 5 classes */ */">
+									<div className="/* UI: Flex container with centered items, distributed elements, and margin bottom spacing */">
+										<span className="/* UI: Small bold purple uppercase text with wide tracking */">
 											Response Output
 										</span>
-										{isGenerating && (<span className="/* UI: /* Style: 6 classes */ */">
-												<span className="/* UI: /* Style: 5 classes */ */"/>
+										{isGenerating && (<span className="/* UI: Small bright blue text in a centered, spaced flex container */">
+												<span className="/* UI: Small animated pulsing circular background indicator. */"/>
 												Ollama generating...
 											</span>)}
 									</div>
 
-									{error ? (<div className="/* UI: /* Style: 9 classes */ */">
-											<AlertCircle className="/* UI: /* Style: 5 classes */ */"/>
+									{error ? (<div className="/* UI: Rounded red background card with subtle border and small text. */">
+											<AlertCircle className="/* UI: Small red square element with fixed size and margin. */"/>
 											<p>
 												{(error as Error).message || "An unexpected error occurred."}
 											</p>
-										</div>) : isPending && !responseText ? (<div className="/* UI: /* Style: 3 classes */ */">
-											<div className="/* UI: /* Style: 4 classes */ */"/>
-											<div className="/* UI: /* Style: 4 classes */ */"/>
-											<div className="/* UI: /* Style: 4 classes */ */"/>
-										</div>) : (<div className="/* UI: /* Style: 2 classes */ */">
-											{parsedMarkup || (<p className="/* UI: /* Style: 3 classes */ */">
+										</div>) : isPending && !responseText ? (<div className="/* UI: Vertical spacing with subtle pulsing animation */">
+											<div className="/* UI: Small rectangular element with rounded edges and transparent background */"/>
+											<div className="/* UI: Small wide rounded element with semi-transparent white background */"/>
+											<div className="/* UI: Small rounded rectangular block with semi-transparent white background */"/>
+										</div>) : (<div className="/* UI: Light text color with vertical spacing between elements */">
+											{parsedMarkup || (<p className="/* UI: Small gray italic text */">
 													Submit a question to execute analysis.
 												</p>)}
 										</div>)}
@@ -3242,18 +3242,18 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 							</div>
 
 							{}
-							<div className="/* UI: /* Style: 9 classes */ */">
+							<div className="/* UI: Elevated header section with spacing and item alignment. */">
 								{}
 								<div className="/* UI: /* Style: 1 classes */ */">
 									<button onClick={()=>setIsDropdownOpen(!isDropdownOpen)} className="/* UI: Small rounded light element with subtle border and hover effect. */">
-										<span className="/* UI: /* Style: 7 classes */ */">
+										<span className="/* UI: Small, dense, uppercase text display with a specific light gray color. */">
 											{selectedModel || "No local models"}
 										</span>
-										<ChevronDown className="/* UI: /* Style: 3 classes */ */"/>
+										<ChevronDown className="/* UI: Small neutral-gray icon or indicator. */"/>
 									</button>
 
 									{isDropdownOpen && localModels?.length > 0 && (<>
-											<div className="/* UI: /* Style: 3 classes */ */" onClick={()=>setIsDropdownOpen(false)}/>
+											<div className="/* UI: Full-screen fixed overlay layer with high z-index */" onClick={()=>setIsDropdownOpen(false)}/>
 											<div className="/* UI: Floating sidebar with frosted appearance and scrollable content area. */">
 												{localModels?.map?.((item)=>(<button key={item.name} onClick={()=>{
             '/* "Executes logic for function anonymous_arrow" */';
@@ -3267,7 +3267,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 								{}
 								<div className="/* UI: /* Style: 2 classes */ */">
 									<button onClick={handleCopy} disabled={!responseText} className="/* UI: Small circular icon button with white border and smooth hover transitions */" title="Copy response to clipboard">
-										{copied ? (<Check className="/* UI: /* Style: 3 classes */ */"/>) : (<Copy className="/* UI: /* Style: 2 classes */ */"/>)}
+										{copied ? (<Check className="/* UI: Small square icon in emerald green color */"/>) : (<Copy className="/* UI: /* Style: 2 classes */ */"/>)}
 									</button>
 
 									<button onClick={()=>triggerInference()} disabled={isGenerating || !submittedQuery} className={`h-8 px-3.5 rounded-full bg-[#8B5CF6] text-white font-semibold text-[10px] uppercase tracking-wider flex items-center gap-1 hover:bg-[#7c4fe3] disabled:opacity-40 disabled:pointer-events-none transition-colors shadow-[0_0_15px_rgba(139,92,246,0.3)] ${isGenerating ? "cursor-progress" : "cursor-pointer"}`}>
