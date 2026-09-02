@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Sanjaiyan <sanjaiyan.pro@gmail.com>"]
 license = "MIT"
-license-file = "LICENSE"
 repository = "https://github.com/sanjaiyan-dev/urai-ecma"
 description = "AST-aware JS/TS code to prompt engine for LLMs"
+readme = "README.md"
 
 [dependencies]
 anyhow = "1.0.103"
@@ -37,7 +37,7 @@ tokio = { version = "1.53.0", features = ["rt-multi-thread"] }
 
 [profile.release]
 opt-level = 3
-lto = "thin"
+lto = "fat"
 codegen-units = 1
 panic = "abort"
 strip = "symbols"
