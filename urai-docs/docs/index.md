@@ -31,6 +31,9 @@ hero:
   text: |
     AST-Aware Code-to-Prompt Engine
   tagline: Strip styling bloat, summarize method bodies, and feed complete JS/TS codebases into LLMs with up to 80% token reduction.
+  image:
+    src: /urai-icon.png
+    alt: urai-ecma Mascot Pruning Codebase
   actions:
     - theme: brand
       text: Get Started

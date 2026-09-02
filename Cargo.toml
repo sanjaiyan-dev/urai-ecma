@@ -2,6 +2,11 @@
 name = "urai-ecma"
 version = "0.1.0"
 edition = "2024"
+authors = ["Sanjaiyan <sanjaiyan.pro@gmail.com>"]
+license = "MIT"
+license-file = "LICENSE"
+repository = "https://github.com/sanjaiyan-dev/urai-ecma"
+description = "AST-aware JS/TS code to prompt engine for LLMs"
 
 [dependencies]
 anyhow = "1.0.103"
