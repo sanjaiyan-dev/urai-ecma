@@ -1,4 +1,5 @@
 {
+    "$schema": "https://raw.githubusercontent.com/sanjaiyan-dev/urai-ecma/master/urai-docs/docs/public/json-schema/v0/config.schema.json",
     // Path to the project directory or single source file
     "input_project": "../ollama-web-browser",
 
