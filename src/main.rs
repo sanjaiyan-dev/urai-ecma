@@ -278,18 +278,16 @@ fn main() {
         "✅ [urai-ecma] Prompt successfully generated at: {}",
         ctx.output_filename.display()
     );
-    if let Ok(content) = fs::read_to_string(&ctx.output_filename)
-        && let Some(bpe) = tiktoken::get_encoding("llama3")
-    {
-        let token_count = bpe.encode(&content);
-        println!(
-            "📊 [urai-ecma] Estimated Tokens in {}: {} tokens",
-            ctx.output_filename.display(),
-            token_count.len()
-        );
-    }
-
     if let Some(bpe) = tiktoken::get_encoding("o200k_base") {
+        if let Ok(content) = fs::read_to_string(&ctx.output_filename) {
+            let token_count = bpe.encode(&content);
+            println!(
+                "📊 [urai-ecma] Estimated Tokens in {}: {} tokens",
+                ctx.output_filename.display(),
+                token_count.len()
+            );
+        }
+
         let output_tokens = fs::read_to_string(&ctx.output_filename)
             .ok()
             .map(|content| bpe.encode(&content).len())

@@ -17,7 +17,7 @@
     // "remove_aggr": aggressively removes class strings even if below character threshold.
     // "summarize": sends class strings exceeding threshold to Ollama for 1-line style descriptions.
     // "preserve": keeps classNames untouched.
-    "tailwind_mode": "summarize",
+    "tailwind_mode": "remove",
 
     // Character length threshold for Tailwind pruning (default: 96 characters)
     "tailwind_threshold": 96,

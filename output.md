@@ -334,7 +334,7 @@ graph LR;
 
 ```typescript
 export default defineBackground(()=>{
-    '/* "Configures the browser\'s side panel to automatically open when an action is clicked." */';
+    '/* "Configures the browser side panel to automatically open when an associated action is clicked." */';
 });
 
 ```
@@ -393,7 +393,7 @@ export const queryClient = new QueryClient({
     }
 });
 startTransition(()=>{
-    '/* "Renders the main application UI structure, including routing for various features, within a state transition context." */';
+    '/* "Renders the main application structure, including routing, state management, and navigation components, within a transition context." */';
 });
 
 ```
@@ -426,7 +426,7 @@ const formatSize = (bytes: number)=>{
     '/* "Executes logic for function formatSize" */';
 };
 const formatDate = (isoString: string)=>{
-    '/* "Converts a standardized ISO string into a localized short date format using British English conventions." */';
+    '/* "Converts an ISO date string into a specific localized date format using English UK conventions." */';
 };
 export default function OllamaSidePanel() {
     const { data, isLoading, isError } = useOllamaListModels();
@@ -459,97 +459,97 @@ export default function OllamaSidePanel() {
     if (isError) {
         return (<ErrorUI copyTagTxt="terminal" copyButtonTxt="Copy Terminal Code" copyHeaderTxt="Terminal Code"/>);
     }
-    return (<div className="/* UI: Full screen layout with dark mode background and fixed typography. */">
+    return (<div>
 			{}
-			<header className="/* UI: Stuck banner with blurred background, dark theme, and centered content. */">
-				<div className="/* UI: Flex container with evenly spaced centered items */">
-					<div className="/* UI: Small animated circular emerald button or indicator */"/>
-					<h1 className="/* UI: Small, semi-bold, uppercase text with wide tracking and gray color. */">
+			<header>
+				<div>
+					<div/>
+					<h1>
 						Local Models
 					</h1>
 				</div>
-				<span className="/* UI: Small text button with rounded borders and dark zinc color scheme */">
+				<span>
 					{endpoint}
 				</span>
 			</header>
 
 			{}
-			<div className="/* UI: Padded background with dark gray color */">
-				<div className="/* UI: /* Style: 1 classes */ */">
-					<input type="search" placeholder="Search models..." value={search} onChange={(e)=>setSearch(e.target.value)} className="/* UI: Full-width, dark-themed input field with defined borders and violet focus ring. */"/>
-					<svg className="/* UI: Small square icon positioned absolutely with a gray tint. */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<div>
+				<div>
+					<input type="search" placeholder="Search models..." value={search} onChange={(e)=>setSearch(e.target.value)}/>
+					<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
 					</svg>
 				</div>
 			</div>
 
 			{}
-			<div className="/* UI: Scrollable content container with uniform padding and vertical spacing. */">
-				{filteredModels.length === 0 ? (<div className="/* UI: Centered text, small size, with 8 units of vertical padding. */">
+			<div>
+				{filteredModels.length === 0 ? (<div>
 						No matching models named '{deferredSearchTerm}' were found.
 					</div>) : (filteredModels.map((result, idx)=>{
         return (<div key={model.name} onClick={()=>selectActiveModel(model.name)} className={`group relative rounded-xl p-3.5 border transition-all cursor-pointer ${isActive ? "bg-zinc-900 border-violet-500/60 shadow-[0_4px_20px_-4px_rgba(139,92,246,0.15)]" : "bg-zinc-900/40 border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/60"}`}>
 								{}
-								{isActive && (<div className="/* UI: Full-height rounded violet banner positioned on the left side. */"/>)}
+								{isActive && (<div/>)}
 
 								{}
-								<div className="/* UI: Flex container with items aligned to the start and justified between elements. */">
-									<div className="/* UI: Vertical flexible container with minimum content width */">
-										<span className="/* UI: Small, medium-weight text, truncated, light grey color */">
+								<div>
+									<div>
+										<span>
 											{model.name}
 										</span>
-										<span className="/* UI: Small gray monospace text, positioned closely with truncated content. */">
+										<span>
 											{model.details?.family} • {model.details?.parameter_size}
 										</span>
 									</div>
 
 									<button onClick={(e)=>{
-            '/* "Stops the event propagation and subsequently handles copying and selecting the active model when the element is clicked." */';
-        }} className="/* UI: Padded rounded text with hover transition and copy cursor */" title="Copy model name" type="button">
-										{copiedIndex === idx ? (<svg className="/* UI: Small emerald square icon */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            '/* "Handles user interaction by preventing propagation, copying the current model\'s name, and then selecting that model." */';
+        }} title="Copy model name" type="button">
+										{copiedIndex === idx ? (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/>
-											</svg>) : (<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											</svg>) : (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
 											</svg>)}
 									</button>
 								</div>
 
 								{}
-								<div className="/* UI: Two-column grid list with thin top border and small text */">
-									<div className="/* UI: Vertical flex container */">
-										<span className="/* UI: Dark grey uppercase small text with wide tracking */">
+								<div>
+									<div>
+										<span>
 											Size
 										</span>
-										<span className="/* UI: Medium text in light gray tone */">
+										<span>
 											{formatSize(model.size)}
 										</span>
 									</div>
-									<div className="/* UI: Vertical flex container */">
-										<span className="/* UI: Dark grey uppercase small text with wide tracking */">
+									<div>
+										<span>
 											Quantization
 										</span>
-										<span className="/* UI: Monospaced font in light gray text color */">
+										<span>
 											{model.details?.quantization_level}
 										</span>
 									</div>
 								</div>
 
 								{}
-								<div className="/* UI: Top margin, flexible wrapping layout with gap and left padding. */">
+								<div>
 									{model.capabilities?.map?.((cap)=>{
             return (<span key={cap} className={`text-[9px] font-medium tracking-wider uppercase px-2 py-0.5 rounded-full border ${capClass}`}>
 												{cap}
 											</span>);
-            '/* "Maps an array of capabilities to display span elements, dynamically applying styling based on the capability type." */';
+            '/* "Maps an array of model capabilities to distinct visual components, styling them based on whether the capability is \\"thinking,\\" \\"tools,\\" or \\"completion.\\"" */';
         })}
 								</div>
 
 								{}
-								<div className="/* UI: Top margin and right-aligned small gray text with padding */">
+								<div>
 									Modified: {formatDate(model?.modified_at)}
 								</div>
 							</div>);
-        '/* "Renders an interactive card listing all filtered models, displaying their specifications, capabilities, and allowing the user to select or copy the model name." */';
+        '/* "Renders a list of model cards, allowing users to select a model and providing options to copy the model name." */';
     }))}
 			</div>
 		</div>);
@@ -610,7 +610,7 @@ export const MagneticNode: React.FC<{
     active?: boolean;
 }> = ({ children, className = "", onClick, active = false })=>{
     const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>)=>{
-        "/* \"Calculates the mouse movement relative to a target element's center and updates state using React's transition API.\" */";
+        '/* "Calculates the mouse position relative to the center of a designated element and updates state with that relative position." */';
     };
     const handleMouseLeave = ()=>{
         '/* "Executes logic for function handleMouseLeave" */';
@@ -627,31 +627,31 @@ export const MagneticNode: React.FC<{
         damping: 12
     }} whileTap={{
         scale: 0.92
-    }} className="/* UI: Full height centered flexible container with padding */">
+    }}>
 				{children}
 			</motion.div>
 		</button>);
-    '/* "Captures the mouse movement relative to the button and animates its internal content using a spring physics model towards the cursor\'s position." */';
+    "/* \"Calculates and applies reactive physics-based translation to a button element based on the user's mouse position relative to the element's center.\" */";
 };
 export const InteractiveGlassCard: React.FC<{
     children: React.ReactNode;
     className?: string;
 }> = ({ children, className = "" })=>{
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>)=>{
-        '/* "Calculates and sets the cursor\'s position relative to the element when a mouse move event occurs over it." */';
+        '/* "Calculates the mouse coordinates relative to a specific DOM element and updates the state with these values." */';
     };
     return (<div ref={cardRef} onMouseMove={handleMouseMove} onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)} className={`relative overflow-hidden backdrop-blur-md bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)] ${className}`}>
 			{}
-			{isHovered && (<div className="/* UI: Full-page overlay with smooth fading transition and non-interactive pointer control */" style={{
+			{isHovered && (<div style={{
         background: `radial-gradient(150px circle at ${coords.x}px ${coords.y}px, rgba(255,255,255,0.04), transparent 80%)`
     }}/>)}
 			{}
-			{isHovered && (<div className="/* UI: Full screen transition overlay with rounded edges. */" style={{
+			{isHovered && (<div style={{
         maskImage: `radial-gradient(100px circle at ${coords.x}px ${coords.y}px, black, transparent)`,
         WebkitMaskImage: `radial-gradient(100px circle at ${coords.x}px ${coords.y}px, black, transparent)`,
         border: "1px solid rgba(0, 224, 255, 0.4)"
     }}/>)}
-			<div className="/* UI: Positions element relative to parent, ensuring it stays above other content. */">{children}</div>
+			<div>{children}</div>
 		</div>);
     '/* "Renders a visually interactive glass card component that reacts to mouse movement by creating dynamic glow effects based on the cursor\'s position relative to the element." */';
 };
@@ -666,7 +666,7 @@ export default function TelemetryDashboard() {
     const { data: freshData, error, isLoading } = useSystemUsage();
     const data = useDeferredValue(freshData);
     useEffect(()=>{
-        '/* "Calculates and updates per-processor usage deltas by comparing the new CPU data against previous readings, and sets an average usage history based on these calculations." */';
+        '/* "Calculates and updates processor usage deltas and overall average usage whenever new CPU telemetry data becomes available." */';
     }, [
         data
     ]);
@@ -682,28 +682,28 @@ export default function TelemetryDashboard() {
     const availableMemoryGB = memoryInfo ? (memoryInfo.availableCapacity / 1024 ** 3).toFixed(1) : "0";
     const usedMemoryGB = memoryInfo ? ((memoryInfo.capacity - memoryInfo.availableCapacity) / 1024 ** 3).toFixed(1) : "0";
     const memoryPercentUsed = memoryInfo ? ((memoryInfo.capacity - memoryInfo.availableCapacity) / memoryInfo.capacity) * 100 : 0;
-    return (<div className="/* UI: Full screen dark background container with flexible column layout and subtle border. */">
+    return (<div>
 			{}
-			<div className="/* UI: Absolute floating circle background blur with bright blue color */" style={{
+			<div style={{
         animation: "pulseAurora 8s ease-in-out infinite"
     }}/>
-			<div className="/* UI: Absolute positioned large blurred purple circular decorative element. */" style={{
+			<div style={{
         animation: "pulseAurora 12s ease-in-out infinite 2s"
     }}/>
 
 			{}
-			<div className="/* UI: /* Style: 1 classes */ */">
-				<div className="/* UI: Horizontal flex container with centered items and spaced out alignment */">
-					<div className="/* UI: Horizontal flex layout for centered items with small spacing */">
-						<span className="/* UI: Small square element positioned relatively within a flex container */">
-							<span className="/* UI: Pulsing blue circle placeholder with full coverage. */"></span>
-							<span className="/* UI: Small round blue dot positioned over other elements */"></span>
+			<div>
+				<div>
+					<div>
+						<span>
+							<span></span>
+							<span></span>
 						</span>
-						<span className="/* UI: Small uppercase bold monospace text with wide tracking in cyan color */">
+						<span>
 							System Active
 						</span>
 					</div>
-					<div className="/* UI: Small mono-spaced pill button with frosted white border and background. */">
+					<div>
 						{cpuInfo?.archName.toUpperCase()} ARCH
 					</div>
 				</div>
@@ -719,27 +719,27 @@ export default function TelemetryDashboard() {
     }} exit={{
         opacity: 0,
         y: -10
-    }} className="/* UI: /* Style: 1 classes */ */">
+    }}>
 							{}
-							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<div className="/* UI: Horizontal flex container with centered items and spaced out alignment */">
-									<h3 className="/* UI: Small, bold uppercase text with wide letter spacing. */">
+							<InteractiveGlassCard>
+								<div>
+									<h3>
 										Core Interconnect Map
 									</h3>
-									<span className="/* UI: Small monospace text in bright cyan color */">
+									<span>
 										{cpuInfo?.numOfProcessors} Compute Nodes
 									</span>
 								</div>
 
-								<div className="/* UI: Four-column grid layout with small spacing between items */">
+								<div>
 									{coreDeltas.map((core)=>{
         return (<motion.button key={core.coreIndex} whileHover={{
             scale: 1.05
         }} whileTap={{
             scale: 0.95
         }} onClick={()=>setSelectedCore(core.coreIndex)} className={`relative p-2.5 flex flex-col items-center justify-center rounded-xl transition-all duration-300 ${isSelected ? "bg-white/[0.08] border border-white/20 shadow-[0_0_12px_rgba(0,224,255,0.15)]" : "bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/10"}`}>
-												<div className="/* UI: Small square container with centered content */">
-													<svg className="/* UI: Small rotated absolute positioned square element */">
+												<div>
+													<svg>
 														<circle cx="20" cy="20" r={r} stroke="rgba(255,255,255,0.03)" strokeWidth="2.5" fill="transparent"/>
 														<motion.circle cx="20" cy="20" r={r} stroke={core.totalUsage > 75 ? "#FF2E63" : core.totalUsage > 40 ? "#8B5CF6" : "#00E0FF"} strokeWidth="2.5" fill="transparent" strokeDasharray={circ} animate={{
             strokeDashoffset
@@ -749,104 +749,104 @@ export default function TelemetryDashboard() {
             damping: 15
         }}/>
 													</svg>
-													<span className="/* UI: Small bold monospace white text */">
+													<span>
 														C{core.coreIndex}
 													</span>
 												</div>
-												<span className="/* UI: Small monochrome text in slate gray, with margin below */">
+												<span>
 													{Math.round(core.totalUsage)}%
 												</span>
 											</motion.button>);
-        '/* "Renders an interactive progress button array where the visual state and color of each button dynamically reflects its usage percentage, allowing users to select one." */';
+        '/* "Renders an array of interactive buttons, each visually representing a core\'s usage status via an animated progress circle and displaying the corresponding index and percentage." */';
     })}
 								</div>
 							</InteractiveGlassCard>
 
 							{}
-							{selectedCore !== null && coreDeltas[selectedCore] && (<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-									<div className="/* UI: Flexible layout with subtle bottom border and padding */">
-										<span className="/* UI: Small bold uppercase technical text in light gray. */">
+							{selectedCore !== null && coreDeltas[selectedCore] && (<InteractiveGlassCard>
+									<div>
+										<span>
 											Physical Core #{selectedCore} Execution Logic
 										</span>
-										<span className="/* UI: Small monospace text in bright cyan color */">
+										<span>
 											ACTIVE PIPELINE
 										</span>
 									</div>
 
 									{}
-									<div className="/* UI: Pale semi-transparent white card layout with internal flexible content area */">
-										<div className="/* UI: Vertical flex layout, centered items, occupying available space. */">
-											<span className="/* UI: Small neon cyan uppercase monospaced text. */">
+									<div>
+										<div>
+											<span>
 												Fetch
 											</span>
-											<div className="/* UI: Small blue circular indicator with a subtle glow effect */"/>
+											<div/>
 										</div>
-										<div className="/* UI: Flex item that centers content both horizontally and vertically */">
-											<svg className="/* UI: /* Style: 2 classes */ */">
+										<div>
+											<svg>
 												<line x1="0" y1="2" x2="100%" y2="2" stroke="rgba(0, 224, 255, 0.15)" strokeWidth="1" strokeDasharray="2 2"/>
 												<line x1="0" y1="2" x2="100%" y2="2" stroke="#00E0FF" strokeWidth="1.2" strokeDasharray="6 14" style={{
         animation: `dataFlow ${coreDeltas[selectedCore].totalUsage > 80 ? "0.5s" : coreDeltas[selectedCore].totalUsage > 40 ? "1s" : "2s"} linear infinite`
     }}/>
 											</svg>
 										</div>
-										<div className="/* UI: Vertical flex layout, centered items, occupying available space. */">
-											<span className="/* UI: Small purple monochrome tracking uppercase text */">
+										<div>
+											<span>
 												Decode
 											</span>
-											<div className="/* UI: Small purple circular icon with a subtle glowing shadow and top margin */"/>
+											<div/>
 										</div>
-										<div className="/* UI: Flex item that centers content both horizontally and vertically */">
-											<svg className="/* UI: /* Style: 2 classes */ */">
+										<div>
+											<svg>
 												<line x1="0" y1="2" x2="100%" y2="2" stroke="rgba(139, 92, 246, 0.15)" strokeWidth="1" strokeDasharray="2 2"/>
 												<line x1="0" y1="2" x2="100%" y2="2" stroke="#8B5CF6" strokeWidth="1.2" strokeDasharray="6 14" style={{
         animation: `dataFlow ${coreDeltas[selectedCore].totalUsage > 80 ? "0.5s" : coreDeltas[selectedCore].totalUsage > 40 ? "1s" : "2s"} linear infinite`
     }}/>
 											</svg>
 										</div>
-										<div className="/* UI: Vertical flex layout, centered items, occupying available space. */">
-											<span className="/* UI: Small uppercase monospaced text in bright pink */">
+										<div>
+											<span>
 												ALU
 											</span>
-											<div className="/* UI: Small circular button with pink glow and margin top */"/>
+											<div/>
 										</div>
 									</div>
 
-									<div className="/* UI: Three-column grid layout with spacing and top padding */">
-										<div className="/* UI: /* Style: 1 classes */ */">
-											<div className="/* UI: Tiny mono text in slate gray. */">
+									<div>
+										<div>
+											<div>
 												User Space
 											</div>
-											<div className="/* UI: Small bold monospace white text typography */">
+											<div>
 												{Math.round(coreDeltas[selectedCore].userUsage)}%
 											</div>
-											<div className="/* UI: Small rounded container with a translucent white background */">
-												<div className="/* UI: Full-height background with a bright cyan rounded pill shape */" style={{
+											<div>
+												<div style={{
         width: `${coreDeltas[selectedCore].userUsage}%`
     }}/>
 											</div>
 										</div>
-										<div className="/* UI: /* Style: 1 classes */ */">
-											<div className="/* UI: Tiny mono text in slate gray. */">
+										<div>
+											<div>
 												Kernel Overhead
 											</div>
-											<div className="/* UI: Small bold monospace white text typography */">
+											<div>
 												{Math.round(coreDeltas[selectedCore].kernelUsage)}%
 											</div>
-											<div className="/* UI: Very short, rounded white element with clear overflow containment. */">
-												<div className="/* UI: Full height background with rounded pill shape */" style={{
+											<div>
+												<div style={{
         width: `${coreDeltas[selectedCore].kernelUsage}%`
     }}/>
 											</div>
 										</div>
-										<div className="/* UI: /* Style: 1 classes */ */">
-											<div className="/* UI: Tiny mono text in slate gray. */">
+										<div>
+											<div>
 												Idle Capacity
 											</div>
-											<div className="/* UI: Small bold monospace white text typography */">
+											<div>
 												{Math.round(coreDeltas[selectedCore].idleUsage)}%
 											</div>
-											<div className="/* UI: Very short, rounded white element with clear overflow containment. */">
-												<div className="/* UI: Full height background with rounded edges */" style={{
+											<div>
+												<div style={{
         width: `${coreDeltas[selectedCore].idleUsage}%`
     }}/>
 											</div>
@@ -864,35 +864,35 @@ export default function TelemetryDashboard() {
     }} exit={{
         opacity: 0,
         y: -10
-    }} className="/* UI: /* Style: 1 classes */ */">
+    }}>
 							{}
-							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<div className="/* UI: /* Style: 1 classes */ */">
-									<span className="/* UI: Small monospaced uppercase text with wide tracking and bold weight. */">
+							<InteractiveGlassCard>
+								<div>
+									<span>
 										Telemetry Engine Specification
 									</span>
-									<h4 className="/* UI: Small, bold white text using the Jakarta font. */">
+									<h4>
 										{cpuInfo?.modelName}
 									</h4>
 								</div>
 
 								{}
-								<div className="/* UI: /* Style: 1 classes */ */">
-									<span className="/* UI: Small uppercase mono-spaced text in light gray. */">
+								<div>
+									<span>
 										Hardware Registers Decoded
 									</span>
-									<div className="/* UI: Flexible grid layout with spacing between items */">
+									<div>
 										{cpuInfo?.features.map((flag)=>{
         return (<button key={flag} onClick={()=>setSelectedFlag(isSelected ? null : flag)} className={`text-[9px] font-mono px-2 py-1 rounded-md transition-all ${isSelected ? "bg-[#00E0FF] text-[#05050A] font-bold shadow-[0_0_8px_#00E0FF]" : "bg-white/[0.03] border border-white/[0.08] text-slate-300 hover:bg-white/[0.06]"}`}>
 													{flag.toUpperCase()}
 												</button>);
-        '/* "Renders a dynamic set of selectable buttons for various CPU features, updating the selection status when a button is clicked." */';
+        '/* "Renders a collection of clickable buttons, one for each CPU feature flag, allowing users to select or deselect the currently active feature." */';
     })}
 									</div>
 
 									{}
-									{selectedFlag && (<div className="/* UI: Small rounded glass-effect container holding tiny monotone monospace text. */">
-											<span className="/* UI: Bright blue bold text */">
+									{selectedFlag && (<div>
+											<span>
 												{selectedFlag.toUpperCase()}:{" "}
 											</span>
 											{FLAG_DEFINITIONS[selectedFlag] || "Dynamic architectural hardware feature register."}
@@ -901,20 +901,20 @@ export default function TelemetryDashboard() {
 							</InteractiveGlassCard>
 
 							{}
-							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<div className="/* UI: Horizontal flex container with centered items and spaced out alignment */">
-									<span className="/* UI: Small bold uppercase monospace text in slate gray. */">
+							<InteractiveGlassCard>
+								<div>
+									<span>
 										Silicon Signals Sparkline
 									</span>
-									<span className="/* UI: Small purple monospace text. */">
+									<span>
 										Avg: {Math.round(averageUsage)}%
 									</span>
 								</div>
 
-								<div className="/* UI: Tall full-width flex container aligned to the bottom. */">
-									{averageHistory.length < 2 ? (<div className="/* UI: Full width centered text in monospace with small grey font. */">
+								<div>
+									{averageHistory.length < 2 ? (<div>
 											Calibrating system telemetry arrays...
-										</div>) : (<svg className="/* UI: Full-width 12-unit high container with visible overflow */">
+										</div>) : (<svg>
 											<defs>
 												<linearGradient id="glowGrad" x1="0" y1="0" x2="0" y2="1">
 													<stop offset="0%" stopColor="#00E0FF" stopOpacity="0.3"/>
@@ -938,21 +938,21 @@ export default function TelemetryDashboard() {
     }} exit={{
         opacity: 0,
         y: -10
-    }} className="/* UI: /* Style: 1 classes */ */">
+    }}>
 							{}
-							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<div className="/* UI: Horizontal flex container with centered items and spaced out alignment */">
-									<span className="/* UI: Small bold uppercase monospace text in slate gray. */">
+							<InteractiveGlassCard>
+								<div>
+									<span>
 										Physical RAM Allocation
 									</span>
-									<span className="/* UI: Tiny monospaced text in vibrant pink */">
+									<span>
 										{Math.round(memoryPercentUsed)}% Used
 									</span>
 								</div>
 
 								{}
-								<div className="/* UI: Relative background element with translucent white border and rounded overflow. */">
-									<motion.div className="/* UI: Full-screen absolute background with a purple to pink gradient and rounded corners. */" animate={{
+								<div>
+									<motion.div animate={{
         width: `${memoryPercentUsed}%`
     }} transition={{
         type: "spring",
@@ -961,37 +961,37 @@ export default function TelemetryDashboard() {
     }}/>
 								</div>
 
-								<div className="/* UI: Two-column grid layout with uniform spacing */">
-									<div className="/* UI: /* Style: 1 classes */ */">
-										<span className="/* UI: Tiny monochrome text in slate gray block format. */">
+								<div>
+									<div>
+										<span>
 											Total Capacity
 										</span>
-										<span className="/* UI: Small bold white monochrome text typography */">
+										<span>
 											{totalMemoryGB} GB
 										</span>
-										<span className="/* UI: Small mono-spaced grey text block with monospace font */">
+										<span>
 											{memoryInfo?.capacity.toLocaleString()} Bytes
 										</span>
 									</div>
-									<div className="/* UI: /* Style: 1 classes */ */">
-										<span className="/* UI: Tiny monochrome text in slate gray block format. */">
+									<div>
+										<span>
 											Available Bounds
 										</span>
-										<span className="/* UI: Small bold monospace text with bright cyan color */">
+										<span>
 											{availableMemoryGB} GB
 										</span>
-										<span className="/* UI: Small mono-spaced grey text block with monospace font */">
+										<span>
 											{memoryInfo?.availableCapacity.toLocaleString()} Bytes
 										</span>
 									</div>
-									<div className="/* UI: /* Style: 1 classes */ */">
-										<span className="/* UI: Tiny monochrome text in slate gray block format. */">
+									<div>
+										<span>
 											Used Bounds
 										</span>
-										<span className="/* UI: Small bold monospace text in vibrant red. */">
+										<span>
 											{usedMemoryGB} GB
 										</span>
-										<span className="/* UI: Small mono-spaced grey text block with monospace font */">
+										<span>
 											{(+usedMemoryGB * 1024 * 1024).toLocaleString()} bytes
 										</span>
 									</div>
@@ -999,19 +999,19 @@ export default function TelemetryDashboard() {
 							</InteractiveGlassCard>
 
 							{}
-							<InteractiveGlassCard className="/* UI: /* Style: 1 classes */ */">
-								<span className="/* UI: Small, bold, uppercase mono-spaced text with wide letter spacing. */">
+							<InteractiveGlassCard>
+								<span>
 									Memory Register Capacitor Matrix
 								</span>
-								<div className="/* UI: Grid layout dividing into eight columns with slight gaps. */">
+								<div>
 									{[
         ...Array(32)
     ].map((_, idx)=>{
         return (<div key={idx} className={`aspect-square rounded-sm border transition-all duration-500 ${isActive ? "bg-linear-to-tr from-[#8B5CF6] to-[#FF2E63] border-[#FF2E63]/30 shadow-[0_0_6px_rgba(255,46,99,0.2)]" : "bg-white/[0.02] border-white/[0.04]"}`}/>);
-        '/* "Generates an array of 32 styled visual blocks whose color and styling dynamically reflect whether a calculated memory usage threshold has been met or exceeded." */';
+        '/* "Generates 32 visual blocks, coloring and styling them based on whether a global memory usage percentage exceeds that block\'s assigned threshold." */';
     })}
 								</div>
-								<span className="/* UI: Tiny mono text, centered and centered in a block element. */">
+								<span>
 									Matrix elements map live capacity state boundaries.
 								</span>
 							</InteractiveGlassCard>
@@ -1019,36 +1019,36 @@ export default function TelemetryDashboard() {
 				</AnimatePresence>
 			</div>
 
-			<div className="/* UI: /* Style: 2 classes */ */">
-				<div className="/* UI: Frosted glass effect containing content with centered layout and subtle drop shadow. */">
-					<MagneticNode active={activeTab === "core"} onClick={()=>setActiveTab("core")} className="/* UI: Takes up available space, clickable area. */">
-						<div className="/* UI: Vertical centered flex container */">
-							<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<div>
+				<div>
+					<MagneticNode active={activeTab === "core"} onClick={()=>setActiveTab("core")}>
+						<div>
+							<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/>
 							</svg>
-							<span className="/* UI: Small bold uppercase monospaced text with extra spacing */">
+							<span>
 								ALU Core
 							</span>
 						</div>
 					</MagneticNode>
 
-					<MagneticNode active={activeTab === "registers"} onClick={()=>setActiveTab("registers")} className="/* UI: /* Style: 1 classes */ */">
-						<div className="/* UI: Vertical centered flex container */">
-							<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<MagneticNode active={activeTab === "registers"} onClick={()=>setActiveTab("registers")}>
+						<div>
+							<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 							</svg>
-							<span className="/* UI: Small bold uppercase monospaced text with extra spacing */">
+							<span>
 								Registers
 							</span>
 						</div>
 					</MagneticNode>
 
-					<MagneticNode active={activeTab === "ram"} onClick={()=>setActiveTab("ram")} className="/* UI: /* Style: 1 classes */ */">
-						<div className="/* UI: Vertical centered flex container */">
-							<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<MagneticNode active={activeTab === "ram"} onClick={()=>setActiveTab("ram")}>
+						<div>
+							<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
 							</svg>
-							<span className="/* UI: Small bold uppercase monospaced text with extra spacing */">
+							<span>
 								RAM Bus
 							</span>
 						</div>
@@ -1578,7 +1578,7 @@ export async function organize_tabs(args: ToolArguments["organize_tabs"]): Promi
     closedCount: number;
 }> {
     const normalizeUrl = (u: string)=>{
-        '/* "Extracts the hostname from a provided URL string, returning the original string if parsing fails." */';
+        '/* "Extracts the hostname from a given URL string, returning the original string if parsing fails." */';
     };
     '/* "9. Organize and Group Tabs" */';
 }
@@ -1660,7 +1660,7 @@ interface ChatMagneticBtnProps {
 }
 const MagneticButton = ({ children, onClick, type = "button", className = "", disabled = false }: ChatMagneticBtnProps)=>{
     const handleMouseMove = (e: React.MouseEvent)=>{
-        '/* "Calculates the user\'s movement relative to the element center and updates spring physics variables for smooth animation." */';
+        '/* "Calculates the distance of a mouse movement from the center of a target element and updates spring values accordingly." */';
     };
     const handleMouseLeave = ()=>{
         '/* "Executes logic for function handleMouseLeave" */';
@@ -1671,15 +1671,15 @@ const MagneticButton = ({ children, onClick, type = "button", className = "", di
 			<motion.div style={{
         x: xSpring,
         y: ySpring
-    }} className="/* UI: Centered overlay component with high stacking order */">
+    }}>
 				{children}
 			</motion.div>
 		</motion.button>);
-    "/* \"Magnets the button's internal content to follow the user's mouse cursor while displaying a standard interactive button interface.\" */";
+    "/* \"Captures and moves the button's children element in response to the user's mouse position, creating a magnetic effect.\" */";
 };
 const AuroraButton = ({ children, pending }: any)=>(<MagneticButton type="submit" disabled={pending} className={`w-10 h-10 bg-white/5 border border-white/20 hover:bg-white/10 relative overflow-hidden group ${pending ? "cursor-wait" : "cursor-pointer"}`}>
-		<div className="/* UI: Absolute full-screen animated gradient overlay with subtle hover effect. */"/>
-		<div className="/* UI: Positioned foreground element with white text. */">
+		<div/>
+		<div>
 			{pending ? (<motion.div animate={{
         rotate: 360
     }} transition={{
@@ -1687,15 +1687,15 @@ const AuroraButton = ({ children, pending }: any)=>(<MagneticButton type="submit
         duration: 1.5,
         ease: "linear"
     }}>
-					<Loader2 size={16} className="/* UI: Bright cyan text color */"/>
+					<Loader2 size={16}/>
 				</motion.div>) : (children)}
 		</div>
 	</MagneticButton>);
 const FormSubmitButton = ()=>{
     return (<AuroraButton pending={pending} className={pending ? "cursor-wait" : "cursor-pointer"}>
-			<Send size={16} className="/* UI: /* Style: 1 classes */ */"/>
+			<Send size={16}/>
 		</AuroraButton>);
-    '/* "Renders a button to submit a form, visually indicating a pending state when the submission process is active." */';
+    '/* "Renders a submit button that visually changes state to indicate whether the form submission is currently in progress." */';
 };
 const MessageBubble = ({ message }: {
     message: Message;
@@ -1710,7 +1710,7 @@ const MessageBubble = ({ message }: {
         scale: 1
     }} className={`flex w-full mb-4 ${isAI ? "justify-start" : "justify-end"}`}>
 			<div className={`max-w-[85%] p-4 ${isAI ? "rounded-2xl rounded-tl-sm bg-[rgba(20,20,25,0.6)] border border-[rgba(255,255,255,0.08)] backdrop-blur-xl" : "rounded-2xl rounded-tr-sm bg-white/10 border border-white/20 backdrop-blur-md"} shadow-[0_8px_32px_rgba(139,92,246,0.08)]`}>
-				{isAI && message.thinking && (<motion.div className="/* UI: Small bold uppercase cyan text with centered icons. */">
+				{isAI && message.thinking && (<motion.div>
 						<motion.div animate={{
         rotate: 360
     }} transition={{
@@ -1723,66 +1723,66 @@ const MessageBubble = ({ message }: {
 						Synthesizing Space-Time...
 					</motion.div>)}
 
-				{message.content && (<p className="/* UI: Sans serif text in light gray, fixed line spacing. */">
+				{message.content && (<p>
 						<ReactMarkdown>{message.content}</ReactMarkdown>
 					</p>)}
 
-				{isAI && message.toolsUsed && (<div className="/* UI: Elevated semi-transparent dark card with internal content alignment. */">
-						<span className="/* UI: Small purple uppercase sans-serif text with wide tracking. */">
+				{isAI && message.toolsUsed && (<div>
+						<span>
 							Requested Actions
 						</span>
-						<code className="/* UI: Small gray monospace text with limited height and auto-scrolling block. */">
+						<code>
 							{message.toolsUsed}
 						</code>
 					</div>)}
 			</div>
 		</motion.div>);
-    '/* "Renders a message bubble component dynamically adapting the style and content display based on whether the message is from the system, a tool execution, or an AI assistant." */';
+    '/* "Renders a dynamic message bubble component, adapting its layout and visual styling based on the message\'s role, whether it is a system directive, a tool execution result, or a conversational utterance." */';
 };
 const ChatInterface = ()=>{
-    return (<div className="/* UI: Full screen dark background layout with subtle border and purple glow ring. */">
-			<div className="/* UI: Large, blurry, semi-transparent blue circle positioned outside the element. */"/>
-			<div className="/* UI: Large blurred purple absolute decorative element. */"/>
-			<div className="/* UI: Large, blurred pink background overlay positioned at center. */"/>
+    return (<div>
+			<div/>
+			<div/>
+			<div/>
 
 			{}
-			<div className="/* UI: Full-size vertical container with padding and layering context */">
+			<div>
 				{}
-				<div className="/* UI: Centered flex container with blurred background and subtle purple shadow. */">
-					<div className="/* UI: A horizontal flex container with centered items and small spacing. */">
-						<div className="/* UI: Small circular badge with gradient glow and sharp blue effect */">
-							<div className="/* UI: Full-screen dark background circular centering container */">
-								<Bot size={18} className="/* UI: Bright cyan text color */"/>
+				<div>
+					<div>
+						<div>
+							<div>
+								<Bot size={18}/>
 							</div>
 						</div>
 						<div>
-							<h1 className="/* UI: Bold 14px sans-serif typography with tight line height and light color. */">
+							<h1>
 								Ollama Native
 							</h1>
-							<p className="/* UI: Small, bold, uppercase label text with wide tracking in vibrant cyan blue. */">
+							<p>
 								{currenLLMModel}
 							</p>
 						</div>
 					</div>
 
 					{}
-					<div className="/* UI: Centered items layout with spacing and relative positioning context */">
-						<div className="/* UI: Pill-shaped button with subtle background and text hover effects. */">
+					<div>
+						<div>
 							<Info size={14}/>
 						</div>
 
 						{}
-						<div className="/* UI: Hidden hoverable tooltip positioned below the element with a frosted dark appearance. */">
-							<div className="/* UI: Flex container with bold small white text and bottom margin */">
-								<Sparkles size={12} className="/* UI: Bright yellow text color */"/> Protocol Mode
+						<div>
+							<div>
+								<Sparkles size={12}/> Protocol Mode
 							</div>
-							<p className="/* UI: Small gray body text in a normal line height */">
+							<p>
 								Toggle between{" "}
-								<span className="/* UI: Bright cyan text in medium font weight */">
+								<span>
 									Standard Inference
 								</span>{" "}
 								(streaming & thinking enabled) and{" "}
-								<span className="/* UI: Vibrant pink text in a medium font weight */">
+								<span>
 									Agentic Access
 								</span>{" "}
 								for direct function calling.
@@ -1791,25 +1791,25 @@ const ChatInterface = ()=>{
 
 						<div onClick={()=>{
         '/* "Executes logic for function ChatInterface" */';
-    }} className="/* UI: Small centered interactive badge with subtle dark border and interior shadow. */">
-							<motion.div layout className="/* UI: Absolute positioned frosted glass badge with a subtle glow and rounded shape. */" animate={{
+    }}>
+							<motion.div layout animate={{
         x: isToolMode ? 38 : 0
     }} transition={{
         type: "spring",
         stiffness: 400,
         damping: 25
     }}/>
-							<div className="/* UI: Flexible center alignment with bright cyan text and high z-index */">
+							<div>
 								<Sparkles size={14} className={!isToolMode ? "opacity-100" : "opacity-40 text-white"}/>
 							</div>
-							<div className="/* UI: Flexible centered element with high z-index and bright pink text. */">
+							<div>
 								<Wrench size={14} className={isToolMode ? "opacity-100" : "opacity-40 text-white"}/>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<div className="/* UI: Full-width, flexible container with minimum height and overflow control. */">
+				<div>
 					<AnimatePresence mode="wait">
 						{isSettingsOpen ? (<motion.div key="settings" initial={{
         opacity: 0,
@@ -1823,7 +1823,7 @@ const ChatInterface = ()=>{
         opacity: 0,
         scale: 0.98,
         y: 10
-    }} className="/* UI: Full height container with scrollable content and hidden scrollbar */">
+    }}>
 								<ProfileSettingsView setModelState={setIsSettingsOpen}/>
 							</motion.div>) : messages.length === 0 ? (<motion.div key="empty" initial={{
         opacity: 0
@@ -1831,26 +1831,26 @@ const ChatInterface = ()=>{
         opacity: 0.5
     }} exit={{
         opacity: 0
-    }} className="/* UI: Centered full height layout with stacked content and sans-serif typography */">
-								<Bot size={48} className="/* UI: Purple text with bottom margin spacing */"/>
-								<p className="/* UI: /* Style: 1 classes */ */">Initiate intelligence matrix.</p>
-							</motion.div>) : (<LegendList key="chat-list" data={messages} renderItem={({ item })=><MessageBubble message={item}/>} keyExtractor={(item: any)=>item.id} maintainScrollAtEnd recycleItems className="/* UI: Full height container with scrollable content and hidden scrollbar */" style={{
+    }}>
+								<Bot size={48}/>
+								<p>Initiate intelligence matrix.</p>
+							</motion.div>) : (<LegendList key="chat-list" data={messages} renderItem={({ item })=><MessageBubble message={item}/>} keyExtractor={(item: any)=>item.id} maintainScrollAtEnd recycleItems style={{
         scrollbarWidth: "none"
-    }} ListFooterComponent={<div className="/* UI: /* Style: 2 classes */ */"/>}/>)}
+    }} ListFooterComponent={<div/>}/>)}
 					</AnimatePresence>
 				</div>
 				{}
 				<div className={`fixed bottom-5 shrink-0 h-14 left-4 right-4 bg-[rgba(20,20,25,0.45)] backdrop-blur-xl saturate-150 border border-[rgba(255,255,255,0.2)] rounded-full p-1.5 shadow-[0_8px_32px_rgba(139,92,246,0.15)] transition-all [&:hover,&:focus]:inset-shadow-sm ${isStreaming || isPending ? "hover:shadow-fuchsia-300 cursor-wait" : "hover:shadow-sky-300"}`}>
-					<form ref={formRef} action={submitAction} className="/* UI: Full width flex container with centered items and spacing gap. */">
-						<div className="/* UI: Centered flex container with relative positioning */">
-							<div className="/* UI: Hidden hoverable overlay panel with translucent dark background and smooth transition. */">
-								<div className="/* UI: Small dark mode text in a centered flex container with spacing. */">
-									<Globe size={12} className="/* UI: Vivid purple text color */"/> Webpage Context
+					<form ref={formRef} action={submitAction}>
+						<div>
+							<div>
+								<div>
+									<Globe size={12}/> Webpage Context
 								</div>
-								<p className="/* UI: Light gray text in a small sans-serif font. */">
+								<p>
 									{currentPageContext ? (<>
 											Inject the text content of:{" "}
-											<span className="/* UI: Bright blue text block with medium weight and defined spacing */">
+											<span>
 												{currentPageContext?.title || "Current Page"}
 											</span>
 										</>) : ("Attach the content of the active browser page as background instructions.")}
@@ -1866,14 +1866,14 @@ const ChatInterface = ()=>{
 						</div>
 
 						{}
-						<div className="/* UI: Centered flex container with relative positioning */">
-							<div className="/* UI: Hidden hover effect tooltip with frosted glass appearance. */">
-								<div className="/* UI: Small dark mode text in a centered flex container with spacing. */">
-									<Brain size={12} className="/* UI: Bright cyan text color */"/> Deep Thinking
+						<div>
+							<div>
+								<div>
+									<Brain size={12}/> Deep Thinking
 								</div>
-								<p className="/* UI: Light gray text in a small sans-serif font. */">
+								<p>
 									Activate reasoning configurations.{" "}
-									<span className="/* UI: Purple semi-bold text color styling */">Note:</span>{" "}
+									<span>Note:</span>{" "}
 									Tool actions default to bypassing manual reasoning overrides.
 								</p>
 							</div>
@@ -1888,13 +1888,13 @@ const ChatInterface = ()=>{
 							</button>
 						</div>
 
-						<div className="/* UI: Centered flex container with relative positioning */">
-							<div className="/* UI: Hidden hover effect tooltip with frosted glass appearance. */">
-								<div className="/* UI: Small dark mode text in a centered flex container with spacing. */">
-									<UserCog size={12} className="/* UI: Bright pink text color */"/> Autofill
+						<div>
+							<div>
+								<div>
+									<UserCog size={12}/> Autofill
 									Profile
 								</div>
-								<p className="/* UI: Light gray text in a small sans-serif font. */">
+								<p>
 									Edit the identity profile information used for programmatic
 									form-filling actions.
 								</p>
@@ -1907,7 +1907,7 @@ const ChatInterface = ()=>{
 							</button>
 						</div>
 
-						<input type="text" name="message" placeholder={isToolMode ? "Instruct system logic..." : "Ask Ollama..."} className="/* UI: Transparent mono-spaced input field with light gray placeholder text. */" autoComplete="off" required disabled={isStreaming || isPending}/>
+						<input type="text" name="message" placeholder={isToolMode ? "Instruct system logic..." : "Ask Ollama..."} autoComplete="off" required disabled={isStreaming || isPending}/>
 
 						<FormSubmitButton/>
 					</form>
@@ -1942,15 +1942,15 @@ interface TypewriterOptions {
 }
 export function useSmoothTypewriter(targetText: string, options: TypewriterOptions = {}) {
     useEffect(()=>{
-        '/* "Cancels ongoing animations and resets associated state variables when the target text input is cleared." */';
+        '/* "When the target text is cleared, this effect resets the display state and cancels any active animation frames." */';
     }, [
         targetText
     ]);
     useEffect(()=>{
         const animate = (timestamp: number)=>{
-            '/* "Animates text progression by incrementally increasing the displayed character count and setting a timer to update the text state at regular intervals until the target length is reached." */';
+            '/* "Controls the sequential display of target text by calculating incremental updates based on time elapsed and rendering the progressing substring." */';
         };
-        '/* "Animates text character by character from a starting state to the target string using requestAnimationFrame controlled by a specified delay per update." */';
+        '/* "Asynchronously types out the target text character by character using a requestAnimationFrame loop controlled by a predefined speed." */';
     }, [
         targetText,
         speedMs
@@ -1963,7 +1963,7 @@ interface MagneticWrapperProps {
 }
 export function MagneticWrapper({ children, className = "" }: MagneticWrapperProps) {
     const handleMouseMove = (e: React.MouseEvent)=>{
-        '/* "Calculates the user\'s offset from the center of a reference element based on mouse movement and updates state variables $x$ and $y$." */';
+        '/* "Calculates the mouse position relative to the center of a targeted element and updates internal state coordinates based on the deviation." */';
     };
     const handleMouseLeave = ()=>{
         '/* "Executes logic for function handleMouseLeave" */';
@@ -1995,7 +1995,7 @@ export function AppleGlowBorder({ children, isActive, className = "" }: AppleGlo
         opacity: 0.65
     }} exit={{
         opacity: 0
-    }} className="/* UI: Full background sphere with colorful gradient and blurred effect. */" style={{
+    }} style={{
         animation: "rotate-glow 5s linear infinite"
     }}/>
 						<motion.div initial={{
@@ -2004,12 +2004,12 @@ export function AppleGlowBorder({ children, isActive, className = "" }: AppleGlo
         opacity: 1
     }} exit={{
         opacity: 0
-    }} className="/* UI: Full viewport background with a vibrant multi-color gradient. */" style={{
+    }} style={{
         animation: "rotate-glow 4s linear infinite"
     }}/>
 					</>)}
 			</AnimatePresence>
-			<div className="/* UI: Full width blurred background with rounded edges. */">
+			<div>
 				{children}
 			</div>
 		</div>);
@@ -2030,43 +2030,43 @@ const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
     }} exit={{
         opacity: 0,
         scale: 0.95
-    }} className="/* UI: Glassmorphic card with subtle transparency and a glowing hover effect. */">
-			<div className="/* UI: Horizontal layout with spacing between items and bottom margin */">
+    }}>
+			<div>
 				<span className={`rounded-full border px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider uppercase ${sourceColorClass}`}>
 					{item.source}
 				</span>
-				<span className="/* UI: Small slate grey monospaced text */">
+				<span>
 					{formattedDate}
 				</span>
 			</div>
 
-			<h2 className="/* UI: Small bold text, smooth hover transition from slate to white. */">
+			<h2>
 				{item.title}
 			</h2>
 
-			<div className="/* UI: Layout with horizontal centering, top padding, and a subtle top border. */">
-				<div className="/* UI: A horizontal flex container with centered items and small spacing. */">
-					<a href={item.link} target="_blank" rel="noopener noreferrer" className="/* UI: Small interactive cyan button with smooth color change on hover. */">
+			<div>
+				<div>
+					<a href={item.link} target="_blank" rel="noopener noreferrer">
 						<span>Read</span>
-						<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
 							<path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
 						</svg>
 					</a>
 
-					<button onClick={onAnalyze} className="/* UI: Small inline interactive link with vibrant purple coloring and subtle hover effect. */">
-						<span className="/* UI: Small positioned flex item with a small margin. */">
-							<span className="/* UI: Pulsing circular element with semi-transparent purple color. */"></span>
-							<span className="/* UI: Small purple rounded element with fixed size */"></span>
+					<button onClick={onAnalyze}>
+						<span>
+							<span></span>
+							<span></span>
 						</span>
 						<span>Analyze</span>
 					</button>
 				</div>
 
-				{item.descHTML && (<button onClick={onToggleExpand} className="/* UI: Small subtle pointer button with smooth color transitions. */">
+				{item.descHTML && (<button onClick={onToggleExpand}>
 						<span>{isExpanded ? "Hide" : "Preview"}</span>
 						<motion.svg animate={{
         rotate: isExpanded ? 180 : 0
-    }} className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
 							<path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
 						</motion.svg>
 					</button>)}
@@ -2078,13 +2078,13 @@ const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
     }} transition={{
         duration: 0.25,
         ease: "easeInOut"
-    }} className="/* UI: Prevents content from spilling outside the container edges */">
-					<div className="/* UI: Top padding with subtle white top border and small gray descriptive text. */" dangerouslySetInnerHTML={{
+    }}>
+					<div dangerouslySetInnerHTML={{
         __html: item.descHTML
     }}/>
 				</motion.div>)}
 		</motion.article>);
-    '/* "Renders a dynamic news article card component that displays the title, source details, and provides interactive options for reading the link, initiating analysis, or toggling the preview of the description HTML content." */';
+    '/* "Renders a dynamic news item card, displaying source, date, title, links, and a preview of the description while managing expand/collapse states." */';
 };
 interface OllamaChatDrawerProps {
     newsItems: NewsItem[];
@@ -2093,7 +2093,7 @@ interface OllamaChatDrawerProps {
 }
 function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
     useEffect(()=>{
-        '/* "Conditionally formats and submits a prompt to an AI API to generate a news summary, either for a single article or a limited bulk feed." */';
+        '/* "It generates a tailored prompt—either for a single article or a bulk feed—and sends it to an AI service to generate a synthesized news summary." */';
     }, [
         newsItems,
         mode,
@@ -2117,32 +2117,32 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
         type: "spring",
         stiffness: 220,
         damping: 22
-    }} className="/* UI: Fixed absolute positioning, dark blurred content area with a strong shadow. */">
-			<div className="/* UI: Full-screen absolute background layer with hidden pointer events */">
-				<div className="/* UI: Thin centering transparent purple gradient line overlaying the content. */"/>
-				<div className="/* UI: Large blurred purple circle positioned on the screen. */"/>
+    }}>
+			<div>
+				<div/>
+				<div/>
 			</div>
 
-			<header className="/* UI: Flex header with light background and thin bottom separator line. */">
-				<div className="/* UI: /* Style: 2 classes */ */">
-					<span className="/* UI: Small uppercase monospaced bold text in a muted blue-gray. */">
+			<header>
+				<div>
+					<span>
 						{mode === "single" ? "Single Update Briefing" : "Consolidated Stream Synthesis"}
 					</span>
-					<h3 className="/* UI: Small, bold, white truncated text confined to a narrow space */">
+					<h3>
 						{mode === "single" ? newsItems[0]?.title : `Synthesizing ${newsItems.length} active stream items`}
 					</h3>
 				</div>
 
 				<MagneticWrapper>
-					<button onClick={onClose} className="/* UI: Small circular interactive icon with subtle frosted glass effect and pointer state styling */">
-						<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+					<button onClick={onClose}>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
 							<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
 						</svg>
 					</button>
 				</MagneticWrapper>
 			</header>
 
-			{isPending && (<div className="/* UI: Thin full-width transparent background element with clipped overflow. */">
+			{isPending && (<div>
 					<motion.div initial={{
         left: "-100%"
     }} animate={{
@@ -2151,23 +2151,23 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
         repeat: Infinity,
         duration: 1.5,
         ease: "linear"
-    }} className="/* UI: Full-height, third-width absolute positioning with a bright gradient background. */"/>
+    }}/>
 				</div>)}
 
-			<div className="/* UI: Flexible scrollable panel with structured padding and scrollbar. */">
-				{displayMessages.length === 0 && !apiError && (<div className="/* UI: Full height centered flex column with space-separated items */">
-						<span className="/* UI: Relative fixed-size container with a flex layout */">
-							<span className="/* UI: Pulsing blue circle placeholder with full coverage. */"></span>
-							<span className="/* UI: Small rounded blue circular indicator element */"></span>
+			<div>
+				{displayMessages.length === 0 && !apiError && (<div>
+						<span>
+							<span></span>
+							<span></span>
 						</span>
-						<p className="/* UI: Small monochrome text in light gray. */">
+						<p>
 							{mode === "single" ? "Initiating single update summary..." : "Analyzing and compiling active news stream..."}
 						</p>
 					</div>)}
 
-				{apiError && (<div className="/* UI: Soft rose-toned bordered container with text styling. */">
-						<p className="/* UI: Bold text with slight bottom margin */">Local Model Error</p>
-						<p className="/* UI: Light gray standard text font style */">{apiError}</p>
+				{apiError && (<div>
+						<p>Local Model Error</p>
+						<p>{apiError}</p>
 					</div>)}
 
 				<LegendList data={displayMessages} renderItem={({ item })=>{
@@ -2182,21 +2182,21 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
 									<ReactMarkdown>{msg.content}</ReactMarkdown>
 								</div>
 							</motion.div>);
-        '/* "Renders a user message or system message within a chat interface, dynamically styling the container based on whether the message belongs to a regular user." */';
-    }} keyExtractor={(item, idx)=>idx + item.role} maintainScrollAtEnd showsVerticalScrollIndicator={true} recycleItems className="/* UI: Full height container with scrollable content and hidden scrollbar */" style={{
+        '/* "Renders a chat message item, styling it to the end or start of the container depending on whether the message originated from a user." */';
+    }} keyExtractor={(item, idx)=>idx + item.role} maintainScrollAtEnd showsVerticalScrollIndicator={true} recycleItems style={{
         scrollbarWidth: "none"
-    }} ItemSeparatorComponent={()=><div className="/* UI: /* Style: 2 classes */ */"/>} ListFooterComponent={<div className="/* UI: /* Style: 2 classes */ */"/>}/>
+    }} ItemSeparatorComponent={()=><div/>} ListFooterComponent={<div/>}/>
 
 				<div ref={threadEndRef}/>
 			</div>
 
-			<form onSubmit={handleSendMessage} className="/* UI: Padded dark background element with top white border. */">
+			<form onSubmit={handleSendMessage}>
 				<AppleGlowBorder isActive={input.length > 0}>
-					<div className="/* UI: Full-width flex container with centered items and padding. */">
-						<input type="text" value={input} onChange={(e)=>setInput(e.target.value)} placeholder={isPending ? "Generating..." : "Ask regarding updates..."} disabled={isPending} className="/* UI: Full-width transparent component with monospaced text and disabled state opacity. */"/>
+					<div>
+						<input type="text" value={input} onChange={(e)=>setInput(e.target.value)} placeholder={isPending ? "Generating..." : "Ask regarding updates..."} disabled={isPending}/>
 						<MagneticWrapper>
-							<button type="submit" disabled={!input.trim() || isPending} className="/* UI: Small circular button with hover state and pointer cursor. */">
-								<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+							<button type="submit" disabled={!input.trim() || isPending}>
+								<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
 									<path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
 								</svg>
 							</button>
@@ -2219,7 +2219,7 @@ export default function NewsDashboard() {
     const [activeChatItems, setActiveChatItems] = useState<NewsItem[]>([]);
     const [googleQuery, yahooQuery, bbcQuery] = queryResults;
     const handleRefetchAll = async ()=>{
-        '/* "It asynchronously re-fetches data for three different news sources: Google, Yahoo, and BBC." */';
+        '/* "Refetches data from multiple asynchronous queries simultaneously to ensure data freshness across different data sources." */';
     };
     const uniqueItems = useMemo(()=>{
         '/* "Aggregates news items from Google, Yahoo, and BBC sources, appending a source field to each item before filtering the results to ensure only unique entries are returned based on ID or link." */';
@@ -2256,44 +2256,44 @@ export default function NewsDashboard() {
     const isInitialLoading = googleQuery.isLoading && yahooQuery.isLoading && bbcQuery.isLoading;
     const isError = googleQuery.isError && yahooQuery.isError && bbcQuery.isError;
     const handleSummarizeEntireFeed = ()=>{
-        '/* "Sets the chat mode to \\"bulk\\" and populates active chat items with the feed data if the feed is not empty." */';
+        '/* "Sets the chat mode to bulk and activates the specified feed items when the feed is not empty." */';
     };
     const handleSummarizeSingleCard = (item: NewsItem)=>{
         '/* "Executes logic for function handleSummarizeSingleCard" */';
     };
     const ollamaLLMActive = useOllamaSelectedModelRead();
-    return (<div className="/* UI: Centered full-height flexible dark card with white border and subtle shadow. */">
+    return (<div>
 			{}
-			<div className="/* UI: Full-size background layer positioned beneath other elements. */">
-				<div className="/* UI: Large blurred background circle positioned off-center. */" style={{
+			<div>
+				<div style={{
         animation: "pulse-mesh 12s ease-in-out infinite"
     }}/>
-				<div className="/* UI: Floating, blurry, violet-toned circle element positioned in the top-right corner. */" style={{
+				<div style={{
         animation: "float-mesh 10s ease-in-out infinite"
     }}/>
-				<div className="/* UI: Large, absolute, blurry background orb with oversized placement and transparency. */" style={{
+				<div style={{
         animation: "pulse-mesh 15s ease-in-out infinite"
     }}/>
 			</div>
 
-			<header className="/* UI: Padded blurred header with content alignment and bottom divider line. */">
+			<header>
 				<div>
-					<div className="/* UI: Centered flex layout with a small gap between items */">
-						<span className="/* UI: Small square element positioned relatively within a flex container */">
-							<span className="/* UI: Pulsing emerald circle overlay effect. */"></span>
-							<span className="/* UI: Small emerald-colored circular indicator badge */"></span>
+					<div>
+						<span>
+							<span></span>
+							<span></span>
 						</span>
-						<span className="/* UI: Small, bold, monochrome, uppercase text with wide letter spacing. */">
+						<span>
 							Ollama Agent UI
 						</span>
 					</div>
-					<h1 className="/* UI: Bold, tightly tracked white text with extra-large font size. */">
+					<h1>
 						Intelligence Stream
 					</h1>
 				</div>
 
 				<MagneticWrapper>
-					<button onClick={handleRefetchAll} disabled={isLoading} className="/* UI: Cubic button with background blur, dynamic shadow on hover. */" title="Refetch feeds">
+					<button onClick={handleRefetchAll} disabled={isLoading} title="Refetch feeds">
 						<svg className={`h-4.5 w-4.5 text-slate-300 ${isLoading ? "animate-spin text-cyan-400" : ""}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
 						</svg>
@@ -2301,23 +2301,23 @@ export default function NewsDashboard() {
 				</MagneticWrapper>
 			</header>
 
-			<div className="/* UI: Sticky vertical content block with background blur and bottom border. */">
+			<div>
 				<AppleGlowBorder isActive={isSearchFocused}>
-					<div className="/* UI: Full-width flex container with centered items and padding. */">
+					<div>
 						<svg className={`h-4 w-4 transition-colors duration-300 ${isSearchFocused ? "text-[#00E0FF]" : "text-slate-400"}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
 						</svg>
-						<input type="text" inputMode="search" placeholder="Search intelligence updates..." value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} onFocus={()=>setIsSearchFocused(true)} onBlur={()=>setIsSearchFocused(false)} className="/* UI: Full width input field with monospace text and transparent background */"/>
-						{searchTerm && (<button onClick={()=>setSearchTerm("")} className="/* UI: Gray text that turns white when hovered, indicating clickability. */">
-								<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+						<input type="text" inputMode="search" placeholder="Search intelligence updates..." value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} onFocus={()=>setIsSearchFocused(true)} onBlur={()=>setIsSearchFocused(false)}/>
+						{searchTerm && (<button onClick={()=>setSearchTerm("")}>
+								<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
 									<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
 								</svg>
 							</button>)}
 					</div>
 				</AppleGlowBorder>
 
-				<div className="/* UI: Small text layout with items centered and content evenly distributed. */">
-					<div className="/* UI: Subtle glassmorphism card layout with rounded edges and thin border. */">
+				<div>
+					<div>
 						{([
         "all",
         "Google News",
@@ -2325,17 +2325,17 @@ export default function NewsDashboard() {
         "BBC News"
     ] as const).map((source)=>{
         return (<button key={source} onClick={()=>{
-            '/* "Sets the active source state within a smooth browser transition when the element is clicked." */';
+            '/* "Initiates a state update for the active source within a transition to ensure smooth UI rendering." */';
         }} className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-200 cursor-pointer ${isSelected ? "bg-white/[0.08] text-white shadow-sm border-white/[0.04] border" : "hover:text-slate-200 hover:bg-white/[0.02]"}`}>
 										{label}
 									</button>);
-        '/* "Creates a button component that displays a selectable filter label and updates the application state when clicked." */';
+        '/* "Renders a clickable button representing a data source, updating the active source when clicked." */';
     })}
 					</div>
 
-					<button onClick={()=>setSortBy((prev)=>(prev === "newest" ? "oldest" : "newest"))} className="/* UI: Small interactive button with transparent frosted glass effect and subtle glow on hover */">
+					<button onClick={()=>setSortBy((prev)=>(prev === "newest" ? "oldest" : "newest"))}>
 						<span>{sortBy === "newest" ? "Newest" : "Oldest"}</span>
-						<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
 							<path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
 						</svg>
 					</button>
@@ -2343,20 +2343,20 @@ export default function NewsDashboard() {
 			</div>
 
 			{}
-			<div className="/* UI: Flexible content block with padding and minimum height defined. */" style={{
+			<div style={{
         height: "calc(600px - 210px)",
         minHeight: 0
     }}>
 				<AnimatePresence mode="popLayout">
-					{isInitialLoading && (<div className="/* UI: Vertical spacing between items with a small top margin */">
+					{isInitialLoading && (<div>
 							{[
         1,
         2,
         3
-    ].map((n)=>(<div key={n} className="/* UI: Pulsing light container with a translucent white background and rounded borders. */">
-									<div className="/* UI: Small rounded white translucent box with bottom margin. */"/>
-									<div className="/* UI: Small rounded block with semi-transparent white background and margin bottom */"/>
-									<div className="/* UI: Small, half-width, rounded container with a semi-transparent white background. */"/>
+    ].map((n)=>(<div key={n}>
+									<div/>
+									<div/>
+									<div/>
 								</div>))}
 						</div>)}
 
@@ -2366,11 +2366,11 @@ export default function NewsDashboard() {
     }} animate={{
         opacity: 1,
         y: 0
-    }} className="/* UI: Rounded rose-themed card with a border and centered text. */">
-							<p className="/* UI: Small bold text in rose color */">
+    }}>
+							<p>
 								Unable to load feeds
 							</p>
-							<button onClick={handleRefetchAll} className="/* UI: Small rounded button with subtle white background and slight hover effect. */">
+							<button onClick={handleRefetchAll}>
 								Retry Stream
 							</button>
 						</motion.div>)}
@@ -2379,36 +2379,36 @@ export default function NewsDashboard() {
         opacity: 0
     }} animate={{
         opacity: 1
-    }} className="/* UI: Centered text with generous vertical padding and muted slate gray color. */">
-							<p className="/* UI: Small, semi-bold text style. */">No results match filters</p>
+    }}>
+							<p>No results match filters</p>
 						</motion.div>)}
 
 					{!isInitialLoading && finalFeed?.length > 0 && (<LegendList data={finalFeed} keyExtractor={({ item })=>`${item.id ?? item.link}-${expandedItemId === (item.id ?? item.link) ? "expanded" : "collapsed"}`} style={{
         height: "100%"
-    }} extraData={expandedItemId} className="/* UI: Semi-transparent glass-like scrollbar design */" contentContainerClassName="pb-[80px] pt-2" recycleItems={true} ItemSeparatorComponent={()=><div className="/* UI: /* Style: 2 classes */ */"/>} renderItem={({ item: news })=>{
+    }} extraData={expandedItemId} contentContainerClassName="pb-[80px] pt-2" recycleItems={true} ItemSeparatorComponent={()=><div/>} renderItem={({ item: news })=>{
         return (<NewsCard item={item} isExpanded={expandedItemId === idKey} onToggleExpand={()=>setExpandedItemId(expandedItemId === idKey ? null : idKey)} onAnalyze={()=>handleSummarizeSingleCard(item)}/>);
-        '/* "Renders a dynamic news card component for each item, managing its expanded state and providing callbacks for analysis." */';
+        '/* "Renders a dynamic news card using the item data, controlling the card\'s expanded state and providing handlers for toggling the view or requesting a summary." */';
     }}/>)}
 				</AnimatePresence>
 			</div>
 
 			{}
-			<div className="/* UI: Fixed bottom notification bar with full width and z-index. */">
-				<div className="/* UI: Full height frosted glass panel with centered items and subtle shadows. */">
-					<div className="/* UI: Flex container with evenly spaced centered items */">
-						<span className="/* UI: Small animated pulsing circular badge with a bright emerald outline */"/>
-						<span className="/* UI: Small bold text in slate gray. */">
+			<div>
+				<div>
+					<div>
+						<span/>
+						<span>
 							Ollama Feed Agent:{" "}
-							<span className="/* UI: Small uppercase monospace white text font */">
+							<span>
 								{ollamaLLMActive}
 							</span>
 						</span>
 					</div>
 
 					{}
-					{finalFeedItems.length > 0 && (<button onClick={handleSummarizeEntireFeed} className="/* UI: Pill-shaped button with glow effect and interactive states. */">
+					{finalFeedItems.length > 0 && (<button onClick={handleSummarizeEntireFeed}>
 							{}
-							<div className="/* UI: Full viewport background with subtle tri-color gradient overlay. */"/>
+							<div/>
 							<Summary size={14} color="#00E0FF"/>
 							<span>
 								Summarize {finalFeedItems?.length} Stream
@@ -2426,7 +2426,7 @@ export default function NewsDashboard() {
         opacity: 1
     }} exit={{
         opacity: 0
-    }} onClick={()=>setActiveChatItems([])} className="/* UI: Full screen semi-transparent blurred dark overlay with active pointer events */"/>)}
+    }} onClick={()=>setActiveChatItems([])}/>)}
 			</AnimatePresence>
 
 			{}
@@ -2483,126 +2483,126 @@ const ProfileSettingsView = ({ setModelState }: {
         '/* "Executes logic for function handleChange" */';
     };
     const handleSave = ()=>{
-        '/* "Saves the user profile and subsequently manages a time-based display state for tracking save status." */';
+        '/* "Saves the user profile and then initiates a sequence of state transitions including setting a saving indicator and managing form state after delays." */';
     };
-    return (<div className="/* UI: Vertical content container with frosted glass effect and defined shadow. */">
+    return (<div>
 			{}
-			<div className="/* UI: Flexible container with spacing, border, and bottom padding */">
-				<div className="/* UI: Vertical column layout with small spacing between items */">
-					<h2 className="/* UI: Bold sans-serif text in light gray, centered with small spacing. */">
+			<div>
+				<div>
+					<h2>
 						Autofill Identity Settings
 					</h2>
-					<p className="/* UI: Small medium-gray text with standard font styling */">
+					<p>
 						Your credentials remain stored locally and privately on your
 						machine.
 					</p>
 				</div>
-				<div className="/* UI: Pill-shaped button with glowing blue border and centered icon/text. */">
-					<ShieldCheck size={10} className="/* UI: Pulsating animation effect applied to the element */"/>
-					<span className="/* UI: Small bold uppercase tracking-wide sans-serif text */">
+				<div>
+					<ShieldCheck size={10}/>
+					<span>
 						Local
 					</span>
 				</div>
 			</div>
 
 			{}
-			<div className="/* UI: Two-column grid layout with spacing and top margin */">
+			<div>
 				{}
-				<div className="/* UI: Two-column vertical flex layout with spacing and hover effects */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						Full Name
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<User size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="text" value={profile.fullName} autoComplete="name" onChange={(e)=>handleChange("fullName", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="e.g. Sanjaiyan Parthipan"/>
+					<div>
+						<User size={12}/>
+						<input type="text" value={profile.fullName} autoComplete="name" onChange={(e)=>handleChange("fullName", e.target.value)} placeholder="e.g. Sanjaiyan Parthipan"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: Vertical flex container with a small gap and column span. */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						Email
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<Mail size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="email" value={profile.email} autoComplete="email" onChange={(e)=>handleChange("email", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="name@email.com"/>
+					<div>
+						<Mail size={12}/>
+						<input type="email" value={profile.email} autoComplete="email" onChange={(e)=>handleChange("email", e.target.value)} placeholder="name@email.com"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: Vertical flex container with a small gap and column span. */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						Phone
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<Phone size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="text" value={profile.phone} autoComplete="tel" onChange={(e)=>handleChange("phone", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */"/>
+					<div>
+						<Phone size={12}/>
+						<input type="text" value={profile.phone} autoComplete="tel" onChange={(e)=>handleChange("phone", e.target.value)}/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: Two-column vertical flex layout with spacing and hover effects */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						Address Line 1
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<MapPin size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="text" value={profile.addressLine1} autoComplete="street-address" onChange={(e)=>handleChange("addressLine1", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Selva Sannithi Murugan, Thondaimanaru"/>
+					<div>
+						<MapPin size={12}/>
+						<input type="text" value={profile.addressLine1} autoComplete="street-address" onChange={(e)=>handleChange("addressLine1", e.target.value)} placeholder="eg: Selva Sannithi Murugan, Thondaimanaru"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: Two-column vertical flex layout with spacing and hover effects */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						Address Line 2 (Suite, Apt)
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<Compass size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="text" value={profile.addressLine2} autoComplete="address-line2" onChange={(e)=>handleChange("addressLine2", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Jaffna, Sri Lanka"/>
+					<div>
+						<Compass size={12}/>
+						<input type="text" value={profile.addressLine2} autoComplete="address-line2" onChange={(e)=>handleChange("addressLine2", e.target.value)} placeholder="eg: Jaffna, Sri Lanka"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: Vertical flex container with a small gap and column span. */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						City
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<Building size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="text" value={profile.city} autoComplete="address-level2" onChange={(e)=>handleChange("city", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Point Pedro"/>
+					<div>
+						<Building size={12}/>
+						<input type="text" value={profile.city} autoComplete="address-level2" onChange={(e)=>handleChange("city", e.target.value)} placeholder="eg: Point Pedro"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: Vertical flex container with a small gap and column span. */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						ZIP Code
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<Hash size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="text" value={profile.zipCode} autoComplete="postal-code" onChange={(e)=>handleChange("zipCode", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: 40000"/>
+					<div>
+						<Hash size={12}/>
+						<input type="text" value={profile.zipCode} autoComplete="postal-code" onChange={(e)=>handleChange("zipCode", e.target.value)} placeholder="eg: 40000"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: Vertical flex container with a small gap and column span. */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						State / Province
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<MapPin size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="text" value={profile.state} onChange={(e)=>handleChange("state", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Jaffna"/>
+					<div>
+						<MapPin size={12}/>
+						<input type="text" value={profile.state} onChange={(e)=>handleChange("state", e.target.value)} placeholder="eg: Jaffna"/>
 					</div>
 				</div>
 
 				{}
-				<div className="/* UI: Vertical flex container with a small gap and column span. */">
-					<label className="/* UI: Small uppercase monochromatic bold text with focus state color change. */">
+				<div>
+					<label>
 						Country
 					</label>
-					<div className="/* UI: Centered items within a relative flex container. */">
-						<Flag size={12} className="/* UI: Absolute positioned text with focus transition to bright pink */"/>
-						<input type="text" value={profile.country} autoComplete="address-level1" onChange={(e)=>handleChange("country", e.target.value)} className="/* UI: Full-width, rounded dark input field with focused pink outline and smooth transition. */" placeholder="eg: Sri Lanka"/>
+					<div>
+						<Flag size={12}/>
+						<input type="text" value={profile.country} autoComplete="address-level1" onChange={(e)=>handleChange("country", e.target.value)} placeholder="eg: Sri Lanka"/>
 					</div>
 				</div>
 			</div>
@@ -2612,7 +2612,7 @@ const ProfileSettingsView = ({ setModelState }: {
         scale: 0.98
     }} className={`w-full mt-4 rounded-xl py-3 text-xs font-bold tracking-widest uppercase font-mono transition-all cursor-pointer flex items-center justify-center gap-2 relative overflow-hidden group shadow-[0_4px_20px_rgba(0,0,0,0.2)] ${isSaved ? "bg-[rgba(16,185,129,0.15)] border border-emerald-500/40 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]" : "bg-linear-to-r from-[#FF2E63] via-[#8a5cf665] to-[#FF2E63] text-white border border-transparent"}`}>
 				{}
-				{!isSaved && (<div className="/* UI: Overlay element with smooth hover fade and blurred background effect. */"/>)}
+				{!isSaved && (<div/>)}
 
 				<AnimatePresence mode="wait">
 					{isPending ? (<motion.div key="loading" initial={{
@@ -2628,7 +2628,7 @@ const ProfileSettingsView = ({ setModelState }: {
         duration: 1.2,
         ease: "linear"
     }}>
-							<Loader2 size={13} className="/* UI: Bright cyan text color */"/>
+							<Loader2 size={13}/>
 						</motion.div>) : isSaved ? (<motion.span key="saved" initial={{
         opacity: 0,
         scale: 0.6
@@ -2641,8 +2641,8 @@ const ProfileSettingsView = ({ setModelState }: {
         type: "spring",
         stiffness: 300,
         damping: 15
-    }} className="/* UI: Centered flex layout with spacing and progress indicator cursor */">
-							<Check size={12} className="/* UI: Animated bouncing effect in place */"/> Profile Details
+    }}>
+							<Check size={12}/> Profile Details
 							Secured
 						</motion.span>) : (<motion.span key="idle" initial={{
         opacity: 0,
@@ -2653,7 +2653,7 @@ const ProfileSettingsView = ({ setModelState }: {
     }} exit={{
         opacity: 0,
         y: -5
-    }} className="/* UI: Flexible layout with centered content, gap, and pointer cursor indicator */">
+    }}>
 							<Save size={12}/> Save Form Identity
 						</motion.span>)}
 				</AnimatePresence>
@@ -2732,10 +2732,10 @@ export function BottomNav() {
         function handleClickOutside(event: MouseEvent) {
             '/* "Determines if a click originated outside of the component\'s container and collapses it if true." */';
         }
-        '/* "Registers a global event listener that collapses the component when a click occurs outside its designated container element." */';
+        '/* "Attaches a mouse click listener to the document to collapse the component state when a click occurs outside its container." */';
     }, []);
     useEffect(()=>{
-        '/* "When the component is expanded, this effect schedules a focus call to the input element after a 300ms delay and cleans up the timer when re-running." */';
+        '/* "When the component expands, it sets a 300-millisecond timer to focus the input element, clearing the timer if the component re-renders before it fires." */';
     }, [
         isExpanded
     ]);
@@ -2743,9 +2743,9 @@ export function BottomNav() {
         '/* "Sets the popover query state with the trimmed input value and opens the popover while unfocusing the current element." */';
     };
     return (<div className={`bg-[#05050A] flex items-center justify-center relative overflow-hidden font-sans`}>
-			<div className="/* UI: Full background coverage with subtle tiled dark noise pattern overlay. */"/>
-			<div className="/* UI: Large blurred purple screen blending abstract floating element positioned near the bottom center. */"/>
-			<div className="/* UI: Floating blurred glowing orb with transparent blue background */"/>
+			<div/>
+			<div/>
+			<div/>
 
 			<motion.div transition={{
         type: "spring",
@@ -2769,7 +2769,7 @@ export function BottomNav() {
 						${isExpanded ? "rounded-[2.5rem] p-3" : "rounded-full p-3 justify-center"}
 						${isFocused ? "bg-[#0f0f14]/90 border-white/25 shadow-[0_24px_48px_rgba(139,92,246,0.15)]" : ""}
 					`}>
-					<div className="/* UI: Full-size transparent white gradient overlay with pointer event disabling. */" style={{
+					<div style={{
         animation: "shine 6s infinite linear"
     }}/>
 
@@ -2785,13 +2785,13 @@ export function BottomNav() {
         scale: 0.8
     }} transition={{
         duration: 0.2
-    }} className="/* UI: Full size centered flex container */">
-								<MagneticButton onClick={()=>setIsExpanded(true)} className="/* UI: Small centered circular button with soft violet glow and interactive shadows. */">
-									<div className="/* UI: Circular element positioned absolutely to fill parent container */" style={{
+    }}>
+								<MagneticButton onClick={()=>setIsExpanded(true)}>
+									<div style={{
         background: "rgba(139, 92, 246, 0.12)",
         boxShadow: "inset 0 1px 1px rgba(255,255,255,0.08), 0 0 20px rgba(139, 92, 246, 0.3)"
     }}/>
-									<Sparkles className="/* UI: Small pulsing violet icon in the foreground */" style={{
+									<Sparkles style={{
         filter: "drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))"
     }}/>
 								</MagneticButton>
@@ -2804,18 +2804,18 @@ export function BottomNav() {
     }} transition={{
         duration: 0.25,
         delay: 0.1
-    }} className="/* UI: Full-sized flex container with centered items and spacing */">
+    }}>
 								<MagneticButton onClick={()=>{
         '/* "Executes logic for function anonymous_arrow" */';
-    }} className="/* UI: Circular button with white background and subtle border, centered and sized. */">
-									<X className="/* UI: Small icon with light gray text and hover effect */"/>
+    }}>
+									<X/>
 								</MagneticButton>
 
-								<div className="/* UI: Inline alignment with spacing and fixed size */">
+								<div>
 									{navItems.map((item)=>{
         return (<Link key={item.id} to={item.to} prefetch="render">
-												<MagneticButton key={item.id} onClick={()=>setActiveTab(item.id)} className="/* UI: Centered circular fixed-size element with constrained dimensions */">
-													{isActive && (<motion.div layoutId="wowActiveIndicator" className="/* UI: Circular full-size element with a semi-transparent white border */" style={{
+												<MagneticButton key={item.id} onClick={()=>setActiveTab(item.id)}>
+													{isActive && (<motion.div layoutId="wowActiveIndicator" style={{
             background: "rgba(255, 255, 255, 0.08)",
             boxShadow: `inset 0 1px 1px rgba(255,255,255,0.1), 0 0 20px ${item.glow}`
         }} transition={{
@@ -2830,7 +2830,7 @@ export function BottomNav() {
             filter: isActive ? `drop-shadow(0 0 8px ${item.glow})` : undefined
         }}/>
 
-													{isActive && (<motion.div layoutId="activeTabDot" className="/* UI: Small absolute corner indicator dot or marker */" style={{
+													{isActive && (<motion.div layoutId="activeTabDot" style={{
             backgroundColor: item.color
         }} transition={{
             type: "spring",
@@ -2839,18 +2839,18 @@ export function BottomNav() {
         }}/>)}
 												</MagneticButton>
 											</Link>);
-        '/* "Renders a list of navigable button components, styling them based on the active tab state and applying animations when selected." */';
+        '/* "Renders a list of navigable items, displaying a dynamic icon and animated indicator that reflects the active navigation state." */';
     })}
 								</div>
 
-								<div className="/* UI: Small, fixed-height, white translucent rounded spacer element. */"/>
+								<div/>
 
 								<motion.div layout className={`
 										relative flex items-center flex-1 h-13 rounded-full overflow-hidden shrink-0 group
 										${isFocused ? "bg-black/50" : "bg-black/30 border border-white/5"}
 										transition-colors duration-300
 									`}>
-									{isFocused && (<div className="/* UI: Full screen positioned element with rounded shape and minimal padding. */" style={{
+									{isFocused && (<div style={{
         background: "linear-gradient(90deg, #00E0FF, #8B5CF6, #FF2E63, #00E0FF)",
         backgroundSize: "200% auto",
         animation: "borderFlow 3s linear infinite",
@@ -2859,7 +2859,7 @@ export function BottomNav() {
         maskComposite: "exclude"
     }}/>)}
 
-									<motion.div className="/* UI: Fixed position element offset slightly from the left with high clickability */" whileHover={{
+									<motion.div whileHover={{
         rotate: 90,
         scale: 1.1
     }} transition={{
@@ -2871,8 +2871,8 @@ export function BottomNav() {
 									</motion.div>
 
 									<input required ref={inputRef} type="text" value={inputValue} onChange={(e)=>setInputValue(e.target.value)} onFocus={()=>setIsFocused(true)} onBlur={()=>setIsFocused(false)} onKeyDown={(e)=>{
-        '/* "Triggers the query submission process when the user presses the Enter key." */';
-    }} placeholder="Ask Ollama..." className="/* UI: Full-size element with focused border and subtle input field styling. */"/>
+        '/* "Invokes the handleSendQuery function when the Enter key is pressed while the element is focused." */';
+    }} placeholder="Ask Ollama..."/>
 
 									<AnimatePresence>
 										{(isFocused || inputValue) && (<motion.button initial={{
@@ -2891,12 +2891,12 @@ export function BottomNav() {
         scale: 1.05
     }} whileTap={{
         scale: 0.95
-    }} onClick={handleSendQuery} className="/* UI: Small circular interactive button with purple glow and pointer cursor */">
-												<div className="/* UI: Full-screen absolute positioning with smooth color transitions */" style={{
+    }} onClick={handleSendQuery}>
+												<div style={{
         backgroundColor: currentTab?.color
     }}/>
-												<div className="/* UI: Full-screen, semi-transparent, rounded modal overlay with a subtle white border. */"/>
-												<ArrowUp strokeWidth={2.5} className="/* UI: Small square element with white text, positioned high in the stack. */"/>
+												<div/>
+												<ArrowUp strokeWidth={2.5}/>
 											</motion.button>)}
 									</AnimatePresence>
 								</motion.div>
@@ -2917,44 +2917,44 @@ export function BottomNav() {
 ```typescript
 import { motion } from "framer-motion";
 export const LoadingUI = ({ headerTxt = "Calibrating Pipeline Interface", headerTxt2 = "Resolving physical silicon vectors...", footerTxt = "CONNECTING KERNEL MEMORY DRIVERS" })=>{
-    return (<div className="/* UI: Full screen dark mode component with subtle white border and centered content. */">
+    return (<div>
 			{}
-			<div className="/* UI: Large blurred pulsing circle overlaying content in a specific corner. */"/>
+			<div/>
 
-			<div className="/* UI: Vertical spacing between elements with margin at the top */">
+			<div>
 				{}
-				<div className="/* UI: Center-aligned square container with flexible content. */">
+				<div>
 					{}
-					<div className="/* UI: Spinner component overlayed with a dashed blue border animation */"/>
-					<div className="/* UI: Pulsing absolutely positioned rounded border outline animation. */"/>
-					<div className="/* UI: Centered, blurred banner with a semi-transparent gradient background. */">
-						<svg className="/* UI: Small animated square icon in bright blue. */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<div/>
+					<div/>
+					<div>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
 						</svg>
 					</div>
 				</div>
 
-				<div className="/* UI: Centered text with vertical spacing between elements */">
-					<h2 className="/* UI: Base size bold white text with tight tracking and pulse animation */">
+				<div>
+					<h2>
 						{headerTxt}
 					</h2>
-					<p className="/* UI: Small gray monochrome text with regular line spacing */">
+					<p>
 						{headerTxt2}
 					</p>
 				</div>
 
 				{}
-				<div className="/* UI: Four-column responsive grid layout with spacing and padding */">
+				<div>
 					{[
         ...Array(4)
-    ].map((_, i)=>(<div key={i} className="/* UI: Pulsing placeholder UI element with frosted glass border and rounded edges */" style={{
+    ].map((_, i)=>(<div key={i} style={{
             animationDelay: `${i * 150}ms`
         }}/>))}
 				</div>
 			</div>
 
-			<div className="/* UI: Adds top padding and subtle top border for a centered look */">
-				<span className="/* UI: Small monospaced text in a light gray color. */">
+			<div>
+				<span>
 					{footerTxt}
 				</span>
 			</div>
@@ -2966,51 +2966,51 @@ export const ErrorUI = ({ headerDescTxt = "The real-time telemetry pipeline requ
         setTimeout(()=>setCopyState(false), 2000);
         '/* "Copies the manifest text to the clipboard and sets a temporary state indicating a successful copy operation." */';
     };
-    return (<div className="/* UI: Full screen container with dark background, padding, and structured column layout. */">
+    return (<div>
 			{}
-			<div className="/* UI: Large translucent blurred circle background element positioned outside the container. */"/>
-			<div className="/* UI: Large blurred glowing purple element positioned off-screen. */"/>
+			<div/>
+			<div/>
 
-			<div className="/* UI: /* Style: 1 classes */ */">
-				<div className="/* UI: Horizontal alignment with spaced items for centered layout */">
-					<div className="/* UI: Small pulsing pink circular element with a soft glow. */"/>
-					<span className="/* UI: Small bold uppercase text in a mono-spaced tracking-wide hot pink. */">
+			<div>
+				<div>
+					<div/>
+					<span>
 						Diagnostics Status: Telemetry Offline
 					</span>
 				</div>
 
-				<div className="/* UI: /* Style: 1 classes */ */">
-					<h1 className="/* UI: Large bold tight tracking white text style */">
+				<div>
+					<h1>
 						System Interface Decoupled
 					</h1>
-					<p className="/* UI: Small gray text with relaxed line spacing */">
+					<p>
 						{headerDescTxt}
 					</p>
 				</div>
 
 				{}
-				<div className="/* UI: Semi-transparent white bordered box with padding and vertical spacing. */">
-					<div className="/* UI: Horizontal layout with a subtle separator line and padding */">
-						<span className="/* UI: Small, bold, monospace, uppercase text with wide tracking. */">
+				<div>
+					<div>
+						<span>
 							{copyHeaderTxt}
 						</span>
-						<div className="/* UI: Semi-transparent, large-bordered flex container with minimal padding. */">
+						<div>
 							<button className={`text-[9px] font-mono px-2 py-1 rounded-md transition-all bg-[#8B5CF6] text-white`}>
 								{copyTagTxt}
 							</button>
 						</div>
 					</div>
 
-					<pre className="/* UI: Small monospace panel with subtle border and dark background. */">
+					<pre>
 						<span>
-							<code className="/* UI: /* Style: 1 classes */ */">{copyTextCommand}</code>
+							<code>{copyTextCommand}</code>
 						</span>
 					</pre>
 
 					<motion.button whileTap={{
         scale: 0.95
-    }} onClick={handleCopyManifest} className="/* UI: Full width card with subtle hover effect and monochrome text display */">
-						<svg className="/* UI: /* Style: 2 classes */ */" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    }} onClick={handleCopyManifest}>
+						<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							{copyState ? (<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/>) : (<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>)}
 						</svg>
 						<span>{copyButtonTxtNode}</span>
@@ -3018,13 +3018,13 @@ export const ErrorUI = ({ headerDescTxt = "The real-time telemetry pipeline requ
 				</div>
 			</div>
 
-			<div className="/* UI: Top padding, thin white border, centered text alignment. */">
-				<span className="/* UI: Small monospace text in gray with wide letter spacing */">
+			<div>
+				<span>
 					Ollama Web Browser v1.0.0
 				</span>
 			</div>
 		</div>);
-    '/* "Displays a system interface decoupled error message, provides configuration details in a code block, and offers a button to copy the necessary permission manifest command." */';
+    '/* "Renders an error user interface that displays system status information and provides a button to copy a necessary configuration manifest command." */';
 };
 
 ```
@@ -3066,7 +3066,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
     });
     const mouseCoords = useDeferredValue(freshCoord);
     useEffect(()=>{
-        '/* "Updates the edited and submitted query state whenever the input query value changes." */';
+        '/* "Updates both the edited and submitted query state when the external query state changes." */';
     }, [
         query
     ]);
@@ -3080,7 +3080,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
         '/* "Executes logic for function handleRefreshPageContent" */';
     };
     const handleQuerySubmit = ()=>{
-        '/* "Stores the non-empty user query into state if it has been edited." */';
+        '/* "Updates the submitted query state if the input field is not empty after trimming whitespace." */';
     };
     function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
         '/* "Custom refresh trigger for page scrapers" */';
@@ -3095,7 +3095,7 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
         responseText
     ]);
     return (<AnimatePresence>
-			{isOpen && (<div className="/* UI: Full screen centered overlay with padding and high z-index */">
+			{isOpen && (<div>
 					<style dangerouslySetInnerHTML={{
         __html: `
             @keyframes appleIntelligenceSpin {
@@ -3117,10 +3117,10 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
         opacity: 1
     }} exit={{
         opacity: 0
-    }} onClick={onClose} className="/* UI: Full screen overlay with semi-transparent blur background. */"/>
+    }} onClick={onClose}/>
 
 					{}
-					<div className="/* UI: Full width constrained box with fixed height and interactivity. */">
+					<div>
 						{}
 						<AnimatePresence>
 							{isGenerating && (<motion.div initial={{
@@ -3131,12 +3131,12 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
         opacity: 0
     }} style={{
         animation: "applePulseBorder 3s ease-in-out infinite"
-    }} className="/* UI: Zero-depth absolute positioned overlay with rounded corners and padding. */">
+    }}>
 									<div style={{
         background: "conic-gradient(from 0deg, #8B5CF6 0%, #00E0FF 25%, #FF2E63 50%, #FF8A00 75%, #8B5CF6 100%)",
         filter: "blur(18px)",
         animation: "appleIntelligenceSpin 6s linear infinite"
-    }} className="/* UI: Large absolutely positioned overlay element. */"/>
+    }}/>
 								</motion.div>)}
 						</AnimatePresence>
 
@@ -3160,81 +3160,81 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
     }} style={{
         background: `radial-gradient(400px circle at ${mouseCoords.x}px ${mouseCoords.y}px, rgba(255, 255, 255, 0.05), transparent 85%), rgba(18, 18, 24, 0.78)`,
         backdropFilter: "blur(24px)"
-    }} className="/* UI: Large elevated card with full height and centered content layout. */">
+    }}>
 							{}
 							<div style={{
         animation: "floatMesh 12s infinite linear"
-    }} className="/* UI: Large blurred blue abstract element positioned in the center of the screen. */"/>
+    }}/>
 							<div style={{
         animation: "floatMesh 16s infinite linear reverse"
-    }} className="/* UI: Full screen blurred absolute overlay with purple tint and rounded shape. */"/>
+    }}/>
 
 							{}
-							<div className="/* UI: Flex container with a bottom border and elevated layout. */">
-								<div className="/* UI: Centered flex container with internal spacing and overflow control */">
-									<div className="/* UI: Small round icon container with faint white borders and soft shadow */">
-										<Sparkles className="/* UI: Small pulsing icon in cyan blue. */"/>
+							<div>
+								<div>
+									<div>
+										<Sparkles/>
 									</div>
-									<div className="/* UI: Vertical flexible layout container with hidden overflow and left alignment */">
-										<div className="/* UI: Centered flex layout with a small gap between items */">
-											<span className="/* UI: Small, bold, wide-tracked, uppercase blue text. */">
+									<div>
+										<div>
+											<span>
 												Active Tab Context
 											</span>
-											<button onClick={handleRefreshPageContent} disabled={isFetchingPageContext || isGenerating} className="/* UI: Text color with hover effect and disabled state opacity. */" title="Refetch web document context">
+											<button onClick={handleRefreshPageContent} disabled={isFetchingPageContext || isGenerating} title="Refetch web document context">
 												<RefreshCw className={`w-3 h-3 ${isFetchingPageContext ? "animate-spin" : ""}`}/>
 											</button>
 										</div>
-										<h3 className="/* UI: Small, bold, light text with tight leading and small top margin. */">
+										<h3>
 											{pageContext?.title || activeTab?.url || "Secure Web Document"}
 										</h3>
 									</div>
 								</div>
 
-								<button onClick={onClose} className="/* UI: Small circular button with white background and subtle borders. */">
-									<X className="/* UI: /* Style: 2 classes */ */"/>
+								<button onClick={onClose}>
+									<X/>
 								</button>
 							</div>
 
 							{}
-							<div className="/* UI: Flexible scrollable container with subtle padding and scrollbar. */">
+							<div>
 								{}
-								<div className="/* UI: Semi-transparent white frosted glass effect card with subtle transitions. */">
-									<span className="/* UI: Small bold uppercase text in a muted gray tone. */">
+								<div>
+									<span>
 										Your Question
 									</span>
-									<div className="/* UI: Flex container aligning items to the bottom with a small gap. */">
+									<div>
 										<textarea value={editedQuery} onChange={(e)=>setEditedQuery(e.target.value)} onKeyDown={(e)=>{
-        '/* "Prevents the default form behavior and executes a query submission if the Enter key is pressed without Shift." */';
-    }} rows={2} className="/* UI: Transparent background small text medium icon layout with default focus styling. */" placeholder="Tweak or enter your question here..."/>
-										{editedQuery !== submittedQuery && (<button onClick={handleQuerySubmit} className="/* UI: Small colorful button with bold white text and hover effect */">
+        '/* "Intercepts the Enter key press without Shift while suppressing default browser behavior and executes the query submission handler." */';
+    }} rows={2} placeholder="Tweak or enter your question here..."/>
+										{editedQuery !== submittedQuery && (<button onClick={handleQuerySubmit}>
 												Apply
 											</button>)}
 									</div>
 								</div>
 
 								{}
-								<div className="/* UI: /* Style: 1 classes */ */">
-									<div className="/* UI: Flex container with centered items, distributed elements, and margin bottom spacing */">
-										<span className="/* UI: Small bold purple uppercase text with wide tracking */">
+								<div>
+									<div>
+										<span>
 											Response Output
 										</span>
-										{isGenerating && (<span className="/* UI: Small bright blue text in a centered, spaced flex container */">
-												<span className="/* UI: Small animated pulsing circular background indicator. */"/>
+										{isGenerating && (<span>
+												<span/>
 												Ollama generating...
 											</span>)}
 									</div>
 
-									{error ? (<div className="/* UI: Rounded red background card with subtle border and small text. */">
-											<AlertCircle className="/* UI: Small red square element with fixed size and margin. */"/>
+									{error ? (<div>
+											<AlertCircle/>
 											<p>
 												{(error as Error).message || "An unexpected error occurred."}
 											</p>
-										</div>) : isPending && !responseText ? (<div className="/* UI: Vertical spacing with subtle pulsing animation */">
-											<div className="/* UI: Small rectangular element with rounded edges and transparent background */"/>
-											<div className="/* UI: Small wide rounded element with semi-transparent white background */"/>
-											<div className="/* UI: Small rounded rectangular block with semi-transparent white background */"/>
-										</div>) : (<div className="/* UI: Light text color with vertical spacing between elements */">
-											{parsedMarkup || (<p className="/* UI: Small gray italic text */">
+										</div>) : isPending && !responseText ? (<div>
+											<div/>
+											<div/>
+											<div/>
+										</div>) : (<div>
+											{parsedMarkup || (<p>
 													Submit a question to execute analysis.
 												</p>)}
 										</div>)}
@@ -3242,19 +3242,19 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 							</div>
 
 							{}
-							<div className="/* UI: Elevated header section with spacing and item alignment. */">
+							<div>
 								{}
-								<div className="/* UI: /* Style: 1 classes */ */">
-									<button onClick={()=>setIsDropdownOpen(!isDropdownOpen)} className="/* UI: Small rounded light element with subtle border and hover effect. */">
-										<span className="/* UI: Small, dense, uppercase text display with a specific light gray color. */">
+								<div>
+									<button onClick={()=>setIsDropdownOpen(!isDropdownOpen)}>
+										<span>
 											{selectedModel || "No local models"}
 										</span>
-										<ChevronDown className="/* UI: Small neutral-gray icon or indicator. */"/>
+										<ChevronDown/>
 									</button>
 
 									{isDropdownOpen && localModels?.length > 0 && (<>
-											<div className="/* UI: Full-screen fixed overlay layer with high z-index */" onClick={()=>setIsDropdownOpen(false)}/>
-											<div className="/* UI: Floating sidebar with frosted appearance and scrollable content area. */">
+											<div onClick={()=>setIsDropdownOpen(false)}/>
+											<div>
 												{localModels?.map?.((item)=>(<button key={item.name} onClick={()=>{
             '/* "Executes logic for function anonymous_arrow" */';
         }} className={`w-full text-left px-3 py-1.5 text-xs font-semibold uppercase hover:bg-white/5 transition-colors ${selectedModel === item.name ? "text-[#8B5CF6]" : "text-[#94A3B8]"}`}>
@@ -3265,9 +3265,9 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 								</div>
 
 								{}
-								<div className="/* UI: /* Style: 2 classes */ */">
-									<button onClick={handleCopy} disabled={!responseText} className="/* UI: Small circular icon button with white border and smooth hover transitions */" title="Copy response to clipboard">
-										{copied ? (<Check className="/* UI: Small square icon in emerald green color */"/>) : (<Copy className="/* UI: /* Style: 2 classes */ */"/>)}
+								<div>
+									<button onClick={handleCopy} disabled={!responseText} title="Copy response to clipboard">
+										{copied ? (<Check/>) : (<Copy/>)}
 									</button>
 
 									<button onClick={()=>triggerInference()} disabled={isGenerating || !submittedQuery} className={`h-8 px-3.5 rounded-full bg-[#8B5CF6] text-white font-semibold text-[10px] uppercase tracking-wider flex items-center gap-1 hover:bg-[#7c4fe3] disabled:opacity-40 disabled:pointer-events-none transition-colors shadow-[0_0_15px_rgba(139,92,246,0.3)] ${isGenerating ? "cursor-progress" : "cursor-pointer"}`}>
@@ -3357,7 +3357,7 @@ export { useOllamaListModels, useSystemUsage, useBrowserCurrentActiveTab };
 export const OLLAMA_BROWSER_EXT_REACTQUERY_KEY = "OLLAMA_BROWSER_EXT_REACTQUERY_KEY";
 export const chromeStorageAdapter = {
     getItem: async (key: string): Promise<string | null> =>{
-        '/* "Retrieves a specific item from the local browser storage, returning it as a string or null if not found." */';
+        '/* "Retrieves a specific item from local browser storage, returning the value as a string if it exists." */';
     },
     setItem: async (key: string, value: string)=>{
         '/* "Executes logic for function chromeStorageAdapter" */';
@@ -3734,10 +3734,10 @@ export function useOllamaChatStream({ isToolMode }: {
     isToolMode: boolean;
 }) {
     useEffect(()=>{
-        '/* "Sets a ref to track component mounting status and cleans up by setting it to false when the component unmounts." */';
+        '/* "Sets a mount state to true upon component mounting and sets it to false during cleanup." */';
     }, []);
     useEffect(()=>{
-        '/* "Resets the tracked URL to null if the navigation history is empty." */';
+        '/* "Updates the last sent URL reference to null if the history array is empty." */';
     }, [
         history.length
     ]);
@@ -3772,15 +3772,15 @@ interface OllamaGeneratePayload {
 const CACHE_DURATION_MS = 7 * 60 * 60 * 1000;
 export function useOllamaNewsAgent() {
     useEffect(()=>{
-        '/* "Cleans up any active asynchronous operations by calling `abort()` on the stored abort controller when the component unmounts." */';
+        '/* "Cleans up any active asynchronous operations by calling abort on the stored abort controller." */';
     }, []);
     useEffect(()=>{
-        '/* "Configures cache duration and staleness settings for a specific React Query key using the global query client." */';
+        '/* "Sets default cache durations for a specific React Query hook across all components." */';
     }, [
         queryClient
     ]);
     const cancel = ()=>{
-        '/* "Aborts an ongoing operation if a stored abort controller exists, then resets the reference." */';
+        '/* "Terminates an ongoing asynchronous operation by calling the abort function on the associated abort controller." */';
     };
     '/* "Manages and executes a server-side large language model generation request to an Ollama endpoint, handling caching, streaming the response, and providing mechanisms for cancellation and state tracking." */';
 }
@@ -3828,7 +3828,7 @@ export { ollamaEndPointAtom, ollamaSelectedModelAtom, ollamaQuickQuestionAtom };
 type ValidWxtKey = `local:${string}` | `session:${string}` | `sync:${string}` | `managed:${string}`;
 export function atomWxtStorage<T>(key: string, initialValue: T) {
     const getValidKey = (key: string): ValidWxtKey =>{
-        '/* "Ensures that a provided key string contains a valid storage area prefix, defaulting to a local scope if the original key is incomplete." */';
+        '/* "Checks if a provided key includes a valid storage area prefix, returning a locally prefixed version if the original key is invalid." */';
     };
     '/* "Configures and returns a reactive storage accessor by validating the provided key prefix before wrapping it in `atomWithStorage`." */';
 }
@@ -3841,7 +3841,7 @@ export function atomWxtStorage<T>(key: string, initialValue: T) {
 import { useMutation } from "@tanstack/react-query";
 import { OLLAMA_BROWSER_EXT_REACTQUERY_KEY } from "../query";
 const useOllamaQuickAnswer = ()=>{
-    '/* "Defines a React Query mutation hook for executing quick answers using Ollama." */';
+    '/* "Creates a React Query mutation hook for interacting with an Ollama-powered quick answer feature." */';
 };
 
 ```
@@ -3871,15 +3871,15 @@ type TabType = Parameters<OnUpdatedListener>[2];
 export function useActiveTab() {
     useEffect(()=>{
         const initTab = async ()=>{
-            '/* "Asynchronously queries and sets the currently active browser tab\'s ID and URL." */';
+            '/* "Queries and sets the current active tab\'s ID and URL if a focused tab is successfully found." */';
         };
         const handleActivated = async (activeInfo: TabActiveInfo)=>{
-            '/* "Retrieves the active browser tab details and sets them if valid information is available." */';
+            '/* "Retrieves and sets the active tab\'s ID and URL after successfully accessing the tab information." */';
         };
         const handleUpdated = (_tabId: number, changeInfo: TabChangeInfo, tab: TabType)=>{
-            '/* "Sets the active tab state if the provided tab is active and its status within the change information is complete." */';
+            '/* "Sets the active tab state if the provided tab is active, the status is complete, and the tab has an ID and URL." */';
         };
-        '/* "Manages and updates the currently active browser tab\'s information by listening to tab activation and update events." */';
+        '/* "Monitors and updates the currently active browser tab\'s metadata whenever the tab is activated or its content status changes." */';
     }, []);
     '/* "Retrieves and monitors the currently active browser tab, updating the state whenever a tab is switched or updated." */';
 }

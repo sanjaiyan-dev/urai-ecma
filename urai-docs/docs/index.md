@@ -1,44 +1,81 @@
 ---
-description: Rspress starter homepage with guide, MDX, search, AI, SSG, and theme customization links.
 pageType: home
+titleSuffix: 'AST-Aware Code-to-Prompt Optimizer'
+description: 'High-speed Rust CLI powered by SWC to compress JavaScript, TypeScript, and React codebases into token-dense prompts for LLMs.'
+
+head:
+  - - meta
+    - property: og:title
+      content: urai-ecma - AST-Aware Code to Prompt Engine
+  - - meta
+    - property: og:description
+      content: Reduce LLM token consumption by up to 80% using SWC AST pruning, intelligent Tailwind stripping, and React component inspection.
+  - - meta
+    - property: og:type
+      content: website
+  - - meta
+    - property: og:image
+      content: https://raw.githubusercontent.com/sanjaiyan-dev/urai-ecma/main/assets/og-banner.png
+  - - meta
+    - name: twitter:card
+      content: summary_large_image
+  - - meta
+    - name: twitter:title
+      content: urai-ecma - Token-Dense LLM Prompts from JS/TS
+  - - meta
+    - name: keywords
+      content: AST, SWC, Rust, LLM prompt engineering, token reduction, Tailwind CSS pruner, React AST, Ollama
 
 hero:
-  name: My Site
-  text: A cool website!
-  tagline: This is the tagline
+  name: urai-ecma
+  text: |
+    AST-Aware Code-to-Prompt Engine
+  tagline: Strip styling bloat, summarize method bodies, and feed complete JS/TS codebases into LLMs with up to 80% token reduction.
   actions:
     - theme: brand
-      text: Quick Start
-      link: /guide/start/introduction
+      text: Get Started
+      link: /guide/quick-start
     - theme: alt
-      text: GitHub
-      link: https://github.com/web-infra-dev/rspress
-  image:
-    src: /urai.jpg
-    alt: Logo
+      text: Explore Features
+      link: /guide/tailwind-pruning
+    - theme: alt
+      text: View on GitHub
+      link: https://github.com/sanjaiyan-dev/urai-ecma
+
 features:
-  - title: Blazing fast build speed
-    details: The core compilation module is based on the Rust front-end toolchain, providing a more ultimate development experience.
-    icon: 🏃🏻‍♀️
-    link: /guide/start/introduction
-  - title: Support for MDX content writing
-    details: MDX is a powerful way to write content, allowing you to use React components in Markdown.
-    icon: 📦
-    link: /guide/use-mdx/components
-  - title: Built-in full-text search
-    details: Automatically generates a full-text search index for you during construction, providing out-of-the-box full-text search capabilities.
+  - title: Multi-Threaded SWC Traversal
+    details: Built on Rust's SWC AST parser and Rayon. Concurrently parses and optimizes large monorepos in milliseconds.
+    icon: ⚡
+    span: 4
+    link: /guide/introduction#swc-pipeline
+
+  - title: Smart Tailwind CSS Pruning
+    details: Strips static styling strings while strictly preserving dynamic clsx, cn(), and template literal logic.
     icon: 🎨
-    link: https://rspress.rs/guide/advanced/custom-search
-  - title: AI-friendly
-    details: Generate llms.txt and Markdown files compliant with the llms.txt specification through SSG-MD, making it easier for large language models to understand and use your documentation.
-    icon: 🤖
-    link: https://rspress.rs/guide/basic/ssg-md
-  - title: Static site generation
-    details: In production, it automatically builds into static HTML files, which can be easily deployed anywhere.
-    icon: 🌈
-    link: https://rspress.rs/guide/basic/ssg
-  - title: Providing multiple custom capabilities
-    details: Through its extension mechanism, you can easily extend theme UI and build process.
-    icon: 🔥
-    link: https://rspress.rs/guide/basic/custom-theme
+    span: 4
+    link: /guide/tailwind-pruning
+
+  - title: Structural Stub Retention
+    details: Retains essential statements (React hooks, JSX returns, event listeners) while pruning internal function bloat.
+    icon: 🧱
+    span: 4
+    link: /guide/function-summarization#structural-stubs
+
+  - title: React Component Inspector
+    details: Extracts typed props, useState variables, effect counters, and hierarchy into clean Markdown summaries.
+    icon: ⚛️
+    span: 4
+    link: /guide/react-analysis
+
+  - title: JSDoc & Local Ollama AI
+    details: Prioritizes instant JSDoc extraction. Falls back to local Ollama models with persistent disk caching.
+    icon: 🦙
+    span: 4
+    link: /guide/function-summarization#jsdoc-first
+
+  - title: Built-in Tiktoken Analytics
+    details: Real-time before-and-after token savings report calculated via OpenAI o200k_base and Llama 3 BPE.
+    icon: 📊
+    span: 4
+    link: /guide/quick-start#token-savings-report
 ---
