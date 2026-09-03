@@ -17,7 +17,7 @@
 
 <br />
 
-<img src="./assets/hero-urai.png" alt="Urai Architecture Banner" width="700" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);" />
+<img src="https://sanjaiyan-dev.github.io/urai-ecma/urai.jpg" alt="Urai Architecture Banner" width="700" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);" />
 
 <br />
 

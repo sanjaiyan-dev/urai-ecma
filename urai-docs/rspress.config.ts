@@ -60,7 +60,7 @@ export default defineConfig({
         },
         {
           tag: 'meta',
-          attrs: { property: 'og:image', content: `${SITE_URL}/urai.jpg` },
+          attrs: { property: 'og:image', content: `${SITE_URL}/urai-og.jpg` },
         },
         // Twitter Cards
         {
