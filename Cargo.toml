@@ -14,10 +14,9 @@ categories = ["command-line-utilities", "development-tools", "compilers"]
 
 include = [
     "src/**/*",
-    "Cargo.toml",
-    "LICENSE",
-    "README.md",
-    "urai.config.jsonc",
+    "/Cargo.toml",
+    "/LICENSE",
+    "/README.md",
 ]
 
 [dependencies]
