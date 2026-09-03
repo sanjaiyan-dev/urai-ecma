@@ -1,0 +1,3 @@
+# Urai Ecma
+
+> A multilingual Rspress documentation site.
