@@ -5,8 +5,12 @@ edition = "2024"
 authors = ["Sanjaiyan <sanjaiyan.pro@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/sanjaiyan-dev/urai-ecma"
+homepage = "https://sanjaiyan-dev.github.io/urai-ecma/"
+documentation = "https://sanjaiyan-dev.github.io/urai-ecma/"
 description = "AST-aware JS/TS code to prompt engine for LLMs"
 readme = "README.md"
+keywords = ["ast", "llm", "prompt", "typescript", "swc"]
+categories = ["command-line-utilities", "development-tools", "compilers"]
 
 [dependencies]
 anyhow = "1.0.103"
