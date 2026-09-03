@@ -60,7 +60,7 @@ export default defineConfig({
         },
         {
           tag: 'meta',
-          attrs: { property: 'og:image', content: `${SITE_URL}/og-image.png` },
+          attrs: { property: 'og:image', content: `${SITE_URL}/urai.jpg` },
         },
         // Twitter Cards
         {
@@ -69,7 +69,7 @@ export default defineConfig({
         },
         {
           tag: 'meta',
-          attrs: { name: 'twitter:image', content: `${SITE_URL}/og-image.png` },
+          attrs: { name: 'twitter:image', content: `${SITE_URL}/urai.jpg` },
         },
         // Schema.org SoftwareApplication JSON-LD
         {
@@ -112,9 +112,13 @@ export default defineConfig({
             url: 'https://sanjaiyan-dev.github.io/urai-ecma/',
             codeRepository: 'https://github.com/sanjaiyan-dev/urai-ecma',
             license: 'https://opensource.org/licenses/MIT',
-          }),
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+            },
+          } as const),
         },
       ],
-    },
+    } as const,
   },
 });

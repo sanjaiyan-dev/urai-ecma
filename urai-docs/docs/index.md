@@ -14,9 +14,6 @@ head:
     - property: og:type
       content: website
   - - meta
-    - property: og:image
-      content: https://raw.githubusercontent.com/sanjaiyan-dev/urai-ecma/main/assets/og-banner.png
-  - - meta
     - name: twitter:card
       content: summary_large_image
   - - meta
@@ -25,6 +22,9 @@ head:
   - - meta
     - name: keywords
       content: AST, SWC, Rust, LLM prompt engineering, token reduction, Tailwind CSS pruner, React AST, Ollama
+  - - link
+    - rel: canonical
+      href: https://sanjaiyan-dev.github.io/urai-ecma/
 
 hero:
   name: urai-ecma

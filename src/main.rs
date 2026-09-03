@@ -110,6 +110,8 @@ pub struct UraiContext {
 }
 
 const DEFAULT_CONFIG: &str = r#"{
+    "$schema": "https://sanjaiyan-dev.github.io/urai-ecma/json-schema/v0/config.schema.json",
+    
     // Path to the project directory or single source file
     "input_project": "./src",
 
