@@ -40,7 +40,7 @@ hero:
       link: /guide/quick-start
     - theme: alt
       text: Explore Features
-      link: /guide/tailwind-pruning
+      link: /guide/introduction
     - theme: alt
       text: View on GitHub
       link: https://github.com/sanjaiyan-dev/urai-ecma

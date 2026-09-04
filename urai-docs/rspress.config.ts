@@ -14,6 +14,46 @@ export default defineConfig({
   icon: '/urai-icon.png',
   logo: '/urai.jpg',
   logoText: 'URAI (உரை)',
+  footer: {
+    message:
+      'Released under the MIT License. Copyright © 2026 Sanjaiyan Parthipan.',
+  },
+  nav: [
+    {
+      text: 'Guide',
+      link: '/guide/introduction',
+      activeMatch: '^/guide/',
+    },
+    {
+      text: 'Architecture',
+      link: '/guide/architecture',
+      activeMatch: '^/guide/architecture',
+    },
+    {
+      text: 'Reference',
+      link: '/reference/cli',
+      activeMatch: '^/reference/',
+    },
+    {
+      text: 'Benchmarks',
+      link: '/reference/benchmarks',
+      activeMatch: '^/reference/benchmarks',
+    },
+    {
+      text: 'v0.1.1',
+      items: [
+        {
+          text: 'Changelog',
+          link: 'https://github.com/sanjaiyan-dev/urai-ecma/releases',
+        },
+        { text: 'Crates.io', link: 'https://crates.io/crates/urai-ecma' },
+        {
+          text: 'npm Registry',
+          link: 'https://www.npmjs.com/package/urai-ecma',
+        },
+      ],
+    },
+  ],
   themeConfig: {
     socialLinks: [
       {
