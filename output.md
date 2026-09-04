@@ -334,7 +334,9 @@ graph LR;
 
 ```typescript
 export default defineBackground(()=>{
-    '/* "Configures the browser side panel to automatically open when an associated action is clicked." */';
+    browser.sidePanel.setPanelBehavior({
+        openPanelOnActionClick: true
+    }).catch((error)=>console.error("Error setting panel behavior:", error));
 });
 
 ```
@@ -358,8 +360,13 @@ import { useOllamaEndPointRead } from "@/hooks/store";
 import "./App.css";
 import { preconnect } from "react-dom";
 function App() {
+    const ollamaEndPoint = useOllamaEndPointRead();
+    if (ollamaEndPoint) {
+        preconnect(ollamaEndPoint, {
+            crossOrigin: "anonymous"
+        });
+    }
     return <>Hi</>;
-    '/* "Establishes a connection preconnect to the Ollama endpoint if available." */';
 }
 export default App;
 
@@ -393,7 +400,20 @@ export const queryClient = new QueryClient({
     }
 });
 startTransition(()=>{
-    '/* "Renders the main application structure, including routing, state management, and navigation components, within a transition context." */';
+    root.render(<React.StrictMode>
+			<QueryClientProvider client={queryClient}>
+				<MemoryRouter useTransitions={true}>
+					<Routes>
+						<Route index element={<ChatAI/>}/>
+						<Route path="sys-usage" element={<SystemMonitor/>}/>
+						<Route path="models-lists" element={<OllamaModelList/>}/>
+						<Route path="ai-chat" element={<ChatAI/>}/>
+						<Route path="news" element={<News/>}/>
+					</Routes>
+					<BottomNav/>
+				</MemoryRouter>
+			</QueryClientProvider>
+		</React.StrictMode>);
 });
 
 ```
@@ -423,10 +443,15 @@ export interface OllamaModel {
     capabilities: string[];
 }
 const formatSize = (bytes: number)=>{
-    '/* "Executes logic for function formatSize" */';
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 };
 const formatDate = (isoString: string)=>{
-    '/* "Converts an ISO date string into a specific localized date format using English UK conventions." */';
+    const date = new Date(isoString);
+    return date.toLocaleDateString("en-GB", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+    });
 };
 export default function OllamaSidePanel() {
     const { data, isLoading, isError } = useOllamaListModels();
@@ -437,11 +462,15 @@ export default function OllamaSidePanel() {
     const [activeModel, setActiveModel] = useState<string>(selectedModel || models?.[0]?.name);
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
     const selectActiveModel = (modelName: string)=>{
-        '/* "Sets the active model by immediately calling a setter and asynchronously scheduling the selected model update within a transition." */';
+        setActiveModel(modelName);
+        startTransition(()=>{
+            setSelectedModel(modelName);
+        });
     };
     const handleCopy = (name: string, index: number)=>{
+        navigator.clipboard.writeText(name);
+        setCopiedIndex(index);
         setTimeout(()=>setCopiedIndex(null), 1500);
-        '/* "Copies the provided name to the clipboard and sets a temporary display state for the operation, which clears itself after 1.5 seconds." */';
     };
     const { results: filteredModels, deferredSearchTerm } = useFuse({
         items: models || [],
@@ -488,6 +517,8 @@ export default function OllamaSidePanel() {
 				{filteredModels.length === 0 ? (<div>
 						No matching models named '{deferredSearchTerm}' were found.
 					</div>) : (filteredModels.map((result, idx)=>{
+        const model = result.item;
+        const isActive = activeModel === model.name;
         return (<div key={model.name} onClick={()=>selectActiveModel(model.name)} className={`group relative rounded-xl p-3.5 border transition-all cursor-pointer ${isActive ? "bg-zinc-900 border-violet-500/60 shadow-[0_4px_20px_-4px_rgba(139,92,246,0.15)]" : "bg-zinc-900/40 border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/60"}`}>
 								{}
 								{isActive && (<div/>)}
@@ -504,7 +535,9 @@ export default function OllamaSidePanel() {
 									</div>
 
 									<button onClick={(e)=>{
-            '/* "Handles user interaction by preventing propagation, copying the current model\'s name, and then selecting that model." */';
+            e.stopPropagation();
+            handleCopy(model.name, idx);
+            selectActiveModel(model.name);
         }} title="Copy model name" type="button">
 										{copiedIndex === idx ? (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/>
@@ -537,10 +570,17 @@ export default function OllamaSidePanel() {
 								{}
 								<div>
 									{model.capabilities?.map?.((cap)=>{
+            let capClass = "bg-zinc-800/50 text-zinc-400 border-zinc-800";
+            if (cap === "thinking") {
+                capClass = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+            } else if (cap === "tools") {
+                capClass = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+            } else if (cap === "completion") {
+                capClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+            }
             return (<span key={cap} className={`text-[9px] font-medium tracking-wider uppercase px-2 py-0.5 rounded-full border ${capClass}`}>
 												{cap}
 											</span>);
-            '/* "Maps an array of model capabilities to distinct visual components, styling them based on whether the capability is \\"thinking,\\" \\"tools,\\" or \\"completion.\\"" */';
         })}
 								</div>
 
@@ -549,7 +589,6 @@ export default function OllamaSidePanel() {
 									Modified: {formatDate(model?.modified_at)}
 								</div>
 							</div>);
-        '/* "Renders a list of model cards, allowing users to select a model and providing options to copy the model name." */';
     }))}
 			</div>
 		</div>);
@@ -609,11 +648,31 @@ export const MagneticNode: React.FC<{
     onClick?: () => void;
     active?: boolean;
 }> = ({ children, className = "", onClick, active = false })=>{
+    const ref = useRef<HTMLButtonElement>(null);
+    const [freshCoords, setCoords] = useState({
+        x: 0,
+        y: 0
+    });
+    const coords = useDeferredValue(freshCoords);
+    const springX = coords.x * 0.35;
+    const springY = coords.y * 0.35;
     const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>)=>{
-        '/* "Calculates the mouse position relative to the center of a designated element and updates state with that relative position." */';
+        if (!ref.current) return;
+        const rect = ref.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        startTransition(()=>{
+            setCoords({
+                x: e.clientX - centerX,
+                y: e.clientY - centerY
+            });
+        });
     };
     const handleMouseLeave = ()=>{
-        '/* "Executes logic for function handleMouseLeave" */';
+        setCoords({
+            x: 0,
+            y: 0
+        });
     };
     return (<button ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} onClick={onClick} className={`relative flex items-center justify-center cursor-pointer select-none outline-none rounded-full transition-colors duration-200 ${active ? "bg-white/[0.08]" : "hover:bg-white/[0.03]"} ${className}`} style={{
         WebkitTapHighlightColor: "transparent"
@@ -631,14 +690,25 @@ export const MagneticNode: React.FC<{
 				{children}
 			</motion.div>
 		</button>);
-    "/* \"Calculates and applies reactive physics-based translation to a button element based on the user's mouse position relative to the element's center.\" */";
 };
 export const InteractiveGlassCard: React.FC<{
     children: React.ReactNode;
     className?: string;
 }> = ({ children, className = "" })=>{
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [freshCoords, setCoords] = useState({
+        x: 0,
+        y: 0
+    });
+    const coords = useDeferredValue(freshCoords);
+    const [isHovered, setIsHovered] = useState(false);
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>)=>{
-        '/* "Calculates the mouse coordinates relative to a specific DOM element and updates the state with these values." */';
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        setCoords({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        });
     };
     return (<div ref={cardRef} onMouseMove={handleMouseMove} onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)} className={`relative overflow-hidden backdrop-blur-md bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)] ${className}`}>
 			{}
@@ -653,7 +723,6 @@ export const InteractiveGlassCard: React.FC<{
     }}/>)}
 			<div>{children}</div>
 		</div>);
-    '/* "Renders a visually interactive glass card component that reacts to mouse movement by creating dynamic glow effects based on the cursor\'s position relative to the element." */';
 };
 export default function TelemetryDashboard() {
     const [activeTab, setActiveTab] = useState<"core" | "registers" | "ram">("core");
@@ -666,7 +735,73 @@ export default function TelemetryDashboard() {
     const { data: freshData, error, isLoading } = useSystemUsage();
     const data = useDeferredValue(freshData);
     useEffect(()=>{
-        '/* "Calculates and updates processor usage deltas and overall average usage whenever new CPU telemetry data becomes available." */';
+        if (data?.cpu) {
+            const prev = prevCpuInfoRef.current;
+            const current = data.cpu;
+            if (prev && prev.processors.length === current.processors.length) {
+                const deltas: ProcessorDelta[] = current.processors.map((proc, idx)=>{
+                    const prevProc = prev.processors[idx];
+                    const prevUsage = prevProc.usage;
+                    const currUsage = proc.usage;
+                    const diffUser = currUsage.user - prevUsage.user;
+                    const diffKernel = currUsage.kernel - prevUsage.kernel;
+                    const diffIdle = currUsage.idle - prevUsage.idle;
+                    const diffTotal = currUsage.total - prevUsage.total;
+                    if (diffTotal > 0) {
+                        return {
+                            coreIndex: idx,
+                            userUsage: (diffUser / diffTotal) * 100,
+                            kernelUsage: (diffKernel / diffTotal) * 100,
+                            idleUsage: (diffIdle / diffTotal) * 100,
+                            totalUsage: ((diffTotal - diffIdle) / diffTotal) * 100
+                        };
+                    }
+                    return {
+                        coreIndex: idx,
+                        userUsage: 0,
+                        kernelUsage: 0,
+                        idleUsage: 0,
+                        totalUsage: 0
+                    };
+                });
+                startTransition(()=>{
+                    setCoreDeltas(deltas);
+                });
+                const avg = deltas.reduce((acc, curr)=>acc + curr.totalUsage, 0) / deltas.length;
+                setAverageUsage(avg);
+                startTransition(()=>{
+                    setAverageHistory((prevHist)=>{
+                        const nextHist = [
+                            ...prevHist,
+                            avg
+                        ];
+                        return nextHist.slice(-15);
+                    });
+                });
+            } else {
+                const initial = current.processors.map((proc, idx)=>{
+                    const u = proc.usage;
+                    if (u.total > 0) {
+                        return {
+                            coreIndex: idx,
+                            userUsage: (u.user / u.total) * 100,
+                            kernelUsage: (u.kernel / u.total) * 100,
+                            idleUsage: (u.idle / u.total) * 100,
+                            totalUsage: ((u.total - u.idle) / u.total) * 100
+                        };
+                    }
+                    return {
+                        coreIndex: idx,
+                        userUsage: 0,
+                        kernelUsage: 0,
+                        idleUsage: 0,
+                        totalUsage: 0
+                    };
+                });
+                setCoreDeltas(initial);
+            }
+            prevCpuInfoRef.current = current;
+        }
     }, [
         data
     ]);
@@ -733,6 +868,10 @@ export default function TelemetryDashboard() {
 
 								<div>
 									{coreDeltas.map((core)=>{
+        const isSelected = selectedCore === core.coreIndex;
+        const r = 13;
+        const circ = 2 * Math.PI * r;
+        const strokeDashoffset = circ - (core.totalUsage / 100) * circ;
         return (<motion.button key={core.coreIndex} whileHover={{
             scale: 1.05
         }} whileTap={{
@@ -757,7 +896,6 @@ export default function TelemetryDashboard() {
 													{Math.round(core.totalUsage)}%
 												</span>
 											</motion.button>);
-        '/* "Renders an array of interactive buttons, each visually representing a core\'s usage status via an animated progress circle and displaying the corresponding index and percentage." */';
     })}
 								</div>
 							</InteractiveGlassCard>
@@ -883,10 +1021,10 @@ export default function TelemetryDashboard() {
 									</span>
 									<div>
 										{cpuInfo?.features.map((flag)=>{
+        const isSelected = selectedFlag === flag;
         return (<button key={flag} onClick={()=>setSelectedFlag(isSelected ? null : flag)} className={`text-[9px] font-mono px-2 py-1 rounded-md transition-all ${isSelected ? "bg-[#00E0FF] text-[#05050A] font-bold shadow-[0_0_8px_#00E0FF]" : "bg-white/[0.03] border border-white/[0.08] text-slate-300 hover:bg-white/[0.06]"}`}>
 													{flag.toUpperCase()}
 												</button>);
-        '/* "Renders a collection of clickable buttons, one for each CPU feature flag, allowing users to select or deselect the currently active feature." */';
     })}
 									</div>
 
@@ -1007,8 +1145,9 @@ export default function TelemetryDashboard() {
 									{[
         ...Array(32)
     ].map((_, idx)=>{
+        const blockBound = (idx / 32) * 100;
+        const isActive = memoryPercentUsed >= blockBound;
         return (<div key={idx} className={`aspect-square rounded-sm border transition-all duration-500 ${isActive ? "bg-linear-to-tr from-[#8B5CF6] to-[#FF2E63] border-[#FF2E63]/30 shadow-[0_0_6px_rgba(255,46,99,0.2)]" : "bg-white/[0.02] border-white/[0.04]"}`}/>);
-        '/* "Generates 32 visual blocks, coloring and styling them based on whether a global memory usage percentage exceeds that block\'s assigned threshold." */';
     })}
 								</div>
 								<span>
@@ -1537,75 +1676,440 @@ export async function getActiveTabInfo(): Promise<{
     title?: string;
     url?: string;
 }> {
-    '/* "1. Active Tab Information" */';
+    const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+    return {
+        title: tab?.title,
+        url: tab?.url
+    };
 }
 export async function createNewTab(args: ToolArguments["createNewTab"]): Promise<Browser.tabs.Tab> {
-    '/* "2. Create New Tab" */';
+    return await browser.tabs.create({
+        url: args.url
+    });
 }
 export async function browser_navigate(args: ToolArguments["browser_navigate"]): Promise<Browser.tabs.Tab | undefined> {
-    '/* "3. Navigate Browser Current Tab" */';
+    const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+    if (!tab || !tab.id) {
+        throw new Error("No active tab found to navigate.");
+    }
+    return await browser.tabs.update(tab.id, {
+        url: args.url
+    });
 }
 export async function click_interactive_element(args: ToolArguments["click_interactive_element"]): Promise<{
     success: boolean;
     message: string;
 } | undefined> {
-    '/* "4. Click Interactive Element\\n * Walk the DOM to prevent XPath string parsing errors and dispatch custom bubbling MouseEvents." */';
+    const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+    if (!tab || !tab.id) {
+        return {
+            success: false,
+            message: "No active tab found."
+        };
+    }
+    try {
+        const [{ result }] = await browser.scripting.executeScript({
+            target: {
+                tabId: tab.id
+            },
+            args: [
+                args.text ?? null,
+                args.selector ?? null
+            ],
+            func: (text, selector)=>{
+                let element: HTMLElement | null = null;
+                if (text) {
+                    const sanitizedText = text.trim().toLowerCase();
+                    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT, {
+                        acceptNode: (node: Node)=>{
+                            const el = node as HTMLElement;
+                            const tag = el.tagName.toLowerCase();
+                            if ([
+                                "script",
+                                "style",
+                                "noscript"
+                            ].includes(tag)) {
+                                return NodeFilter.FILTER_REJECT;
+                            }
+                            const valueAttr = el.getAttribute("value") || "";
+                            const placeholderAttr = el.getAttribute("placeholder") || "";
+                            const ariaLabel = el.getAttribute("aria-label") || "";
+                            const elementText = (el.innerText || "").toLowerCase();
+                            if (elementText.includes(sanitizedText) || valueAttr.toLowerCase().includes(sanitizedText) || placeholderAttr.toLowerCase().includes(sanitizedText) || ariaLabel.toLowerCase().includes(sanitizedText)) {
+                                return NodeFilter.FILTER_ACCEPT;
+                            }
+                            return NodeFilter.FILTER_SKIP;
+                        }
+                    });
+                    let currentNode = walker.nextNode();
+                    while(currentNode){
+                        element = currentNode as HTMLElement;
+                        currentNode = walker.nextNode();
+                    }
+                }
+                if (!element && selector) {
+                    element = document.querySelector(selector);
+                }
+                if (element) {
+                    const mousedown = new MouseEvent("mousedown", {
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    const mouseup = new MouseEvent("mouseup", {
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    const click = new MouseEvent("click", {
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    element.dispatchEvent(mousedown);
+                    element.dispatchEvent(mouseup);
+                    element.dispatchEvent(click);
+                    return {
+                        success: true,
+                        message: `Dispatched full click event flow to targeted target element.`
+                    };
+                }
+                return {
+                    success: false,
+                    message: "Target DOM element was not found."
+                };
+            }
+        });
+        return result;
+    } catch (error: any) {
+        return {
+            success: false,
+            message: `Execution failed: ${error?.message || error}`
+        };
+    }
 }
 export async function get_highlighted_text(): Promise<{
     text: string;
 }> {
-    '/* "5. Get Highlighted Text" */';
+    const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+    if (!tab || !tab.id) return {
+        text: ""
+    };
+    try {
+        const [{ result }] = await browser.scripting.executeScript({
+            target: {
+                tabId: tab.id
+            },
+            func: ()=>window.getSelection()?.toString() || ""
+        });
+        return {
+            text: result || ""
+        };
+    } catch  {
+        return {
+            text: ""
+        };
+    }
 }
 export async function web_search(args: ToolArguments["web_search"]): Promise<Array<{
     title: string;
     url: string;
     snippet: string;
 }>> {
-    '/* "6. Web Search\\n * Queries DuckDuckGo HTML version inside the background script to gather snippet results without API keys." */';
+    try {
+        const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(args.query)}`;
+        const response = await fetch(searchUrl, {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            }
+        });
+        const html = await response.text();
+        const results: Array<{
+            title: string;
+            url: string;
+            snippet: string;
+        }> = [];
+        const resultRegExp = /<a\s+class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]*?<a\s+class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi;
+        let match;
+        let count = 0;
+        while((match = resultRegExp.exec(html)) !== null && count < 5){
+            let url = match[1];
+            if (url.startsWith("//duckduckgo.com/l/?uddg=")) {
+                const searchParams = new URLSearchParams(url.split("?")[1]);
+                url = searchParams.get("uddg") || url;
+            }
+            const title = match[2].trim().replace(/&amp;/g, "&").replace(/&quot;/g, '"');
+            const snippet = match[3].trim().replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"');
+            results.push({
+                title,
+                url,
+                snippet
+            });
+            count++;
+        }
+        return results;
+    } catch (error) {
+        return [
+            {
+                title: "Search Error",
+                url: "",
+                snippet: "Failed to execute background web fetch."
+            }
+        ];
+    }
 }
 export async function read_readable_content(): Promise<{
     content: string;
 }> {
-    '/* "7. Read Readable Content\\n * Pulls body text and cleans non-content tags." */';
+    const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+    if (!tab || !tab.id) throw new Error("No active tab found.");
+    try {
+        const [{ result }] = await browser.scripting.executeScript({
+            target: {
+                tabId: tab.id
+            },
+            func: ()=>{
+                const bodyClone = document.body.cloneNode(true) as HTMLElement;
+                const selectorsToRemove = [
+                    "script",
+                    "style",
+                    "noscript",
+                    "iframe",
+                    "header",
+                    "footer",
+                    "nav",
+                    "aside",
+                    ".nav",
+                    ".footer",
+                    "#footer",
+                    ".sidebar",
+                    "#sidebar",
+                    "form",
+                    "button",
+                    "input"
+                ];
+                selectorsToRemove.forEach((selector)=>{
+                    bodyClone.querySelectorAll(selector).forEach((el)=>el.remove());
+                });
+                const rawText = bodyClone.innerText || bodyClone.textContent || "";
+                const cleanText = rawText.replace(/\s+/g, " ").replace(/\n+/g, "\n").trim();
+                return cleanText.substring(0, 10000);
+            }
+        });
+        return {
+            content: result || ""
+        };
+    } catch (error: any) {
+        return {
+            content: `Error extracting page body: ${error?.message}`
+        };
+    }
 }
 export async function export_session_auth(args: ToolArguments["export_session_auth"]): Promise<{
     cookies: string;
 }> {
-    '/* "8. Export Session Cookies" */';
+    const cookies = await browser.cookies.getAll({
+        domain: args.domain
+    });
+    const cookieString = cookies.map((cookie)=>`${cookie.name}=${cookie.value}`).join("; ");
+    return {
+        cookies: cookieString
+    };
 }
 export async function organize_tabs(args: ToolArguments["organize_tabs"]): Promise<{
     success: boolean;
     closedCount: number;
 }> {
+    const allTabs = await browser.tabs.query({});
+    const tabsToGroup: number[] = [];
+    const tabsToClose: number[] = [];
     const normalizeUrl = (u: string)=>{
-        '/* "Extracts the hostname from a given URL string, returning the original string if parsing fails." */';
+        try {
+            return new URL(u).hostname;
+        } catch  {
+            return u;
+        }
     };
-    '/* "9. Organize and Group Tabs" */';
+    const targetHosts = args.urls_to_group.map(normalizeUrl);
+    for (const tab of allTabs){
+        if (!tab.id) continue;
+        const tabHost = normalizeUrl(tab.url || "");
+        const isTarget = targetHosts.some((target)=>tabHost.includes(target));
+        if (isTarget) {
+            tabsToGroup.push(tab.id);
+        } else if (!tab.pinned) {
+            tabsToClose.push(tab.id);
+        }
+    }
+    if (tabsToGroup.length > 0) {
+        const groupId = await browser.tabs.group({
+            tabIds: tabsToGroup as [number, ...number[]]
+        });
+        await browser.tabGroups.update(groupId, {
+            title: args.group_name,
+            color: args.color || "blue"
+        });
+    }
+    if (tabsToClose.length > 0) {
+        await browser.tabs.remove(tabsToClose);
+    }
+    return {
+        success: true,
+        closedCount: tabsToClose.length
+    };
 }
 export async function get_system_metrics(): Promise<{
     cpuModel: string;
     availableMemoryGB: number;
     totalMemoryGB: number;
 }> {
-    '/* "10. System Metrics" */';
+    const cpuInfo = await browser.system.cpu.getInfo();
+    const memInfo = await browser.system.memory.getInfo();
+    const totalMemoryGB = Math.round((memInfo.capacity / (1024 * 1024 * 1024)) * 100) / 100;
+    const availableMemoryGB = Math.round((memInfo.availableCapacity / (1024 * 1024 * 1024)) * 100) / 100;
+    return {
+        cpuModel: cpuInfo.modelName,
+        availableMemoryGB,
+        totalMemoryGB
+    };
 }
 export async function create_monitoring_alarm(args: ToolArguments["create_monitoring_alarm"]): Promise<{
     success: boolean;
 }> {
-    '/* "11. Monitoring Alarms" */';
+    await browser.storage.local.set({
+        [`alarm_config_${args.alarm_name}`]: {
+            url: args.url,
+            selector: args.selector
+        }
+    });
+    await browser.alarms.create(args.alarm_name, {
+        periodInMinutes: args.interval_minutes
+    });
+    return {
+        success: true
+    };
 }
 export async function get_user_profile(): Promise<{
     success: boolean;
     profile?: any;
     error?: string;
 }> {
-    '/* "12. Get Stored User Autofill Profile" */';
+    try {
+        const result = await browser.storage.sync.get("agent_user_autofill_profile");
+        const profile = result["agent_user_autofill_profile"];
+        return {
+            success: true,
+            profile: profile || null
+        };
+    } catch (err: any) {
+        return {
+            success: false,
+            error: err?.message || String(err)
+        };
+    }
 }
 export async function fill_form_fields(args: ToolArguments["fill_form_fields"]): Promise<{
     success: boolean;
     message: string;
 }> {
-    '/* "13. Fill Form Fields\\n * Dynamically queries active DOM inputs and applies simulated input events\\n * to bypass modern reactive framework state-locks." */';
+    const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+    if (!tab || !tab.id) {
+        return {
+            success: false,
+            message: "No active tab found."
+        };
+    }
+    const sanitizedFields = args.fields.map((field)=>({
+            selector: field.selector ?? null,
+            label: field.label ?? null,
+            value: field.value ?? ""
+        }));
+    try {
+        const [{ result }] = await browser.scripting.executeScript({
+            target: {
+                tabId: tab.id
+            },
+            args: [
+                sanitizedFields
+            ],
+            func: (fields)=>{
+                let filledCount = 0;
+                const failures: string[] = [];
+                for (const field of fields){
+                    let element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null = null;
+                    if (field.selector) {
+                        element = document.querySelector(field.selector);
+                    }
+                    if (!element && field.label) {
+                        const queryText = field.label.trim().toLowerCase();
+                        const labels = Array.from(document.querySelectorAll("label"));
+                        for (const label of labels){
+                            if (label.innerText.toLowerCase().includes(queryText)) {
+                                if (label.htmlFor) {
+                                    element = document.getElementById(label.htmlFor) as any;
+                                } else {
+                                    element = label.querySelector("input, textarea, select");
+                                }
+                                if (element) break;
+                            }
+                        }
+                        if (!element) {
+                            const inputs = Array.from(document.querySelectorAll("input, textarea, select")) as Array<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>;
+                            for (const input of inputs){
+                                const placeholder = input.getAttribute("placeholder") || "";
+                                const name = input.getAttribute("name") || "";
+                                const ariaLabel = input.getAttribute("aria-label") || "";
+                                if (placeholder.toLowerCase().includes(queryText) || name.toLowerCase().includes(queryText) || ariaLabel.toLowerCase().includes(queryText)) {
+                                    element = input;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (element) {
+                        element.value = field.value;
+                        element.dispatchEvent(new Event("input", {
+                            bubbles: true
+                        }));
+                        element.dispatchEvent(new Event("change", {
+                            bubbles: true
+                        }));
+                        filledCount++;
+                    } else {
+                        failures.push(field.label || field.selector || "unidentified field");
+                    }
+                }
+                return {
+                    success: filledCount > 0,
+                    message: `Successfully filled ${filledCount}/${fields.length} fields.${failures.length > 0 ? " Missing: " + failures.join(", ") : ""}`
+                };
+            }
+        });
+        return result as {
+            success: boolean;
+            message: string;
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            message: `Script injection failed: ${error?.message || error}`
+        };
+    }
 }
 export async function list_all_tabs(): Promise<Array<{
     id?: number;
@@ -1614,7 +2118,14 @@ export async function list_all_tabs(): Promise<Array<{
     active: boolean;
     windowId: number;
 }>> {
-    '/* "14. List All Opened Tabs\\n * Queries and gathers structured metadata for all open tabs in the browser." */';
+    const tabs = await browser.tabs.query({});
+    return tabs.map((tab)=>({
+            id: tab.id,
+            title: tab.title,
+            url: tab.url,
+            active: tab.active,
+            windowId: tab.windowId
+        }));
 }
 
 ```
@@ -1624,14 +2135,30 @@ export async function list_all_tabs(): Promise<Array<{
 ```typescript
 import type { ToolArguments } from "./basicTools";
 export async function compose_gmail_window(args: ToolArguments["compose_gmail_window"]): Promise<Browser.tabs.Tab> {
-    '/* "1. Compose Gmail Window\\n * Launches a pre-populated draft compose window in a new tab." */';
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(args.to)}&su=${encodeURIComponent(args.subject)}&body=${encodeURIComponent(args.body)}${args.cc ? `&cc=${encodeURIComponent(args.cc)}` : ""}${args.bcc ? `&bcc=${encodeURIComponent(args.bcc)}` : ""}`;
+    return await browser.tabs.create({
+        url
+    });
 }
 export async function schedule_google_calendar(args: ToolArguments["schedule_google_calendar"]): Promise<Browser.tabs.Tab> {
     const formatTime = (isoStr: string)=>isoStr.replace(/[-:]/g, "");
-    '/* "2. Schedule Google Calendar\\n * Populates an event draft onto Google Calendar\'s web interface." */';
+    const datesParam = `${formatTime(args.start_datetime)}/${formatTime(args.end_datetime)}`;
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(args.title)}&dates=${datesParam}&details=${encodeURIComponent(args.details || "")}&location=${encodeURIComponent(args.location || "")}`;
+    return await browser.tabs.create({
+        url
+    });
 }
 export async function create_google_workspace_file(args: ToolArguments["create_google_workspace_file"]): Promise<Browser.tabs.Tab> {
-    '/* "3. Create Google Workspace File\\n * Directs the browser to Google\'s fast-creation workspace shortcuts." */';
+    const mapping = {
+        document: "https://docs.new",
+        spreadsheet: "https://sheets.new",
+        presentation: "https://slides.new",
+        form: "https://forms.new"
+    } as const;
+    const url = mapping[args.app_type] || "https://docs.new";
+    return await browser.tabs.create({
+        url
+    });
 }
 
 ```
@@ -1659,11 +2186,28 @@ interface ChatMagneticBtnProps {
     disabled: boolean;
 }
 const MagneticButton = ({ children, onClick, type = "button", className = "", disabled = false }: ChatMagneticBtnProps)=>{
+    const ref = useRef<HTMLButtonElement>(null);
+    const xSpring = useSpring(0, {
+        stiffness: 180,
+        damping: 12,
+        mass: 0.5
+    });
+    const ySpring = useSpring(0, {
+        stiffness: 180,
+        damping: 12,
+        mass: 0.5
+    });
     const handleMouseMove = (e: React.MouseEvent)=>{
-        '/* "Calculates the distance of a mouse movement from the center of a target element and updates spring values accordingly." */';
+        if (!ref.current || disabled) return;
+        const rect = ref.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        xSpring.set((e.clientX - centerX) * 0.35);
+        ySpring.set((e.clientY - centerY) * 0.35);
     };
     const handleMouseLeave = ()=>{
-        '/* "Executes logic for function handleMouseLeave" */';
+        xSpring.set(0);
+        ySpring.set(0);
     };
     return (<motion.button type={type} ref={ref} onClick={onClick} disabled={disabled} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} whileTap={!disabled ? {
         scale: 0.95
@@ -1675,7 +2219,6 @@ const MagneticButton = ({ children, onClick, type = "button", className = "", di
 				{children}
 			</motion.div>
 		</motion.button>);
-    "/* \"Captures and moves the button's children element in response to the user's mouse position, creating a magnetic effect.\" */";
 };
 const AuroraButton = ({ children, pending }: any)=>(<MagneticButton type="submit" disabled={pending} className={`w-10 h-10 bg-white/5 border border-white/20 hover:bg-white/10 relative overflow-hidden group ${pending ? "cursor-wait" : "cursor-pointer"}`}>
 		<div/>
@@ -1692,14 +2235,69 @@ const AuroraButton = ({ children, pending }: any)=>(<MagneticButton type="submit
 		</div>
 	</MagneticButton>);
 const FormSubmitButton = ()=>{
+    const { pending } = useFormStatus();
     return (<AuroraButton pending={pending} className={pending ? "cursor-wait" : "cursor-pointer"}>
 			<Send size={16}/>
 		</AuroraButton>);
-    '/* "Renders a submit button that visually changes state to indicate whether the form submission is currently in progress." */';
 };
 const MessageBubble = ({ message }: {
     message: Message;
 })=>{
+    "use memo";
+    const isAI = message.role === "assistant";
+    const isTool = message.role === "tool";
+    const isSystem = message.role === "system";
+    if (isSystem) {
+        return (<motion.div initial={{
+            opacity: 0,
+            y: 15,
+            scale: 0.98
+        }} animate={{
+            opacity: 1,
+            y: 0,
+            scale: 1
+        }}>
+				<div>
+					<div>
+						<div>
+							<ServerCog size={10}/>
+						</div>
+					</div>
+					<div>
+						Webpage Content:{" "}
+						<ReactMarkdown>
+							{message.content.substring(0, 212).trim()}
+						</ReactMarkdown>
+						...
+					</div>
+				</div>
+			</motion.div>);
+    }
+    if (isTool) {
+        return (<motion.div initial={{
+            opacity: 0,
+            y: 15,
+            scale: 0.98
+        }} animate={{
+            opacity: 1,
+            y: 0,
+            scale: 1
+        }}>
+				<div>
+					<div>
+						<div>
+							<Wrench size={10}/>
+						</div>
+						<span>
+							Executed: {message.toolsUsed}
+						</span>
+					</div>
+					<div>
+						<ReactMarkdown>{message.content}</ReactMarkdown>
+					</div>
+				</div>
+			</motion.div>);
+    }
     return (<motion.div initial={{
         opacity: 0,
         y: 15,
@@ -1737,9 +2335,31 @@ const MessageBubble = ({ message }: {
 					</div>)}
 			</div>
 		</motion.div>);
-    '/* "Renders a dynamic message bubble component, adapting its layout and visual styling based on the message\'s role, whether it is a system directive, a tool execution result, or a conversational utterance." */';
 };
 const ChatInterface = ()=>{
+    const [isToolMode, setIsToolMode] = useState(false);
+    const [isThinkingEnabled, setIsThinkingEnabled] = useState(true);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const formRef = useRef<HTMLFormElement>(null);
+    const [isPageContextEnabled, setIsPageContextEnabled] = useState(true);
+    const { data: currentPageContext } = useBrowserCurrentActiveTab();
+    const tabActive = useActiveTab();
+    const { messages: freshMessages, sendMessage, isStreaming, activeTool } = useOllamaChatStream({
+        isToolMode
+    });
+    const messages = useDeferredValue(freshMessages);
+    const [, submitAction, isPending] = useActionState(async (prevState: any, formData: FormData)=>{
+        const text = formData.get("message") as string;
+        if (!text || !text.trim()) return prevState;
+        formRef.current?.reset();
+        await sendMessage(text.trim(), {
+            url: tabActive?.url || "",
+            title: currentPageContext?.title || "",
+            enabled: isPageContextEnabled
+        });
+        return null;
+    }, null);
+    const currenLLMModel = useOllamaSelectedModelRead();
     return (<div>
 			<div/>
 			<div/>
@@ -1790,7 +2410,8 @@ const ChatInterface = ()=>{
 						</div>
 
 						<div onClick={()=>{
-        '/* "Executes logic for function ChatInterface" */';
+        setIsToolMode((prevMode)=>!prevMode);
+        setIsThinkingEnabled(true);
     }}>
 							<motion.div layout animate={{
         x: isToolMode ? 38 : 0
@@ -1882,7 +2503,11 @@ const ChatInterface = ()=>{
 
 							{}
 							<button type="button" disabled={isToolMode || isStreaming || isPending} onClick={()=>{
-        '/* "Toggles the \\"thinking\\" status for the chat interface, enabling it if tool mode is active." */';
+        if (isToolMode) {
+            setIsThinkingEnabled(true);
+        } else {
+            setIsThinkingEnabled((prevThinkMode)=>!prevThinkMode);
+        }
     }} className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300 cursor-pointer relative z-10 ${isThinkingEnabled ? "bg-[rgba(0,224,255,0.1)] border-[#00E0FF]/40 text-[#00E0FF] shadow-[0_0_15px_rgba(0,224,255,0.2)]" : "bg-white/5 border-white/10 text-[#64748B] hover:text-[#94A3B8] hover:bg-white/10"}`}>
 								<BrainCircuit size={18} className={`transition-transform duration-500 ${isThinkingEnabled ? "scale-110 animate-pulse" : "scale-100"}`}/>
 							</button>
@@ -1914,7 +2539,6 @@ const ChatInterface = ()=>{
 				</div>
 			</div>
 		</div>);
-    '/* "Renders a customizable chat interface that allows users to interact with an LLM by toggling between standard inference and agentic tool mode while managing contextual inputs like browser data and deep thinking settings." */';
 };
 export default ChatInterface;
 
@@ -1941,32 +2565,90 @@ interface TypewriterOptions {
     speedMs?: number;
 }
 export function useSmoothTypewriter(targetText: string, options: TypewriterOptions = {}) {
+    const { speedMs = 15 } = options;
+    const [displayedText, setDisplayedText] = useState("");
+    const indexRef = useRef(0);
+    const requestRef = useRef<number | null>(null);
+    const lastUpdateTimeRef = useRef(0);
     useEffect(()=>{
-        '/* "When the target text is cleared, this effect resets the display state and cancels any active animation frames." */';
+        if (!targetText) {
+            setDisplayedText("");
+            indexRef.current = 0;
+            lastUpdateTimeRef.current = 0;
+            if (requestRef.current) {
+                cancelAnimationFrame(requestRef.current);
+                requestRef.current = null;
+            }
+        }
     }, [
         targetText
     ]);
     useEffect(()=>{
+        if (!targetText) return;
         const animate = (timestamp: number)=>{
-            '/* "Controls the sequential display of target text by calculating incremental updates based on time elapsed and rendering the progressing substring." */';
+            if (!lastUpdateTimeRef.current) {
+                lastUpdateTimeRef.current = timestamp;
+            }
+            const elapsed = timestamp - lastUpdateTimeRef.current;
+            if (elapsed >= speedMs) {
+                const remainingChars = targetText.length - indexRef.current;
+                if (remainingChars > 0) {
+                    const step = Math.max(1, Math.min(remainingChars, Math.ceil(remainingChars / 12)));
+                    indexRef.current += step;
+                    startTransition(()=>{
+                        setDisplayedText(targetText.slice(0, indexRef.current));
+                    });
+                    lastUpdateTimeRef.current = timestamp;
+                }
+            }
+            if (indexRef.current < targetText.length) {
+                requestRef.current = requestAnimationFrame(animate);
+            } else {
+                requestRef.current = null;
+            }
         };
-        '/* "Asynchronously types out the target text character by character using a requestAnimationFrame loop controlled by a predefined speed." */';
+        if (indexRef.current < targetText.length && !requestRef.current) {
+            requestRef.current = requestAnimationFrame(animate);
+        }
+        return ()=>{
+            if (requestRef.current) {
+                cancelAnimationFrame(requestRef.current);
+                requestRef.current = null;
+            }
+        };
     }, [
         targetText,
         speedMs
     ]);
-    '/* "--- CUSTOM OLLAMA REACT-QUERY HOOK ---" */';
+    return displayedText;
 }
 interface MagneticWrapperProps {
     children: React.ReactNode;
     className?: string;
 }
 export function MagneticWrapper({ children, className = "" }: MagneticWrapperProps) {
+    const ref = useRef<HTMLDivElement>(null);
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const springConfig = {
+        stiffness: 180,
+        damping: 12
+    };
+    const springX = useSpring(x, springConfig);
+    const springY = useSpring(y, springConfig);
     const handleMouseMove = (e: React.MouseEvent)=>{
-        '/* "Calculates the mouse position relative to the center of a targeted element and updates internal state coordinates based on the deviation." */';
+        if (!ref.current) return;
+        const rect = ref.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const deltaX = e.clientX - centerX;
+        const deltaY = e.clientY - centerY;
+        x.set(deltaX * 0.35);
+        y.set(deltaY * 0.35);
     };
     const handleMouseLeave = ()=>{
-        '/* "Executes logic for function handleMouseLeave" */';
+        x.set(0);
+        y.set(0);
     };
     return (<div ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className={`relative cursor-pointer select-none ${className}`}>
 			<motion.div style={{
@@ -1978,7 +2660,6 @@ export function MagneticWrapper({ children, className = "" }: MagneticWrapperPro
 				{children}
 			</motion.div>
 		</div>);
-    '/* "--- MAGNETIC PHYSICS WRAPPER ---" */';
 }
 interface AppleGlowBorderProps {
     children: React.ReactNode;
@@ -2013,7 +2694,6 @@ export function AppleGlowBorder({ children, isActive, className = "" }: AppleGlo
 				{children}
 			</div>
 		</div>);
-    '/* "--- APPLE / SIRI INTELLIGENCE GLOW BORDER ---" */';
 }
 const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
     item: NewsItem;
@@ -2021,6 +2701,14 @@ const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
     onToggleExpand: () => void;
     onAnalyze: () => void;
 })=>{
+    const itemDate = new Date(item.pubDate);
+    const formattedDate = itemDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+    const sourceColorClass = item.source === "Google News" ? "bg-[#00E0FF]/10 text-[#00E0FF] border-[#00E0FF]/20" : item.source === "Yahoo News" ? "bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20" : "bg-[#FF2E63]/10 text-[#FF2E63] border-[#FF2E63]/20";
     return (<motion.article layout="position" initial={{
         opacity: 0,
         y: 12
@@ -2084,7 +2772,6 @@ const NewsCard = ({ item, isExpanded, onToggleExpand, onAnalyze }: {
     }}/>
 				</motion.div>)}
 		</motion.article>);
-    '/* "Renders a dynamic news item card, displaying source, date, title, links, and a preview of the description while managing expand/collapse states." */';
 };
 interface OllamaChatDrawerProps {
     newsItems: NewsItem[];
@@ -2092,20 +2779,137 @@ interface OllamaChatDrawerProps {
     onClose: () => void;
 }
 function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
+    const { mutate: askOllama, isPending, isStreaming, streamedText } = useOllamaNewsAgent();
+    const [freshMsg, setMessages] = useState<ChatMessage[]>([]);
+    const [input, setInput] = useState("");
+    const [apiError, setApiError] = useState<string | null>(null);
+    const threadEndRef = useRef<HTMLDivElement>(null);
+    const messages = useDeferredValue(freshMsg);
+    const animatedStreamedText = useSmoothTypewriter(streamedText, {
+        speedMs: 12
+    });
+    const displayMessages = useMemo(()=>{
+        const isCurrentlyStreaming = isStreaming && streamedText;
+        if (isCurrentlyStreaming) {
+            return [
+                ...messages,
+                {
+                    role: "assistant" as const,
+                    content: animatedStreamedText || "..."
+                }
+            ];
+        }
+        if (isPending && !streamedText) {
+            return [
+                ...messages,
+                {
+                    role: "assistant" as const,
+                    content: "..."
+                }
+            ];
+        }
+        return messages;
+    }, [
+        messages,
+        isStreaming,
+        streamedText,
+        animatedStreamedText,
+        isPending
+    ]);
     useEffect(()=>{
-        '/* "It generates a tailored prompt—either for a single article or a bulk feed—and sends it to an AI service to generate a synthesized news summary." */';
+        if (newsItems.length > 0) {
+            setMessages([]);
+            setApiError(null);
+            const systemPrompt = "You are a professional local news intelligence agent. Formulate dense, objective summaries.";
+            let prompt = "";
+            if (mode === "single" && newsItems.length === 1) {
+                const item = newsItems[0];
+                prompt = `Generate a concise 3-sentence summary of this news article. Use bullet points for key implications if relevant.
+Title: ${item.title}
+Source: ${item.source}
+Context: ${item.descHTML || ""}`.trim();
+            } else {
+                const truncatedList = newsItems.slice(0, 6);
+                const formattedArticles = truncatedList.map((item, idx)=>`[Article #${idx + 1}] Source: ${item.source}\nTitle: ${item.title}\nContext: ${item.descHTML ? item.descHTML.replace(/<[^>]*>/g, "").substring(0, 200) : "No context"}`).join("\n\n");
+                prompt = `You are analyzing a live stream of news updates. Synthesize the following news articles into a single, cohesive brief. 
+Identify the top 3 overarching narratives or key trends in the news right now. Organize them using concise bullet points under thematic headers.
+
+Articles to analyze:
+${formattedArticles}`.trim();
+            }
+            askOllama({
+                prompt,
+                system: systemPrompt
+            }, {
+                onSuccess: (summary)=>{
+                    setMessages([
+                        {
+                            role: "assistant",
+                            content: summary
+                        }
+                    ]);
+                },
+                onError: (err)=>{
+                    setApiError(err.message);
+                }
+            });
+        }
     }, [
         newsItems,
         mode,
         askOllama
     ]);
+    const scrollToLastMessage = useEffectEvent(()=>{
+        threadEndRef.current?.scrollIntoView?.({
+            behavior: "smooth"
+        });
+    });
     useEffect(()=>{
-        '/* "Executes logic for function anonymous_arrow" */';
+        scrollToLastMessage();
     }, [
         displayMessages
     ]);
     const handleSendMessage = (e: React.FormEvent)=>{
-        '/* "The function processes and validates a user\'s message, updates the local chat history, constructs a detailed contextual prompt including conversation logs and background information, and then calls an API to generate an assistant response." */';
+        e.preventDefault();
+        if (!input.trim() || isPending) return;
+        const userMsg: ChatMessage = {
+            role: "user",
+            content: input
+        };
+        const updatedHistory = [
+            ...messages,
+            userMsg
+        ];
+        setMessages(updatedHistory);
+        setInput("");
+        setApiError(null);
+        const formattedHistory = updatedHistory.map((m)=>`${m.role === "user" ? "User" : "Assistant"}: ${m.content}`).join("\n");
+        const contextualScope = mode === "single" ? `Article Context: ${newsItems[0]?.title} - ${newsItems[0]?.descHTML || ""}` : `Analyzed Stream Context: ${newsItems.map((item)=>item.title).join(", ")}`;
+        const chatPrompt = `Scope of conversation:
+${contextualScope}
+
+Conversation logs:
+${formattedHistory}
+
+Assistant: Respond to the last User query directly, incorporating intelligence context when useful.
+Today's date and time is ${new Date().toString()}
+`.trim();
+        askOllama({
+            prompt: chatPrompt
+        }, {
+            onSuccess: (reply)=>{
+                setMessages((prev)=>[
+                        ...prev,
+                        {
+                            role: "assistant",
+                            content: reply
+                        }
+                    ]);
+            },
+            onError: (err)=>{
+                setApiError(err.message);
+            }
+        });
     };
     return (<motion.div initial={{
         y: "100%"
@@ -2171,6 +2975,8 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
 					</div>)}
 
 				<LegendList data={displayMessages} renderItem={({ item })=>{
+        const msg = item;
+        const isUser = msg.role === "user";
         return (<motion.div initial={{
             opacity: 0,
             y: 8
@@ -2182,7 +2988,6 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
 									<ReactMarkdown>{msg.content}</ReactMarkdown>
 								</div>
 							</motion.div>);
-        '/* "Renders a chat message item, styling it to the end or start of the container depending on whether the message originated from a user." */';
     }} keyExtractor={(item, idx)=>idx + item.role} maintainScrollAtEnd showsVerticalScrollIndicator={true} recycleItems style={{
         scrollbarWidth: "none"
     }} ItemSeparatorComponent={()=><div/>} ListFooterComponent={<div/>}/>
@@ -2205,7 +3010,6 @@ function OllamaChatDrawer({ newsItems, mode, onClose }: OllamaChatDrawerProps) {
 				</AppleGlowBorder>
 			</form>
 		</motion.div>);
-    '/* "--- CHAT SHEET / BOTTOM DRAWER FOR SINGLE OR BULK SUMMARIES ---" */';
 }
 export default function NewsDashboard() {
     const queryResults = useNewsInternationalFeeds();
@@ -2219,17 +3023,56 @@ export default function NewsDashboard() {
     const [activeChatItems, setActiveChatItems] = useState<NewsItem[]>([]);
     const [googleQuery, yahooQuery, bbcQuery] = queryResults;
     const handleRefetchAll = async ()=>{
-        '/* "Refetches data from multiple asynchronous queries simultaneously to ensure data freshness across different data sources." */';
+        await Promise.all([
+            googleQuery.refetch(),
+            yahooQuery.refetch(),
+            bbcQuery.refetch()
+        ]);
     };
     const uniqueItems = useMemo(()=>{
-        '/* "Aggregates news items from Google, Yahoo, and BBC sources, appending a source field to each item before filtering the results to ensure only unique entries are returned based on ID or link." */';
+        const rawGoogle = (googleQuery.data || []).map((item)=>({
+                ...item,
+                source: "Google News"
+            }));
+        const rawYahoo = (yahooQuery.data || []).map((item)=>({
+                ...item,
+                source: "Yahoo News"
+            }));
+        const rawBbc = (bbcQuery.data || []).map((item)=>({
+                ...item,
+                source: "BBC News"
+            }));
+        const unified = [
+            ...rawGoogle,
+            ...rawYahoo,
+            ...rawBbc
+        ];
+        const uniqueMap = new Map<string, NewsItem>();
+        unified.forEach((item)=>{
+            const key = item.id || item.link;
+            if (!uniqueMap.has(key)) {
+                uniqueMap.set(key, item);
+            }
+        });
+        return Array.from(uniqueMap.values());
     }, [
         googleQuery.data,
         yahooQuery.data,
         bbcQuery.data
     ]);
     const filteredAndSortedBase = useMemo(()=>{
-        '/* "Filters a unique set of items based on an active source and then sorts the result either by newest or oldest publication date." */';
+        let list = [
+            ...uniqueItems
+        ];
+        if (activeSource !== "all") {
+            list = list.filter((item)=>item.source.trim().toLowerCase().includes(activeSource.trim().toLowerCase()));
+        }
+        list.sort((a, b)=>{
+            const dateA = new Date(a.pubDate).getTime();
+            const dateB = new Date(b.pubDate).getTime();
+            return sortBy === "newest" ? dateB - dateA : dateA - dateB;
+        });
+        return list;
     }, [
         uniqueItems,
         activeSource,
@@ -2248,7 +3091,7 @@ export default function NewsDashboard() {
     });
     const finalFeed = useDeferredValue(freshFeed);
     const finalFeedItems = useMemo(()=>{
-        '/* "Executes logic for function finalFeedItems" */';
+        return (finalFeed || []).map((f)=>f.item);
     }, [
         finalFeed
     ]);
@@ -2256,10 +3099,15 @@ export default function NewsDashboard() {
     const isInitialLoading = googleQuery.isLoading && yahooQuery.isLoading && bbcQuery.isLoading;
     const isError = googleQuery.isError && yahooQuery.isError && bbcQuery.isError;
     const handleSummarizeEntireFeed = ()=>{
-        '/* "Sets the chat mode to bulk and activates the specified feed items when the feed is not empty." */';
+        if (finalFeedItems.length === 0) return;
+        setChatMode("bulk");
+        setActiveChatItems(finalFeedItems);
     };
     const handleSummarizeSingleCard = (item: NewsItem)=>{
-        '/* "Executes logic for function handleSummarizeSingleCard" */';
+        setChatMode("single");
+        setActiveChatItems([
+            item
+        ]);
     };
     const ollamaLLMActive = useOllamaSelectedModelRead();
     return (<div>
@@ -2324,12 +3172,15 @@ export default function NewsDashboard() {
         "Yahoo News",
         "BBC News"
     ] as const).map((source)=>{
+        const label = source === "all" ? "All" : source.split(" ")[0];
+        const isSelected = activeSource === source;
         return (<button key={source} onClick={()=>{
-            '/* "Initiates a state update for the active source within a transition to ensure smooth UI rendering." */';
+            startTransition(()=>{
+                setActiveSource(source);
+            });
         }} className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-200 cursor-pointer ${isSelected ? "bg-white/[0.08] text-white shadow-sm border-white/[0.04] border" : "hover:text-slate-200 hover:bg-white/[0.02]"}`}>
 										{label}
 									</button>);
-        '/* "Renders a clickable button representing a data source, updating the active source when clicked." */';
     })}
 					</div>
 
@@ -2386,8 +3237,9 @@ export default function NewsDashboard() {
 					{!isInitialLoading && finalFeed?.length > 0 && (<LegendList data={finalFeed} keyExtractor={({ item })=>`${item.id ?? item.link}-${expandedItemId === (item.id ?? item.link) ? "expanded" : "collapsed"}`} style={{
         height: "100%"
     }} extraData={expandedItemId} contentContainerClassName="pb-[80px] pt-2" recycleItems={true} ItemSeparatorComponent={()=><div/>} renderItem={({ item: news })=>{
+        const item = news.item;
+        const idKey = item.id || item.link;
         return (<NewsCard item={item} isExpanded={expandedItemId === idKey} onToggleExpand={()=>setExpandedItemId(expandedItemId === idKey ? null : idKey)} onAnalyze={()=>handleSummarizeSingleCard(item)}/>);
-        '/* "Renders a dynamic news card using the item data, controlling the card\'s expanded state and providing handlers for toggling the view or requesting a summary." */';
     }}/>)}
 				</AnimatePresence>
 			</div>
@@ -2468,22 +3320,53 @@ const defaultProfile = {
     country: ""
 } satisfies UserProfile;
 async function saveUserProfile(profile: UserProfile): Promise<void> {
-    '/* "Saves the provided user profile data either to browser storage or local storage, depending on environment availability." */';
+    if (typeof browser !== "undefined" && browser.storage) {
+        await browser.storage.sync.set({
+            [STORAGE_KEY]: profile
+        });
+    } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    }
 }
 async function getUserProfile(): Promise<UserProfile> {
-    '/* "Retrieves the user\'s stored profile data either from browser sync storage or local storage, falling back to a default profile if no data is found." */';
+    if (typeof browser !== "undefined" && browser.storage) {
+        const result = await browser.storage.sync.get(STORAGE_KEY);
+        const profile = result[STORAGE_KEY] as UserProfile | undefined;
+        return profile || defaultProfile;
+    } else {
+        const local = localStorage.getItem(STORAGE_KEY);
+        return local ? JSON.parse(local) : defaultProfile;
+    }
 }
 const ProfileSettingsView = ({ setModelState }: {
     setModelState: React.Dispatch<React.SetStateAction<boolean>>;
 })=>{
+    "use memo";
+    const [profile, setProfile] = useState<UserProfile>(defaultProfile);
+    const [isPending, startTransition] = useTransition();
+    const [isSaved, setIsSaved] = useState(false);
     useEffect(()=>{
-        '/* "Executes logic for function ProfileSettingsView" */';
+        getUserProfile().then(setProfile);
     }, []);
     const handleChange = (key: keyof UserProfile, val: string)=>{
-        '/* "Executes logic for function handleChange" */';
+        setProfile((prev)=>({
+                ...prev,
+                [key]: val
+            }));
     };
     const handleSave = ()=>{
-        '/* "Saves the user profile and then initiates a sequence of state transitions including setting a saving indicator and managing form state after delays." */';
+        startTransition(async ()=>{
+            await saveUserProfile(profile);
+            startTransition(()=>{
+                setIsSaved(true);
+                setTimeout(()=>{
+                    setIsSaved(false);
+                }, 2000);
+                setTimeout(()=>{
+                    setModelState(false);
+                }, 2500);
+            });
+        });
     };
     return (<div>
 			{}
@@ -2659,7 +3542,6 @@ const ProfileSettingsView = ({ setModelState }: {
 				</AnimatePresence>
 			</motion.button>
 		</div>);
-    '/* "Renders and manages a form allowing the user to view, edit, and save their personal profile details, including name, contact information, and addresses." */';
 };
 export default ProfileSettingsView;
 
@@ -2681,11 +3563,26 @@ interface MagneticButtonProps {
     onClick?: () => void;
 }
 function MagneticButton({ children, className = "", onClick }: MagneticButtonProps) {
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const mouseX = useSpring(x, {
+        stiffness: 180,
+        damping: 12
+    });
+    const mouseY = useSpring(y, {
+        stiffness: 180,
+        damping: 12
+    });
     function handleMouseMove(e: React.MouseEvent<HTMLButtonElement>) {
-        '/* "Updates internal x and y state variables based on the mouse position relative to the button\'s center point." */';
+        const rect = e.currentTarget.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        x.set((e.clientX - centerX) * 0.35);
+        y.set((e.clientY - centerY) * 0.35);
     }
     function handleMouseLeave() {
-        '/* "Executes logic for function handleMouseLeave" */';
+        x.set(0);
+        y.set(0);
     }
     return (<motion.button onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} style={{
         x: mouseX,
@@ -2695,7 +3592,6 @@ function MagneticButton({ children, className = "", onClick }: MagneticButtonPro
     }}>
 			{children}
 		</motion.button>);
-    '/* "Provides a responsive, magnetic interactive effect to a standard button by calculating mouse displacement from its center and applying dynamic positional transformation." */';
 }
 const navItems = [
     {
@@ -2728,19 +3624,42 @@ const navItems = [
     }
 ] as const;
 export function BottomNav() {
+    const [activeTab, setActiveTab] = useState<(typeof navItems)[number]["id"]>("chat");
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
+    const [inputValue, setInputValue] = useOllamaQuickQuestionState();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const currentTab = navItems.find((t)=>t.id === activeTab);
     useEffect(()=>{
         function handleClickOutside(event: MouseEvent) {
-            '/* "Determines if a click originated outside of the component\'s container and collapses it if true." */';
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsExpanded(false);
+                setIsFocused(false);
+            }
         }
-        '/* "Attaches a mouse click listener to the document to collapse the component state when a click occurs outside its container." */';
+        document.addEventListener("mousedown", handleClickOutside);
+        return ()=>document.removeEventListener("mousedown", handleClickOutside);
     }, []);
     useEffect(()=>{
-        '/* "When the component expands, it sets a 300-millisecond timer to focus the input element, clearing the timer if the component re-renders before it fires." */';
+        if (isExpanded) {
+            const timer = setTimeout(()=>{
+                inputRef.current?.focus();
+            }, 300);
+            return ()=>clearTimeout(timer);
+        }
     }, [
         isExpanded
     ]);
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const [popoverQuery, setPopoverQuery] = useState("");
     const handleSendQuery = ()=>{
-        '/* "Sets the popover query state with the trimmed input value and opens the popover while unfocusing the current element." */';
+        if (!inputValue.trim()) return;
+        startTransition(()=>{
+            setPopoverQuery(inputValue.trim());
+        });
+        setIsPopoverOpen(true);
+        setIsFocused(false);
     };
     return (<div className={`bg-[#05050A] flex items-center justify-center relative overflow-hidden font-sans`}>
 			<div/>
@@ -2806,13 +3725,16 @@ export function BottomNav() {
         delay: 0.1
     }}>
 								<MagneticButton onClick={()=>{
-        '/* "Executes logic for function anonymous_arrow" */';
+        setIsExpanded(false);
+        setIsFocused(false);
     }}>
 									<X/>
 								</MagneticButton>
 
 								<div>
 									{navItems.map((item)=>{
+        const isActive = activeTab === item.id;
+        const Icon = item.icon;
         return (<Link key={item.id} to={item.to} prefetch="render">
 												<MagneticButton key={item.id} onClick={()=>setActiveTab(item.id)}>
 													{isActive && (<motion.div layoutId="wowActiveIndicator" style={{
@@ -2839,7 +3761,6 @@ export function BottomNav() {
         }}/>)}
 												</MagneticButton>
 											</Link>);
-        '/* "Renders a list of navigable items, displaying a dynamic icon and animated indicator that reflects the active navigation state." */';
     })}
 								</div>
 
@@ -2871,7 +3792,9 @@ export function BottomNav() {
 									</motion.div>
 
 									<input required ref={inputRef} type="text" value={inputValue} onChange={(e)=>setInputValue(e.target.value)} onFocus={()=>setIsFocused(true)} onBlur={()=>setIsFocused(false)} onKeyDown={(e)=>{
-        '/* "Invokes the handleSendQuery function when the Enter key is pressed while the element is focused." */';
+        if (e.key === "Enter") {
+            handleSendQuery();
+        }
     }} placeholder="Ask Ollama..."/>
 
 									<AnimatePresence>
@@ -2907,7 +3830,6 @@ export function BottomNav() {
 
 			<OllamaQuickQuestionPopover isOpen={isPopoverOpen} onClose={()=>setIsPopoverOpen(false)} query={popoverQuery}/>
 		</div>);
-    '/* "Renders a dynamic, interactive bottom navigation bar that allows users to switch between predefined topics and input questions for an AI assistant." */';
 }
 
 ```
@@ -2959,13 +3881,15 @@ export const LoadingUI = ({ headerTxt = "Calibrating Pipeline Interface", header
 				</span>
 			</div>
 		</div>);
-    '/* "Renders a stylized loading screen interface featuring dynamic elements and displaying customizable titles and instructions." */';
 };
 export const ErrorUI = ({ headerDescTxt = "The real-time telemetry pipeline requires runtime binding. Ensure this window resides in a Chrome extension popup configured with permission parameters.", copyTextCommand = 'OLLAMA_ORIGINS="*" ollama serve', copyTagTxt = "MV3", copyHeaderTxt = "Manifest Interface Schema", copiedButtonTxt = "Copied Configuration", copyButtonTxt = "Copy Permission Manifest" })=>{
+    const [copyState, setCopyState] = useState(false);
     const handleCopyManifest = ()=>{
+        navigator.clipboard.writeText(copyTextCommand);
+        setCopyState(true);
         setTimeout(()=>setCopyState(false), 2000);
-        '/* "Copies the manifest text to the clipboard and sets a temporary state indicating a successful copy operation." */';
     };
+    const copyButtonTxtNode = copyState ? copiedButtonTxt : copyButtonTxt;
     return (<div>
 			{}
 			<div/>
@@ -3024,7 +3948,6 @@ export const ErrorUI = ({ headerDescTxt = "The real-time telemetry pipeline requ
 				</span>
 			</div>
 		</div>);
-    '/* "Renders an error user interface that displays system status information and provides a button to copy a necessary configuration manifest command." */';
 };
 
 ```
@@ -3047,7 +3970,24 @@ interface PopoverProps {
     query: string;
 }
 function parseInline(raw: string) {
-    '/* "Splits the input string by markdown formatting (bold and inline code) and maps the resulting segments into React elements (`<strong>` or `<code>`) while stripping the surrounding markup." */';
+    "use memo";
+    const boldTokens = raw.split(/(\*\*.*?\*\*)/g);
+    return boldTokens.map((segment, i)=>{
+        if (segment.startsWith("**") && segment.endsWith("**")) {
+            return (<strong key={i}>
+					{segment.slice(2, -2)}
+				</strong>);
+        }
+        const codeTokens = segment.split(/(\`.*?\`)/g);
+        return codeTokens.map((sub, j)=>{
+            if (sub.startsWith("`") && sub.endsWith("`")) {
+                return (<code key={j}>
+						{sub.slice(1, -1)}
+					</code>);
+            }
+            return sub;
+        });
+    });
 }
 export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: PopoverProps) {
     const activeTab = useActiveTab();
@@ -3066,7 +4006,10 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
     });
     const mouseCoords = useDeferredValue(freshCoord);
     useEffect(()=>{
-        '/* "Updates both the edited and submitted query state when the external query state changes." */';
+        if (query) {
+            setEditedQuery(query);
+            setSubmittedQuery(query);
+        }
     }, [
         query
     ]);
@@ -3077,20 +4020,82 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
     });
     const isGenerating = isPending || isFetching;
     const handleRefreshPageContent = async ()=>{
-        '/* "Executes logic for function handleRefreshPageContent" */';
+        await refetchPageContext();
+        triggerInference();
     };
     const handleQuerySubmit = ()=>{
-        '/* "Updates the submitted query state if the input field is not empty after trimming whitespace." */';
+        if (editedQuery.trim()) {
+            setSubmittedQuery(editedQuery.trim());
+        }
     };
     function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-        '/* "Custom refresh trigger for page scrapers" */';
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        startTransition(()=>{
+            setMouseCoords({
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            });
+        });
     }
     const handleCopy = ()=>{
+        if (!responseText) return;
+        navigator.clipboard.writeText(responseText);
+        setCopied(true);
         setTimeout(()=>setCopied(false), 2000);
-        '/* "Copies the current response text to the clipboard and briefly displays a success indicator before resetting it." */';
     };
     const parsedMarkup = useMemo(()=>{
-        '/* "Parses raw markdown text into a structured array of React components, rendering plain paragraphs, headers (H1-H4), and code blocks with copy functionality." */';
+        if (!responseText) return null;
+        const segments = responseText.split(/(```[\s\S]*?```)/g);
+        return segments.map((chunk, idx)=>{
+            if (chunk.startsWith("```")) {
+                const blockMatch = chunk.match(/```(\w*)\n([\s\S]*?)```/);
+                const lang = blockMatch ? blockMatch[1] : "code";
+                const body = blockMatch ? blockMatch[2] : chunk.slice(3, -3);
+                return (<div key={idx}>
+						<div>
+							<span>
+								{lang || "code"}
+							</span>
+							<button onClick={()=>navigator.clipboard.writeText(body)}>
+								<Copy/>
+							</button>
+						</div>
+						<pre>
+							<code>{body.trim()}</code>
+						</pre>
+					</div>);
+            }
+            return (<div key={idx}>
+					{chunk.split("\n").map((line, lIdx)=>{
+                const trimmed = line.trim();
+                if (!trimmed) return <div key={lIdx}/>;
+                if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+                    return (<li key={lIdx}>
+									{parseInline(trimmed.substring(2))}
+								</li>);
+                }
+                if (trimmed.startsWith("### ")) {
+                    return (<h4 key={lIdx}>
+									{parseInline(trimmed.substring(4))}
+								</h4>);
+                }
+                if (trimmed.startsWith("## ")) {
+                    return (<h3 key={lIdx}>
+									{parseInline(trimmed.substring(3))}
+								</h3>);
+                }
+                if (trimmed.startsWith("# ")) {
+                    return (<h2 key={lIdx}>
+									{parseInline(trimmed.substring(2))}
+								</h2>);
+                }
+                return (<p key={lIdx}>
+								{parseInline(trimmed)}
+							</p>);
+            })}
+				</div>);
+        });
     }, [
         responseText
     ]);
@@ -3204,7 +4209,10 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 									</span>
 									<div>
 										<textarea value={editedQuery} onChange={(e)=>setEditedQuery(e.target.value)} onKeyDown={(e)=>{
-        '/* "Intercepts the Enter key press without Shift while suppressing default browser behavior and executes the query submission handler." */';
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleQuerySubmit();
+        }
     }} rows={2} placeholder="Tweak or enter your question here..."/>
 										{editedQuery !== submittedQuery && (<button onClick={handleQuerySubmit}>
 												Apply
@@ -3256,7 +4264,8 @@ export default function OllamaQuickQuestionPopover({ isOpen, onClose, query }: P
 											<div onClick={()=>setIsDropdownOpen(false)}/>
 											<div>
 												{localModels?.map?.((item)=>(<button key={item.name} onClick={()=>{
-            '/* "Executes logic for function anonymous_arrow" */';
+            setSelectedModel(item.name);
+            setIsDropdownOpen(false);
         }} className={`w-full text-left px-3 py-1.5 text-xs font-semibold uppercase hover:bg-white/5 transition-colors ${selectedModel === item.name ? "text-[#8B5CF6]" : "text-[#94A3B8]"}`}>
 														{item.name}
 													</button>))}
@@ -3339,7 +4348,21 @@ import { OLLAMA_BROWSER_EXT_REACTQUERY_KEY } from ".";
 import { useOllamaEndPointRead } from "../store";
 import axios from "axios";
 const useOllamaListModels = ()=>{
-    '/* "Fetches a list of available models from the Ollama API endpoint using React Query." */';
+    const ollamaEndPoint = useOllamaEndPointRead();
+    return useQuery({
+        queryKey: [
+            OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+            "useOllamaListModels",
+            ollamaEndPoint
+        ] as const,
+        queryFn: async ({ signal })=>{
+            return axios.get(`${ollamaEndPoint}/api/tags`, {
+                signal
+            });
+        },
+        staleTime: Infinity,
+        gcTime: 60 * 60 * 1000 * 3
+    });
 };
 export { useOllamaListModels };
 
@@ -3357,13 +4380,17 @@ export { useOllamaListModels, useSystemUsage, useBrowserCurrentActiveTab };
 export const OLLAMA_BROWSER_EXT_REACTQUERY_KEY = "OLLAMA_BROWSER_EXT_REACTQUERY_KEY";
 export const chromeStorageAdapter = {
     getItem: async (key: string): Promise<string | null> =>{
-        '/* "Retrieves a specific item from local browser storage, returning the value as a string if it exists." */';
+        const result = await browser.storage.local.get(key);
+        const value = result[key];
+        return typeof value === "string" ? value : null;
     },
     setItem: async (key: string, value: string)=>{
-        '/* "Executes logic for function chromeStorageAdapter" */';
+        await browser.storage.local.set({
+            [key]: value
+        });
     },
     removeItem: async (key: string)=>{
-        '/* "Executes logic for function chromeStorageAdapter" */';
+        await browser.storage.local.remove(key);
     }
 };
 export const persister = createAsyncStoragePersister({
@@ -3401,7 +4428,31 @@ interface MemoryInfo {
     capacity: number;
 }
 export const useSystemUsage = ()=>{
-    '/* "Retrieves the current CPU and memory usage information from the browser\'s system API, refetching the data periodically." */';
+    return useQuery({
+        queryKey: [
+            OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+            "useSystemUsage"
+        ] as const,
+        queryFn: async ()=>{
+            if (typeof browser === "undefined" || !browser.system || !browser.system.cpu || !browser.system.memory) {
+                throw new Error("System API unavailable in current environment. Verify popup manifests are loaded.");
+            }
+            const getCpuInfo = (): Promise<CpuInfo> =>new Promise((resolve)=>browser.system.cpu.getInfo(resolve));
+            const getMemoryInfo = (): Promise<MemoryInfo> =>new Promise((resolve)=>browser.system.memory.getInfo(resolve));
+            const [cpu, memory] = await Promise.all([
+                getCpuInfo(),
+                getMemoryInfo()
+            ]);
+            return {
+                cpu,
+                memory,
+                timestamp: Date.now()
+            };
+        },
+        refetchInterval: 3012,
+        retry: false,
+        staleTime: Infinity
+    });
 };
 
 ```
@@ -3424,14 +4475,138 @@ interface StreamFuncParams {
     signal: AbortSignal;
 }
 async function* streamAIResponse({ fullPrompt, signal, ollamaEndpoint, ollamaModelName, systemInstruction, thinking }: StreamFuncParams) {
-    '/* "Fetches a streaming response from an Ollama AI model, yielding parsed JSON chunks as they arrive in the data stream." */';
+    const response = await fetch(`${ollamaEndpoint}/api/generate`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: ollamaModelName || "gemma4:latest",
+            stream: true,
+            think: thinking,
+            prompt: fullPrompt,
+            system: systemInstruction
+        }),
+        signal
+    });
+    if (!response.ok) {
+        throw new Error(`Ollama request failed: ${response.statusText}`);
+    }
+    const reader = response.body?.getReader();
+    if (!reader) {
+        throw new Error("No readable stream body found on response.");
+    }
+    const decoder = new TextDecoder();
+    let buffer = "";
+    try {
+        while(true){
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, {
+                stream: true
+            });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+            for (const line of lines){
+                if (line.trim()) {
+                    try {
+                        const data = JSON.parse(line);
+                        yield data;
+                    } catch (e) {
+                        console.warn("Invalid JSON chunk:", line);
+                    }
+                }
+            }
+        }
+    } finally{
+        reader.releaseLock();
+    }
 }
 export const useOllamaQuickAnswer = ({ question, thinking = false, trigger }: {
     question: string;
     thinking?: boolean;
     trigger: boolean;
 })=>{
-    '/* "Asynchronously executes an AI query against a local Ollama instance, feeding the user\'s question and relevant web page content to generate a structured technical answer." */';
+    const ollamaEndPoint = useOllamaEndPointRead();
+    const ollamaModelName = useOllamaSelectedModelRead();
+    const activeTab = useActiveTab();
+    const currentTabURL = activeTab?.url;
+    const { data: pageContext } = useBrowserCurrentActiveTab();
+    const deferredQuestion = useDeferredValue(question?.trim());
+    const docTitle = pageContext?.title || activeTab?.url || "Unknown Page";
+    const docText = pageContext?.text || "";
+    const truncatedText = docText.substring(0, 4512);
+    const fullPrompt = `
+<ROLE>
+Advanced Technical Browser Assistant. 
+Output: DIRECT MARKDOWN ONLY. 
+Constraints: No preamble, no conversational filler, no "Based on the text."
+</ROLE>
+
+<CONTEXT>
+TITLE: "${docTitle}"
+URL: ${activeTab?.url || "N/A"}
+CONTENT: 
+"""
+${truncatedText}
+"""
+</CONTEXT>
+
+<QUERY>
+${deferredQuestion}
+</QUERY>
+
+<INSTRUCTIONS>
+1. Synthesize a premium technical response using the CONTEXT.
+2. Structure with bullet points and nested lists.
+3. Use Markdown code blocks for technical terms or snippets.
+4. If information is missing, state "Data unavailable in current context."
+5. OUTPUT ONLY THE RESPONSE.
+</INSTRUCTIONS>
+`.trim();
+    const systemInstruction = `
+You are an Advanced Technical Browser Assistant. Your purpose is to synthesize highly technical, accurate responses based strictly on the provided web context.
+
+## Output Constraints:
+- Output: DIRECT MARKDOWN ONLY.
+- No preamble, no conversational filler, and no intros like "Based on the text provided..."
+
+## Formatting Rules:
+1. Structure your answers with bullet points and nested lists.
+2. Use Markdown inline code blocks (\`\`) for technical terms, parameters, or short code snippets.
+3. Use Markdown multi-line code blocks (\`\`\`lang) for larger blocks of code.
+4. OUTPUT ONLY THE FINAL RESPONSE.
+`.trim();
+    return useQuery({
+        queryKey: [
+            OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+            "useOllamaQuickAnswer",
+            ollamaEndPoint,
+            deferredQuestion,
+            ollamaModelName,
+            currentTabURL
+        ] as const,
+        queryFn: experimental_streamedQuery({
+            streamFn: async ({ signal })=>{
+                if (!deferredQuestion.trim()) throw new Error("Empty question string provided.");
+                if (!ollamaModelName) throw new Error("No model selected.");
+                return streamAIResponse({
+                    fullPrompt,
+                    signal,
+                    systemInstruction,
+                    thinking,
+                    ollamaEndpoint: ollamaEndPoint,
+                    ollamaModelName
+                });
+            },
+            reducer: (acc: string, chunk: any)=>acc + (chunk?.response || ""),
+            initialValue: ""
+        }),
+        enabled: !!deferredQuestion && !!ollamaModelName && trigger && !!ollamaEndPoint,
+        staleTime: 1000 * 60 * 21,
+        gcTime: 1000 * 60 * 30,
+        retry: 1
+    });
 };
 
 ```
@@ -3450,14 +4625,56 @@ export interface ExtractedContent {
     html: string;
 }
 export function isRestrictedUrl(url?: string): boolean {
+    if (!url) return true;
     return (url.startsWith("chrome://") || url.startsWith("chrome-extension://") || url.startsWith("devtools://") || url.startsWith("edge://") || url.startsWith("about:") || url.includes("chromewebstore.google.com"));
-    '/* "Determines if a given URL is restricted by checking if it starts with specific proprietary scheme prefixes or contains certain substrings." */';
 }
 export async function fetchTabContent(tabId: number): Promise<ExtractedContent> {
-    '/* "Executes a script within the specified browser tab to asynchronously extract the document\'s title, text body, and initial HTML content." */';
+    try {
+        const results = await browser.scripting.executeScript({
+            target: {
+                tabId
+            },
+            func: ()=>{
+                return {
+                    title: document.title,
+                    text: document.body?.innerText || "",
+                    html: document.documentElement.outerHTML.substring(0, 10000)
+                };
+            }
+        });
+        if (results?.[0]?.result) {
+            return results[0].result as ExtractedContent;
+        }
+        throw new Error("No content returned from page extraction.");
+    } catch (error) {
+        console.error("Script injection error:", error);
+        throw error;
+    }
 }
 export const useBrowserCurrentActiveTab = ()=>{
-    '/* "Retrieves and caches the content of the browser\'s active tab by fetching it if it is not a restricted URL." */';
+    "use memo";
+    const activeTab = useActiveTab();
+    return useQuery({
+        queryKey: [
+            OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+            activeTab?.id,
+            activeTab?.url
+        ] as const,
+        queryFn: async ()=>{
+            if (!activeTab?.id) throw new Error("No active tab identified.");
+            if (isRestrictedUrl(activeTab.url)) {
+                return {
+                    title: "Restricted Page",
+                    text: "Scripts cannot run on secure browser pages or extensions stores.",
+                    html: "<noscript>Scripts cannot run on secure browser pages or extensions stores.</noscript>"
+                };
+            }
+            return fetchTabContent(activeTab.id);
+        },
+        enabled: !!activeTab?.id && !!activeTab?.url,
+        staleTime: 7 * 60 * 1000,
+        gcTime: 12 * 60 * 1000
+    });
 };
 
 ```
@@ -3482,7 +4699,20 @@ const NEWS_URLS = {
     BBC_TECH_NEWS: "https://feeds.bbci.co.uk/news/technology/rss.xml"
 } as const;
 async function fetchXmlDoc(url: string, signal?: AbortSignal): Promise<Document> {
-    '/* "Map human-readable topics to Google News RSS Topic IDs" */';
+    const response = await fetch(url, {
+        signal
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to fetch RSS feed (${response.status}): ${response.statusText}`);
+    }
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+    const parserError = xmlDoc.querySelector("parsererror");
+    if (parserError) {
+        throw new Error(`Failed to parse RSS XML: ${parserError.textContent || "Unknown parser error"}`);
+    }
+    return xmlDoc;
 }
 export interface RelatedArticle {
     title: string;
@@ -3499,7 +4729,38 @@ export interface NewsItem {
     descHTML: string;
 }
 export async function fetchGoogleNews(url: string, signal: AbortSignal, type?: string): Promise<NewsItem[]> {
-    '/* "Parses an XML feed fetched from a URL into an array of structured news items, cleaning and transforming fields like title and description." */';
+    const xmlDoc = await fetchXmlDoc(url, signal);
+    const items = xmlDoc.querySelectorAll("item");
+    return Array.from(items).map((item, index)=>{
+        const rawTitle = item.querySelector("title")?.textContent?.trim() || "";
+        const link = item.querySelector("link")?.textContent?.trim() || "";
+        const pubDate = item.querySelector("pubDate")?.textContent?.trim() || "";
+        const guid = item.querySelector("guid")?.textContent?.trim() || "";
+        const sourceEl = item.querySelector("source");
+        const source = sourceEl?.textContent?.trim() || "Google News";
+        const sourceUrl = sourceEl?.getAttribute("url")?.trim() || undefined;
+        const titleSuffix = ` - ${source}`;
+        const title = rawTitle.endsWith(titleSuffix) ? rawTitle.slice(0, -titleSuffix.length).trim() : rawTitle;
+        const id = guid || `${type || "news"}-${index}-${pubDate}`;
+        const descEl = item.querySelector("description");
+        const descriptionHtml = descEl?.innerHTML?.trim() || descEl?.textContent?.trim() || "";
+        const decodeHTMLEntities = (text: string)=>{
+            const textArea = document.createElement("textarea");
+            textArea.innerHTML = text;
+            return textArea.value;
+        };
+        const decoded = decodeHTMLEntities(descriptionHtml);
+        const descHTML = DOMPurify.sanitize(decoded).trim();
+        return {
+            id,
+            title,
+            link,
+            pubDate,
+            source,
+            sourceUrl,
+            descHTML
+        };
+    });
 }
 export interface YahooNewsItem {
     id: string;
@@ -3513,7 +4774,43 @@ export interface YahooNewsItem {
     imageHeight?: number;
 }
 export async function fetchYahooNews(url: string, signal: AbortSignal, type?: string): Promise<YahooNewsItem[]> {
-    '/* "Parses an XML document fetched from a URL to extract and structure details for multiple news items, including titles, links, publication dates, and associated media metadata." */';
+    const xmlDoc = await fetchXmlDoc(url, signal);
+    const items = xmlDoc.querySelectorAll("item");
+    const mediaNS = "http://search.yahoo.com/mrss/";
+    return Array.from(items).map((item, index)=>{
+        const rawTitle = item.querySelector("title")?.textContent?.trim() || "";
+        const link = item.querySelector("link")?.textContent?.trim() || "";
+        const pubDate = item.querySelector("pubDate")?.textContent?.trim() || "";
+        const guid = item.querySelector("guid")?.textContent?.trim() || "";
+        const sourceEl = item.querySelector("source");
+        const source = sourceEl?.textContent?.trim() || "Yahoo News";
+        const sourceUrl = sourceEl?.getAttribute("url")?.trim() || undefined;
+        const titleSuffix = ` - ${source}`;
+        const title = rawTitle.endsWith(titleSuffix) ? rawTitle.slice(0, -titleSuffix.length).trim() : rawTitle;
+        const id = guid || `${type || "yahoo"}-${index}-${pubDate}`;
+        let imageUrl: string | undefined = undefined;
+        let imageWidth: number | undefined = undefined;
+        let imageHeight: number | undefined = undefined;
+        const mediaContent = item.getElementsByTagNameNS(mediaNS, "content")[0];
+        if (mediaContent) {
+            imageUrl = mediaContent.getAttribute("url")?.trim() || undefined;
+            const widthAttr = mediaContent.getAttribute("width");
+            const heightAttr = mediaContent.getAttribute("height");
+            if (widthAttr) imageWidth = parseInt(widthAttr, 10);
+            if (heightAttr) imageHeight = parseInt(heightAttr, 10);
+        }
+        return {
+            id,
+            title,
+            link,
+            pubDate,
+            source,
+            sourceUrl,
+            imageUrl,
+            imageWidth,
+            imageHeight
+        };
+    });
 }
 export interface BbcNewsItem {
     id: string;
@@ -3528,13 +4825,94 @@ export interface BbcNewsItem {
     imageHeight?: number;
 }
 export async function fetchBbcTechNews(url: string, signal: AbortSignal, type?: string): Promise<BbcNewsItem[]> {
-    '/* "Parses an XML document fetched from a URL to extract and structure various fields for BBC technology news items." */';
+    const xmlDoc = await fetchXmlDoc(url, signal);
+    const items = xmlDoc.querySelectorAll("item");
+    const mediaNS = "http://search.yahoo.com/mrss/";
+    return Array.from(items).map((item, index)=>{
+        const title = item.querySelector("title")?.textContent?.trim() || "";
+        const description = item.querySelector("description")?.textContent?.trim() || "";
+        const guid = item.querySelector("guid")?.textContent?.trim() || "";
+        const pubDate = item.querySelector("pubDate")?.textContent?.trim() || "";
+        const rawLink = item.querySelector("link")?.textContent?.trim() || "";
+        const link = rawLink.split("?")[0] || rawLink;
+        const id = guid || `${type || "bbc"}-${index}-${pubDate}`;
+        let imageUrl: string | undefined = undefined;
+        let imageWidth: number | undefined = undefined;
+        let imageHeight: number | undefined = undefined;
+        const thumbnailEl = item.getElementsByTagNameNS(mediaNS, "thumbnail")[0];
+        if (thumbnailEl) {
+            imageUrl = thumbnailEl.getAttribute("url")?.trim() || undefined;
+            const widthAttr = thumbnailEl.getAttribute("width");
+            const heightAttr = thumbnailEl.getAttribute("height");
+            if (widthAttr) imageWidth = parseInt(widthAttr, 10);
+            if (heightAttr) imageHeight = parseInt(heightAttr, 10);
+        }
+        return {
+            id,
+            title,
+            description,
+            link,
+            rawLink,
+            pubDate,
+            source: "BBC News",
+            imageUrl,
+            imageWidth,
+            imageHeight
+        };
+    });
 }
 export function useNewsInternationalFeed() {
-    '/* "Fetches the latest international news articles from Google News using a React Query hook." */';
+    return useQuery<NewsItem[], Error>({
+        queryKey: [
+            OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+            "useNewsInternationalFeed"
+        ] as const,
+        queryFn: ({ signal })=>fetchGoogleNews("https://news.google.com/rss", signal),
+        staleTime: 1000 * 60 * 60 * 12,
+        gcTime: 1000 * 60 * 60 * 5
+    });
 }
 export function useNewsInternationalFeeds() {
-    '/* "Establishes preconnect hints for multiple international news sources and executes asynchronous queries to fetch data from Google News, Yahoo, and BBC Technology feeds." */';
+    preconnect("https://news.google.com/rss");
+    preconnect("https://news.yahoo.com/rss/world");
+    preconnect("https://feeds.bbci.co.uk/news/technology/rss.xml");
+    preconnect("https://feeds.bbci.co.uk/news/world/rss.xml");
+    preconnect("https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664");
+    preconnect("https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=15839069");
+    return useQueries({
+        queries: [
+            {
+                queryKey: [
+                    OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+                    "useNewsInternationalFeed",
+                    NEWS_URLS["GOOGLE_NEWS"]
+                ] as const,
+                queryFn: ({ signal })=>fetchGoogleNews(NEWS_URLS["GOOGLE_NEWS"], signal),
+                staleTime: 1000 * 60 * 60 * 12,
+                gcTime: 1000 * 60 * 60 * 5
+            },
+            {
+                queryKey: [
+                    OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+                    "useNewsInternationalFeed",
+                    NEWS_URLS["YAHOO_NEWS"]
+                ] as const,
+                queryFn: ({ signal })=>fetchGoogleNews(NEWS_URLS["YAHOO_NEWS"], signal),
+                staleTime: 1000 * 60 * 60 * 12,
+                gcTime: 1000 * 60 * 60 * 5
+            },
+            {
+                queryKey: [
+                    OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+                    "useNewsInternationalFeed",
+                    NEWS_URLS["BBC_TECH_NEWS"]
+                ] as const,
+                queryFn: ({ signal })=>fetchGoogleNews(NEWS_URLS["BBC_TECH_NEWS"], signal),
+                staleTime: 1000 * 60 * 60 * 12,
+                gcTime: 1000 * 60 * 60 * 5
+            }
+        ]
+    });
 }
 
 ```
@@ -3548,7 +4926,63 @@ export async function* fetchOllamaStream(messages: {
     content: string;
     tool_calls?: any;
 }[], model: string, isToolMode: boolean, functionCall: typeof toolsSchema, onToolCalls?: (toolCalls: any[]) => void, apiEndpoint = "http://localhost:11434/api/chat"): AsyncIterable<string> {
-    '/* "Fetches and streams responses from an Ollama API endpoint, yielding message content while processing embedded tool calls." */';
+    "use memo";
+    const payload = {
+        model,
+        messages,
+        stream: true,
+        ...(isToolMode ? {
+            tools: toolsSchema,
+            think: true
+        } : {
+            think: true
+        }),
+        ...(functionCall && functionCall.length > 0 ? {
+            tools: functionCall
+        } : {})
+    };
+    const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        throw new Error(`Ollama stream error: ${response.statusText}`);
+    }
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("Body reader missing.");
+    const decoder = new TextDecoder();
+    let buffer = "";
+    try {
+        while(true){
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, {
+                stream: true
+            });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+            for (const line of lines){
+                if (!line.trim()) continue;
+                try {
+                    const parsed = JSON.parse(line);
+                    if (parsed.message?.tool_calls && parsed.message.tool_calls.length > 0) {
+                        if (onToolCalls) {
+                            onToolCalls(parsed.message.tool_calls);
+                        }
+                    }
+                    const content = parsed.message?.content || "";
+                    if (content) {
+                        yield content;
+                    }
+                } catch (e) {}
+            }
+        }
+    } finally{
+        reader.releaseLock();
+    }
 }
 
 ```
@@ -3579,10 +5013,10 @@ interface OllamaApiMessage {
 }
 type BrowserToolFn = (...args: any[]) => Promise<any>;
 function generateTimestampId(prefix = "msg"): string {
-    '/* "Executes logic for function generateTimestampId" */';
+    return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${crypto?.randomUUID?.()}`;
 }
 function generateToolResponseId(toolName: string): string {
-    '/* "Executes logic for function generateToolResponseId" */';
+    return `tool-${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${toolName}-${crypto?.randomUUID?.()}`;
 }
 const currentDateAndTime = new Date().toString();
 const systemPrompt = `
@@ -3724,7 +5158,22 @@ const TOOL_REGISTRY: Record<string, BrowserToolFn> = {
     create_google_workspace_file: googleTools.create_google_workspace_file
 };
 async function runLocalTool(name: string, args: unknown): Promise<string> {
-    '/* "Execute extension APIs on the client locally based on LLM parameters" */';
+    try {
+        const tool = TOOL_REGISTRY[name];
+        if (!tool) {
+            return JSON.stringify({
+                success: false,
+                error: `The tool function "${name}" is not supported or defined on this client.`
+            });
+        }
+        const result = args !== undefined && args !== null ? await tool(args) : await tool();
+        return typeof result === "string" ? result : JSON.stringify(result);
+    } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        return JSON.stringify({
+            error: errorMessage
+        });
+    }
 }
 const queryKey = [
     OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
@@ -3733,25 +5182,245 @@ const queryKey = [
 export function useOllamaChatStream({ isToolMode }: {
     isToolMode: boolean;
 }) {
+    const queryClient = useQueryClient();
+    const model = useOllamaSelectedModelRead();
+    const apiEndpoint = useOllamaEndPointRead();
+    const currentApiEndPoint = `${apiEndpoint}/api/chat`;
+    const [activeTool, setActiveTool] = useState<string | null>(null);
+    const [isStreaming, startTransition] = useTransition();
+    const lastSentUrlRef = useRef<string | null>(null);
+    const isMountedRef = useRef(true);
     useEffect(()=>{
-        '/* "Sets a mount state to true upon component mounting and sets it to false during cleanup." */';
+        isMountedRef.current = true;
+        return ()=>{
+            isMountedRef.current = false;
+        };
     }, []);
+    const { data: history = [] } = useQuery<Message[]>({
+        queryKey: queryKey,
+        initialData: [
+            {
+                role: "system",
+                id: `system-${generateTimestampId()}`,
+                content: systemPrompt
+            }
+        ],
+        queryFn: ()=>[],
+        staleTime: Infinity,
+        gcTime: Infinity
+    });
     useEffect(()=>{
-        '/* "Updates the last sent URL reference to null if the history array is empty." */';
+        if (history.length === 0) {
+            lastSentUrlRef.current = null;
+        }
     }, [
         history.length
     ]);
     const executeAgentTurn = async (currentMessages: Message[]): Promise<void> =>{
-        '/* "Executes a single agent turn by streaming the model response to the UI, and recursively handles tool calls by running local tools before continuing the assistant\'s turn." */';
+        if (!isMountedRef.current) return;
+        const assistantMessageId = generateTimestampId();
+        queryClient.setQueryData<Message[]>(queryKey, (old)=>[
+                ...(old || []),
+                {
+                    id: assistantMessageId,
+                    role: "assistant",
+                    content: "",
+                    thinking: true
+                }
+            ]);
+        let accumulatedText = "";
+        const detectedToolCalls: any[] = [];
+        try {
+            const apiMessages: OllamaApiMessage[] = currentMessages.map((m)=>{
+                const apiMsg: OllamaApiMessage = {
+                    role: m.role,
+                    content: m.content
+                };
+                if (m.toolsUsed && m.role === "assistant") {
+                    try {
+                        apiMsg.tool_calls = JSON.parse(m.toolsUsed);
+                    } catch (e) {
+                        console.error("Failed to parse tool call payload", e);
+                    }
+                }
+                return apiMsg;
+            });
+            const stream = fetchOllamaStream(apiMessages, model ?? "gemma:latest", isToolMode, toolsSchema, (toolCalls: any[])=>{
+                detectedToolCalls.push(...toolCalls);
+            }, currentApiEndPoint);
+            const iterator = stream[Symbol.asyncIterator]();
+            while(true){
+                const { value: chunk, done } = await iterator.next();
+                if (done) break;
+                if (!isMountedRef.current) return;
+                accumulatedText += chunk;
+                queryClient.setQueryData<Message[]>(queryKey, (old)=>{
+                    if (!old || old.length === 0) return [];
+                    const lastIdx = old.length - 1;
+                    if (old[lastIdx].id === assistantMessageId) {
+                        const updated = [
+                            ...old
+                        ];
+                        updated[lastIdx] = {
+                            ...updated[lastIdx],
+                            content: accumulatedText,
+                            thinking: accumulatedText.length < 15
+                        };
+                        return updated;
+                    }
+                    return old.map((msg)=>msg.id === assistantMessageId ? {
+                            ...msg,
+                            content: accumulatedText,
+                            thinking: accumulatedText.length < 15
+                        } : msg);
+                });
+            }
+            if (detectedToolCalls.length > 0) {
+                if (!isMountedRef.current) return;
+                queryClient.setQueryData<Message[]>(queryKey, (old)=>{
+                    if (!old || old.length === 0) return [];
+                    const lastIdx = old.length - 1;
+                    const payload = {
+                        content: accumulatedText || "Executing browser tools...",
+                        thinking: false,
+                        toolsUsed: JSON.stringify(detectedToolCalls)
+                    };
+                    if (old[lastIdx].id === assistantMessageId) {
+                        const updated = [
+                            ...old
+                        ];
+                        updated[lastIdx] = {
+                            ...updated[lastIdx],
+                            ...payload
+                        };
+                        return updated;
+                    }
+                    return old.map((msg)=>msg.id === assistantMessageId ? {
+                            ...msg,
+                            ...payload
+                        } : msg);
+                });
+                const nextHistory = [
+                    ...(queryClient.getQueryData<Message[]>(queryKey) || [])
+                ];
+                for (const toolCall of detectedToolCalls){
+                    if (!isMountedRef.current) return;
+                    const toolName = toolCall.function.name;
+                    const toolArgs = toolCall.function.arguments;
+                    setActiveTool(toolName);
+                    const toolResult = await runLocalTool(toolName, toolArgs);
+                    const toolResponseMsg: Message = {
+                        id: generateToolResponseId(toolName),
+                        role: "tool",
+                        content: toolResult,
+                        toolsUsed: toolName
+                    };
+                    nextHistory.push(toolResponseMsg);
+                    queryClient.setQueryData<Message[]>(queryKey, ()=>[
+                            ...nextHistory
+                        ]);
+                }
+                setActiveTool(null);
+                await executeAgentTurn(nextHistory);
+            } else {
+                if (!isMountedRef.current) return;
+                queryClient.setQueryData<Message[]>(queryKey, (old)=>{
+                    if (!old || old.length === 0) return [];
+                    const lastIdx = old.length - 1;
+                    if (old[lastIdx].id === assistantMessageId) {
+                        const updated = [
+                            ...old
+                        ];
+                        updated[lastIdx] = {
+                            ...updated[lastIdx],
+                            thinking: false
+                        };
+                        return updated;
+                    }
+                    return old.map((msg)=>msg.id === assistantMessageId ? {
+                            ...msg,
+                            thinking: false
+                        } : msg);
+                });
+            }
+        } catch (error: unknown) {
+            console.error("Agent Turn Failure:", error);
+            if (!isMountedRef.current) return;
+            const errorString = error instanceof Error ? error.message : String(error);
+            queryClient.setQueryData<Message[]>(queryKey, (old)=>{
+                if (!old || old.length === 0) return [];
+                const lastIdx = old.length - 1;
+                const errorMessage = `Error during system execution: ${errorString}`;
+                if (old[lastIdx].id === assistantMessageId) {
+                    const updated = [
+                        ...old
+                    ];
+                    updated[lastIdx] = {
+                        ...updated[lastIdx],
+                        content: errorMessage,
+                        thinking: false
+                    };
+                    return updated;
+                }
+                return old.map((msg)=>msg.id === assistantMessageId ? {
+                        ...msg,
+                        content: errorMessage,
+                        thinking: false
+                    } : msg);
+            });
+        }
     };
+    const { data: currentPageCtx } = useBrowserCurrentActiveTab();
     const sendMessage = async (text: string, pageContext?: {
         url: string;
         title: string;
         enabled: boolean;
     }): Promise<void> =>{
-        '/* "Sends a user message along with optional webpage context and then executes the agent\'s turn against the updated conversation history." */';
+        return new Promise<void>((resolve)=>{
+            startTransition(()=>{
+                const newMessages: Message[] = [];
+                if (pageContext?.enabled && pageContext?.url) {
+                    if (lastSentUrlRef.current !== pageContext.url) {
+                        try {
+                            const pageContent = currentPageCtx?.text;
+                            lastSentUrlRef.current = pageContext.url;
+                            const systemMsg: Message = {
+                                id: `system-${generateTimestampId()}`,
+                                role: "system",
+                                content: `[System Instruction: You are analyzing the active browser page. Use this background information to guide your replies.\nURL: ${pageContext.url}\nTitle: ${pageContext.title}\nContent:\n${pageContent}]`.trim()
+                            };
+                            newMessages.push(systemMsg);
+                        } catch (err) {
+                            console.error("Failed to append webpage context:", err);
+                        }
+                    }
+                }
+                const userMsg: Message = {
+                    id: generateTimestampId(),
+                    role: "user",
+                    content: text
+                };
+                newMessages.push(userMsg);
+                const updatedHistory = [
+                    ...history,
+                    ...newMessages
+                ];
+                queryClient.setQueryData<Message[]>(queryKey, ()=>updatedHistory);
+                startTransition(async ()=>{
+                    await executeAgentTurn(updatedHistory);
+                    startTransition(()=>{
+                        resolve();
+                    });
+                });
+            });
+        });
     };
-    '/* "Manages the complete lifecycle of an AI conversation, handling user input, integrating browser context, streaming model responses via Ollama API, and recursively executing chained tool calls before resolving the chat turn." */';
+    return {
+        messages: history,
+        sendMessage,
+        isStreaming,
+        activeTool
+    };
 }
 
 ```
@@ -3771,18 +5440,157 @@ interface OllamaGeneratePayload {
 }
 const CACHE_DURATION_MS = 7 * 60 * 60 * 1000;
 export function useOllamaNewsAgent() {
+    const ollamaEndPoint = useOllamaEndPointRead();
+    const queryClient = useQueryClient();
+    const [streamedFreshText, setStreamedText] = useState<string>("");
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const ollamaLLMModel = useOllamaSelectedModelRead();
     useEffect(()=>{
-        '/* "Cleans up any active asynchronous operations by calling abort on the stored abort controller." */';
+        return ()=>{
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+        };
     }, []);
     useEffect(()=>{
-        '/* "Sets default cache durations for a specific React Query hook across all components." */';
+        queryClient.setQueryDefaults([
+            OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+            "useOllamaNewsAgent"
+        ], {
+            gcTime: CACHE_DURATION_MS,
+            staleTime: CACHE_DURATION_MS
+        });
     }, [
         queryClient
     ]);
+    const mutation = useMutation<string, Error, OllamaGeneratePayload>({
+        mutationKey: [
+            OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+            "useOllamaNewsAgent-bulk",
+            ollamaEndPoint
+        ],
+        mutationFn: async ({ prompt, system, onChunk, bypassCache = false })=>{
+            setStreamedText("");
+            const cacheKey = [
+                OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+                "useOllamaNewsAgent",
+                ollamaEndPoint,
+                system || "",
+                prompt
+            ] as const;
+            if (!bypassCache) {
+                const cachedResponse = queryClient.getQueryData<string>(cacheKey);
+                if (cachedResponse) {
+                    setStreamedText(cachedResponse);
+                    if (onChunk) {
+                        onChunk(cachedResponse, cachedResponse);
+                    }
+                    return cachedResponse;
+                }
+            }
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+            const controller = new AbortController();
+            abortControllerRef.current = controller;
+            const endpoint = `${ollamaEndPoint}/api/generate`;
+            let response: Response;
+            try {
+                response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        model: ollamaLLMModel ?? "gemma4:latest",
+                        prompt: prompt,
+                        system: system,
+                        stream: true,
+                        think: false
+                    })
+                });
+            } catch (err: any) {
+                abortControllerRef.current = null;
+                if (err.name === "AbortError") {
+                    return Promise.reject(new Error("Generation was stopped."));
+                }
+                return Promise.reject(new Error("Cannot reach Ollama. Verify Ollama is running locally and CORS is enabled via `OLLAMA_ORIGINS=*`."));
+            }
+            if (!response.ok) {
+                abortControllerRef.current = null;
+                const errorText = await response.text();
+                return Promise.reject(new Error(`Ollama error (${response.status}): ${errorText || response.statusText}`));
+            }
+            if (!response.body) {
+                abortControllerRef.current = null;
+                return Promise.reject(new Error("The response body is empty and cannot be read as a stream."));
+            }
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let accumulatedText = "";
+            let buffer = "";
+            try {
+                while(true){
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, {
+                        stream: true
+                    });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop() || "";
+                    for (const line of lines){
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) continue;
+                        const parsed = JSON.parse(trimmedLine);
+                        if (typeof parsed.response === "string") {
+                            accumulatedText += parsed.response;
+                            setStreamedText(accumulatedText);
+                            if (onChunk) {
+                                onChunk(parsed.response, accumulatedText);
+                            }
+                        }
+                    }
+                }
+                if (buffer.trim()) {
+                    try {
+                        const parsed = JSON.parse(buffer);
+                        if (typeof parsed.response === "string") {
+                            accumulatedText += parsed.response;
+                            setStreamedText(accumulatedText);
+                            if (onChunk) {
+                                onChunk(parsed.response, accumulatedText);
+                            }
+                        }
+                    } catch  {}
+                }
+                queryClient.setQueryData(cacheKey, accumulatedText);
+                reader.releaseLock();
+                abortControllerRef.current = null;
+                return accumulatedText;
+            } catch (streamErr: any) {
+                reader.releaseLock();
+                abortControllerRef.current = null;
+                if (streamErr.name === "AbortError") {
+                    return Promise.reject(new Error("Generation was stopped."));
+                }
+                return Promise.reject(new Error(streamErr.message && streamErr.message.includes("Ollama error") ? streamErr.message : "An error occurred during streaming."));
+            }
+        }
+    });
     const cancel = ()=>{
-        '/* "Terminates an ongoing asynchronous operation by calling the abort function on the associated abort controller." */';
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
     };
-    '/* "Manages and executes a server-side large language model generation request to an Ollama endpoint, handling caching, streaming the response, and providing mechanisms for cancellation and state tracking." */';
+    const streamedText = useDeferredValue(streamedFreshText);
+    return {
+        ...mutation,
+        streamedText,
+        cancel,
+        isStreaming: !!mutation.isPending && !mutation.isError
+    };
 }
 
 ```
@@ -3794,24 +5602,24 @@ import { atom, useAtom, useAtomValue } from "jotai";
 import { atomWxtStorage } from ".";
 export const ollamaEndPointAtom = atomWxtStorage("local:ollamaEndPointAtom", "http://localhost:11434");
 export const useOllamaEndPointRead = ()=>{
-    '/* "Executes logic for function useOllamaEndPointRead" */';
+    return useAtomValue(ollamaEndPointAtom) || "http://localhost:11434";
 };
 export const useOllamaEndPointState = ()=>{
-    '/* "Executes logic for function useOllamaEndPointState" */';
+    return useAtom(ollamaEndPointAtom);
 };
 export const ollamaSelectedModelAtom = atomWxtStorage<string | null>("local:ollamaSelectedModelAtom", "gemma:latest");
 export const useOllamaSelectedModelState = ()=>{
-    '/* "Executes logic for function useOllamaSelectedModelState" */';
+    return useAtom(ollamaSelectedModelAtom);
 };
 export const useOllamaSelectedModelRead = ()=>{
-    '/* "Executes logic for function useOllamaSelectedModelRead" */';
+    return useAtomValue(ollamaSelectedModelAtom);
 };
 export const ollamaQuickQuestionAtom = atom<string>("");
 export const useOllamaQuickQuestionState = ()=>{
-    '/* "Executes logic for function useOllamaQuickQuestionState" */';
+    return useAtom(ollamaQuickQuestionAtom);
 };
 export const useOllamaQuickQuestionRead = ()=>{
-    '/* "Executes logic for function useOllamaQuickQuestionRead" */';
+    return useAtomValue(ollamaQuickQuestionAtom);
 };
 
 ```
@@ -3828,9 +5636,34 @@ export { ollamaEndPointAtom, ollamaSelectedModelAtom, ollamaQuickQuestionAtom };
 type ValidWxtKey = `local:${string}` | `session:${string}` | `sync:${string}` | `managed:${string}`;
 export function atomWxtStorage<T>(key: string, initialValue: T) {
     const getValidKey = (key: string): ValidWxtKey =>{
-        '/* "Checks if a provided key includes a valid storage area prefix, returning a locally prefixed version if the original key is invalid." */';
+        if (!/^(local|session|sync|managed):/.test(key)) {
+            console.warn(`[WXT Storage Adapter] Key "${key}" is missing a storage area prefix. Defaulting to "local:${key}".`);
+            return `local:${key}` as ValidWxtKey;
+        }
+        return key as ValidWxtKey;
     };
-    '/* "Configures and returns a reactive storage accessor by validating the provided key prefix before wrapping it in `atomWithStorage`." */';
+    const validKey = getValidKey(key);
+    const customStorage = {
+        getItem: async (key: string, initialValue: T): Promise<T> =>{
+            return await storage.getItem<T>(key as ValidWxtKey, {
+                fallback: initialValue
+            });
+        },
+        setItem: async (key: string, newValue: T): Promise<void> =>{
+            await storage.setItem<T>(key as ValidWxtKey, newValue);
+        },
+        removeItem: async (key: string): Promise<void> =>{
+            await storage.removeItem(key as ValidWxtKey);
+        },
+        subscribe: (key: string, callback: (value: T) => void, initialValue: T)=>{
+            return storage.watch<T>(key as ValidWxtKey, (newValue)=>{
+                callback(newValue ?? initialValue);
+            });
+        }
+    };
+    return atomWithStorage<T>(validKey, initialValue, customStorage, {
+        getOnInit: true
+    });
 }
 
 ```
@@ -3841,7 +5674,12 @@ export function atomWxtStorage<T>(key: string, initialValue: T) {
 import { useMutation } from "@tanstack/react-query";
 import { OLLAMA_BROWSER_EXT_REACTQUERY_KEY } from "../query";
 const useOllamaQuickAnswer = ()=>{
-    '/* "Creates a React Query mutation hook for interacting with an Ollama-powered quick answer feature." */';
+    return useMutation({
+        mutationKey: [
+            OLLAMA_BROWSER_EXT_REACTQUERY_KEY,
+            "useOllamaQuickAnswer"
+        ]
+    });
 };
 
 ```
@@ -3869,19 +5707,54 @@ type OnUpdatedListener = Parameters<typeof browser.tabs.onUpdated.addListener>[0
 type TabChangeInfo = Parameters<OnUpdatedListener>[1];
 type TabType = Parameters<OnUpdatedListener>[2];
 export function useActiveTab() {
+    const [activeTab, setActiveTab] = useState<ActiveTabState | null>(null);
     useEffect(()=>{
         const initTab = async ()=>{
-            '/* "Queries and sets the current active tab\'s ID and URL if a focused tab is successfully found." */';
+            try {
+                const [tab] = await browser.tabs.query({
+                    active: true,
+                    lastFocusedWindow: true
+                });
+                if (tab?.id && tab?.url) {
+                    setActiveTab({
+                        id: tab.id,
+                        url: tab.url
+                    });
+                }
+            } catch (err) {
+                console.error("Error fetching initial active tab:", err);
+            }
         };
+        initTab();
         const handleActivated = async (activeInfo: TabActiveInfo)=>{
-            '/* "Retrieves and sets the active tab\'s ID and URL after successfully accessing the tab information." */';
+            try {
+                const tab = await browser.tabs.get(activeInfo.tabId);
+                if (tab.active && tab.id && tab.url) {
+                    setActiveTab({
+                        id: tab.id,
+                        url: tab.url
+                    });
+                }
+            } catch (err) {
+                console.warn("Could not read activated tab metadata:", err);
+            }
         };
         const handleUpdated = (_tabId: number, changeInfo: TabChangeInfo, tab: TabType)=>{
-            '/* "Sets the active tab state if the provided tab is active, the status is complete, and the tab has an ID and URL." */';
+            if (tab.active && changeInfo.status === "complete" && tab.id && tab.url) {
+                setActiveTab({
+                    id: tab.id,
+                    url: tab.url
+                });
+            }
         };
-        '/* "Monitors and updates the currently active browser tab\'s metadata whenever the tab is activated or its content status changes." */';
+        browser.tabs.onActivated.addListener(handleActivated);
+        browser.tabs.onUpdated.addListener(handleUpdated);
+        return ()=>{
+            browser.tabs.onActivated.removeListener(handleActivated);
+            browser.tabs.onUpdated.removeListener(handleUpdated);
+        };
     }, []);
-    '/* "Retrieves and monitors the currently active browser tab, updating the state whenever a tab is switched or updated." */';
+    return activeTab;
 }
 
 ```

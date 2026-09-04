@@ -37,7 +37,16 @@ impl PackageJsonUrai {
             }
             package_json_path
         } else if input_path.is_file() {
-            input_path.to_path_buf()
+            input_path
+                .ancestors()
+                .map(|dir| dir.join("package.json"))
+                .find(|p| p.is_file())
+                .ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "Could not find 'package.json' in '{}' or any of its parent directories",
+                        input_path.display()
+                    )
+                })?
         } else {
             bail!(
                 "The path '{}' does not exist or is not a valid file or directory",

@@ -18,6 +18,7 @@ pub struct ClassMethodSummarizerVisitor<'a> {
     pub current_export_lo: Option<BytePos>,
     pub fn_name_stack: Vec<String>,
     pub class_name_stack: Vec<String>,
+    pub sumarize_class_method_enabled: bool,
 }
 
 impl<'a> ClassMethodSummarizerVisitor<'a> {
@@ -27,6 +28,7 @@ impl<'a> ClassMethodSummarizerVisitor<'a> {
         ollama: Option<&'a OllamaUrai>,
         comments: SingleThreadedComments,
         line_threshold: usize,
+        sumarize_class_method_enabled: bool,
     ) -> Self {
         Self {
             cm,
@@ -38,6 +40,7 @@ impl<'a> ClassMethodSummarizerVisitor<'a> {
             current_export_lo: None,
             fn_name_stack: Vec::new(),
             class_name_stack: Vec::new(),
+            sumarize_class_method_enabled,
         }
     }
 }
@@ -136,7 +139,7 @@ impl<'a> VisitMut for ClassMethodSummarizerVisitor<'a> {
 
         let summary = if let Some(jsdoc_text) = jsdoc_summary {
             jsdoc_text
-        } else if line_count >= self.line_threshold {
+        } else if line_count >= self.line_threshold && self.sumarize_class_method_enabled {
             if let Some(ollama) = self.ollama {
                 let fn_snippet = extract_snippet(self.file_content, lo_pos.line, hi_pos.line);
                 ollama
@@ -200,10 +203,6 @@ impl<'a> VisitMut for ClassMethodSummarizerVisitor<'a> {
         } else {
             format!("Executes logic for method {}", full_name)
         };
-
-        if let Some(function_body) = &mut class_method.function.body {
-            function_body.stmts.retain(is_structural_stub_stmt);
-        }
 
         if let Some(function_body) = class_method.function.body.as_mut() {
             function_body.stmts.retain(is_structural_stub_stmt);

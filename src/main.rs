@@ -16,8 +16,12 @@ mod ollama;
 #[derive(Parser, Debug)]
 #[command(
     name = "urai-ecma",
-    version = "1.0",
-    about = "AST-aware JS/TS code to prompt tool"
+    version,
+    about = "AST-powered JS/TS codebase analyzer and token-optimized prompt compiler for LLMs",
+    long_about = "A high-performance context distillation engine for JavaScript and TypeScript.\n\n\
+                  urai-ecma inspects codebases via SWC ASTs to extract API routes, React component \n\
+                  hierarchies, and module graphs while pruning Tailwind classes and method bodies to \n\
+                  maximize LLM context window efficiency."
 )]
 struct Cli {
     #[command(subcommand)]

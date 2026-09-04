@@ -23,7 +23,7 @@
     "tailwind_threshold": 96,
 
     // Summarize function block bodies using local Ollama or fallback to JSDoc comments
-    "summarize_functions": true,
+    "summarize_functions": false,
 
     // Line count threshold to trigger function summarization (default: 5 lines)
     "summarize_functions_threshold": 5,

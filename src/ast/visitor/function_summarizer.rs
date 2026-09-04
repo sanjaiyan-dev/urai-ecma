@@ -17,6 +17,7 @@ pub struct FunctionSummarizerVisitor<'a> {
     pub line_threshold: usize,
     pub current_export_lo: Option<BytePos>,
     pub fn_name_stack: Vec<String>,
+    pub sumarize_function_enabled: bool,
 }
 
 impl<'a> FunctionSummarizerVisitor<'a> {
@@ -26,6 +27,7 @@ impl<'a> FunctionSummarizerVisitor<'a> {
         ollama: Option<&'a OllamaUrai>,
         comments: SingleThreadedComments,
         line_threshold: usize,
+        sumarize_function_enabled: bool,
     ) -> Self {
         Self {
             cm,
@@ -36,6 +38,7 @@ impl<'a> FunctionSummarizerVisitor<'a> {
             line_threshold,
             current_export_lo: None,
             fn_name_stack: Vec::new(),
+            sumarize_function_enabled,
         }
     }
 }
@@ -169,7 +172,7 @@ impl<'a> VisitMut for FunctionSummarizerVisitor<'a> {
 
         let summary = if let Some(jsdoc_text) = jsdoc_summary {
             jsdoc_text
-        } else if line_count >= self.line_threshold {
+        } else if line_count >= self.line_threshold && self.sumarize_function_enabled {
             if let Some(ollama) = self.ollama {
                 let fn_snippet = extract_snippet(self.file_content, lo_pos.line, hi_pos.line);
                 ollama

@@ -84,6 +84,7 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                             ollama_ref,
                             comments.to_owned(),
                             ctx.summarize_functions_threshold,
+                            ctx.summarize_functions,
                         );
                         module.visit_mut_with(&mut fn_vis);
                     }
@@ -96,6 +97,7 @@ pub fn run_project_analysis(ctx: Arc<UraiContext>) -> Result<()> {
                             ollama_ref,
                             comments,
                             ctx.summarize_functions_threshold,
+                            ctx.summarize_functions,
                         );
                         module.visit_mut_with(&mut fn_vis);
                     }
