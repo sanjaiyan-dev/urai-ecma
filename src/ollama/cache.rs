@@ -12,11 +12,11 @@ pub fn init_cache(
 
     rt.block_on(async {
         let device = FsDeviceBuilder::new(cache_folder)
-            .with_capacity(8 * 1024 * 1024)
+            .with_capacity(128 * 1024 * 1024)
             .build()?;
 
         let hybrid = HybridCacheBuilder::new()
-            .memory(2 * 1024 * 1024)
+            .memory(64 * 1024 * 1024)
             .storage()
             .with_engine_config(BlockEngineConfig::new(device))
             .with_compression(foyer::Compression::Zstd)
