@@ -4,5 +4,7 @@
 
 ## Others
 
+- [Engine Internals: Rust SWC AST & Cache Architecture | URAI](https://sanjaiyan-dev.github.io/urai-ecma/architecture/engine-internals.md): Explore URAI's compiler internals: SWC AST pruning, foyer Zstd hybrid caching, Rayon concurrency, and structural stubs for up to 80% LLM token reduction.
 - [Introduction & Philosophy](https://sanjaiyan-dev.github.io/urai-ecma/guide/introduction.md): Discover the philosophy of URAI (உரை), the mathematics of attention budgets, and why compiler-level AST pruning radically outperforms naive codebase dumpers.
 - [Installation & Quick Start](https://sanjaiyan-dev.github.io/urai-ecma/guide/quick-start.md): Get up and running with urai-ecma in under 60 seconds. Install via Shell, PowerShell, npm, or Cargo, scaffold urai.config.jsonc, and synthesize your first AST-dense prompt.
+- [`urai.config` API Reference](https://sanjaiyan-dev.github.io/urai-ecma/reference/config.md): Comprehensive specification and line-by-line breakdown of urai.config.jsonc and urai.config.json settings.

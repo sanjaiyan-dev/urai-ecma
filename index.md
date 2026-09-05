@@ -7,7 +7,7 @@ AST-Aware Code-to-Prompt Engine
 
 > Strip styling bloat, summarize method bodies, and feed complete JS/TS codebases into LLMs with up to 80% token reduction.
 
-[Get Started](/guide/quick-start) | [Explore Features](/guide/introduction) | [View on GitHub](https://github.com/sanjaiyan-dev/urai-ecma)
+[Get Started](/guide/quick-start) | [Explore Architecture](/architecture/engine-internals) | [View on GitHub](https://github.com/sanjaiyan-dev/urai-ecma)
 
 ## Features
 

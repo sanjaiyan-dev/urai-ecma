@@ -1,7 +1,7 @@
 > For AI agents: the complete documentation index is available at https://sanjaiyan-dev.github.io/urai-ecma/llms.txt, the full documentation bundle is available at https://sanjaiyan-dev.github.io/urai-ecma/llms-full.txt.
 
-# The Philosophy of URAI (உரை
-)
+# The Philosophy of URAI (உரை)
+
 
 Rust SWC Core
 Attention Budget Optimizer
@@ -11,7 +11,7 @@ Tiktoken o200k BPE
 
 > **“உரை” (_Urai_)** in classical Tamil translates to _reasoned exposition, critical discourse, structural commentary, or analytical narrative_.
 >
-> **`urai-ecma`** transforms massive JavaScript, TypeScript, and React codebases into an information-dense, noise-free Markdown prompt engineered specifically for Large Language Model context windows (GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro, and local Llama/Qwen models).
+> **`urai-ecma`** transforms massive JavaScript, TypeScript, and React codebases into an information-dense, noise-free Markdown prompt engineered specifically for Large Language Model context windows (GPT-4o, Claude 3.5 Sonnet, Gemini 3.1 Pro, and local Llama/Gemma models).
 
 ## 📊 Live Interactive BPE Telemetry Simulator
 
@@ -384,19 +384,14 @@ Explore the operational guides to integrate `urai-ecma` into your engineering wo
 Install prebuilt binaries via Shell, PowerShell, npm, or Cargo in seconds.
 
 
-](/guide/quick-start)[🌳 Compiler Pipeline
+](/urai-ecma/guide/quick-start)[🌳 Compiler Pipeline
 
 Deep dive into the SWC visitor pattern, Foyer hybrid caching, and Rayon threading.
 
 
-](/guide/architecture)[🛠️ CLI & Config Reference
+](/urai-ecma/architecture/engine-internals)[🛠️ CLI & Config Reference
 
 Complete reference for all CLI arguments, environment variables, and config options.
 
 
-](/reference/cli)[📈 Empirical Benchmarks
-
-Performance and token comparisons against Repomix, GitIngest, and raw code dumps.
-
-
-](/reference/benchmarks)
+](/urai-ecma/reference/config)

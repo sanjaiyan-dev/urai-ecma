@@ -1,11 +1,448 @@
 ---
+url: https://sanjaiyan-dev.github.io/urai-ecma/architecture/engine-internals.md
+---
+
+> For AI agents: the complete documentation index is available at https://sanjaiyan-dev.github.io/urai-ecma/llms.txt, the full documentation bundle is available at https://sanjaiyan-dev.github.io/urai-ecma/llms-full.txt.
+
+# Architecture & Engine Internals (கட்டமைப்பு மற்றும் பொறி உள்ளமைப்புகள்)
+
+```
+               ┌────────────────────────────────────────────────────────┐
+               │           RAW JS / TS / TSX / JSON CODEBASE            │
+               └───────────────────────────┬────────────────────────────┘
+                                           │
+                       ignore::WalkBuilder │ Prunes node_modules, target,
+                                           │ .git, respects .gitignore
+                                           ▼
+               ┌────────────────────────────────────────────────────────┐
+               │        Rayon Parallel Work-Stealing Threadpool         │
+               │             files.par_iter().filter_map(...)           │
+               └─────────────┬────────────────────────────┬─────────────┘
+                             │                            │
+             Thread Worker A │            Thread Worker B │
+                             ▼                            ▼
+            ┌────────────────────────────────┐ ┌────────────────────────────────┐
+            │       SWC Ingestion Core       │ │       SWC Ingestion Core       │
+            │   swc_ecma_parser::parse_file  │ │   swc_ecma_parser::parse_file  │
+            │  Lrc<SourceMap> + Comments Map │ │  Lrc<SourceMap> + Comments Map │
+            └────────────────┬───────────────┘ └────────────────┬───────────────┘
+                             │                                  │
+      ┌──────────────────────┴──────────────────────────────────┴──────────────────────┐
+      │                     MULTI-STAGE AST VISITOR PIPELINE                           │
+      │                                                                                │
+      │   1. RouteVisitor               ──► Next.js verbs, NestJS @Controller, Express │
+      │   2. ReactComponentAnalyzer     ──► Props, useState, useEffect, JSX hierarchy  │
+      │   3. FunctionSummarizerVisitor  ──► JSDoc / Ollama AI + Structural Stubs       │
+      │   4. ClassMethodSummarizer      ──► Constructors, Methods, Private #methods     │
+      │   5. ReactJsxPruner             ──► 4-Mode Tailwind Utility Pruning            │
+      └──────────────────────────────────────┬─────────────────────────────────────────┘
+                                             │
+                                             ▼
+                             ┌────────────────────────────────┐
+                             │       foyer Hybrid Cache       │
+                             │  Sha512_256 Key ──► Zstd Disk  │
+                             │  (Sub-ms Ollama Memoization)   │
+                             └───────────────┬────────────────┘
+                                             │
+                                             ▼
+                             ┌────────────────────────────────┐
+                             │    swc_ecma_codegen Emitter    │
+                             │    JsWriter AST-to-String      │
+                             └───────────────┬────────────────┘
+                                             │
+                                             ▼
+                             ┌────────────────────────────────┐
+                             │    MarkdownContentBuilder      │
+                             │  + petgraph Dependency Graph   │
+                             └───────────────┬────────────────┘
+                                             │
+                                             ▼
+                             ┌────────────────────────────────┐
+                             │   tiktoken o200k_base Engine   │
+                             │ BPE Reduction Telemetry Report │
+                             └────────────────────────────────┘
+```
+
+## 1. Concurrency Model & File Ingestion
+
+`urai-ecma` processes large enterprise monorepos (10,000+ files) without thread contention or memory exhaustion.
+
+### 1.1 Git-Aware Pruning Traversal (`collect_source_files`)
+
+Standard directory traversals choke on `node_modules`, `.next`, or build artifacts. `urai-ecma` uses `ignore::WalkBuilder` with early prefix pruning:
+
+```rust
+WalkBuilder::new(path)
+    .hidden(true)
+    .git_ignore(true)
+    .ignore(true)
+    .filter_entry(|entry| {
+        if let Some(file_name) = entry.file_name().to_str()
+            && (file_name == "node_modules"
+                || file_name == "dist"
+                || file_name == "build"
+                || file_name == "target")
+        {
+            return false; // Skips descending into directory entirely
+        }
+        true
+    })
+```
+
+- **Early Branch Termination**: By returning `false` inside `filter_entry`, the directory tree traversal avoids calling `stat()` or descending into tens of thousands of nested dependencies.
+- **Extension Matching**: `is_supported_extension` bounds AST ingestion to valid ECMAScript/TypeScript MIME signatures: `js`, `jsx`, `ts`, `tsx`, `mjs`, and `cjs`.
+
+### 1.2 Rayon Parallelism and Thread Safety
+
+File processing runs inside a fork-join work-stealing pool using `rayon::prelude::*`:
+
+```rust
+let processed_data: Vec<(FileAnalysisResult, Vec<RouteInfo>)> = files
+    .par_iter()
+    .filter_map(|file_path| { ... })
+    .collect();
+```
+
+- **Thread Confinement**: Each worker thread maintains its own independent AST traversal instance, avoiding mutex contention during parsing.
+- **Safe Context Sharing**: `UraiContext` is wrapped in an `Arc<UraiContext>`. Read-only properties (thresholds, modes, endpoint paths) are accessed concurrently across CPU cores without locking.
+
+***
+
+## 2. The SWC Parser & AST Ingestion Engine
+
+Rather than relying on brittle regex matching, `urai-ecma` parses full Abstract Syntax Trees using **SWC (`swc_ecma_parser`)**.
+
+### Memory Layout and Comment Attachment
+
+```rust
+let parse_res = parse_file(&raw_content, file_path.to_str().unwrap_or_default());
+```
+
+When SWC parses a module, it yields a three-part tuple:
+
+1. `swc_ecma_ast::Module`: The root AST node representing statements, imports, exports, and declarations.
+2. `SingleThreadedComments`: A two-tiered comment map separating **leading** and **trailing** trivia tokens indexed by `BytePos`.
+3. `Lrc<SourceMap>`: An atomic reference-counted source map linking internal byte offsets (`lo`, `hi`) to concrete file line numbers and character positions.
+
+***
+
+## 3. The AST Visitor Pipeline
+
+`urai-ecma` sequences AST visitors in a specific order: extraction occurs before destructive pruning.
+
+```
+AST Node (Module)
+   │
+   ├──► 1. RouteVisitor (Read-Only: Next.js, NestJS, Express)
+   │
+   ├──► 2. ReactComponentAnalyzer (Read-Only: Props, useState, useEffect, Tags)
+   │
+   ├──► 3. FunctionSummarizerVisitor (Mutating: Stubs body, inserts summary comment)
+   │
+   ├──► 4. ClassMethodSummarizerVisitor (Mutating: Handles classes, constructors, #private)
+   │
+   └──► 5. ReactJsxPruner (Mutating: Strips or summarizes static className/style)
+```
+
+***
+
+### 3.1 Structural Stub Retention (`is_structural_stub_stmt`)
+
+The core innovation of `urai-ecma` is **Structural Stub Retention**. When collapsing multi-line function bodies, removing all statements blinds the downstream LLM to component lifecycle and reactive event flows.
+
+`urai-ecma` solves this with `is_structural_stub_stmt`:
+
+```rust
+fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
+    match stmt {
+        // 1. Nested function declarations
+        Stmt::Decl(Decl::Fn(_)) => true,
+
+        // 2. Nested arrow expressions assigned to variables
+        Stmt::Decl(Decl::Var(var_decl)) => var_decl.decls.iter().any(|decl| {
+            if let Some(init) = &decl.init {
+                matches!(**init, Expr::Arrow(_) | Expr::Fn(_))
+            } else {
+                false
+            }
+        }),
+
+        // 3. Reactive hooks, lifecycle timers, and global listeners
+        Stmt::Expr(expr_stmt) => {
+            if let Expr::Call(call_expr) = &*expr_stmt.expr
+                && let Callee::Expr(callee_expr) = &call_expr.callee
+                && let Expr::Ident(ident) = &**callee_expr
+            {
+                let name = ident.sym.as_ref();
+                return name.starts_with("use")
+                    || name == "setTimeout"
+                    || name == "setInterval"
+                    || name.contains("addEventListener")
+                    || name.contains("requestIdleCallback");
+            }
+            false
+        }
+
+        // 4. Component JSX returns (preserves UI hierarchy)
+        Stmt::Return(ret_stmt) => {
+            if let Some(arg) = &ret_stmt.arg {
+                matches!(
+                    &**arg,
+                    Expr::JSXElement(_) | Expr::JSXFragment(_) | Expr::Paren(_)
+                )
+            } else {
+                false
+            }
+        }
+
+        _ => false, // Computational loops, arithmetic, validations are stripped
+    }
+}
+```
+
+#### Why This Works
+
+- **Hooks Kept Intact**: `useEffect(() => { ... }, [dep])` is preserved, signaling side-effect dependencies to the LLM.
+- **JSX Output Preserved**: The return structure (`<div ...><Child /></div>`) remains visible.
+- **Dead Logic Discarded**: Intermediate loops, data sanitization, and variable assignments are stripped and replaced with a single synthetic expression comment:
+  ```rust
+  function_body.stmts.push(Stmt::Expr(ExprStmt {
+      span: DUMMY_SP,
+      expr: Box::new(Expr::Lit(Lit::Str(Str {
+          span: DUMMY_SP,
+          value: format!("/* {:?} */", summary).into(),
+          raw: None,
+      }))),
+  }));
+  ```
+
+***
+
+### 3.2 JSDoc Extraction with Distance-Based Fallback
+
+Before querying an LLM, `FunctionSummarizerVisitor` checks for human-written documentation using the `jsdoc` crate:
+
+```rust
+let positions_to_check = [self.current_export_lo, Some(fn_lo), Some(ident_lo)];
+for pos in positions_to_check.into_iter().flatten() {
+    if let Some(leading_comments) = self.comments.get_leading(pos) {
+        for comment in &leading_comments {
+            if let Some(info) = parse_jsdoc_comment(comment) {
+                return Some(format_jsdoc_summary(&info));
+            }
+        }
+    }
+}
+```
+
+- **Export Anchor Matching**: When functions are wrapped in export statements (e.g., `export default function ...`), comments attach to the `ExportDecl` span rather than the inner `FnDecl`. Tracking `current_export_lo` captures these comments.
+- **Proximity Scan Fallback**: If exact span alignment fails, the engine scans all comments within a 300-byte window (`distance <= 300`) to associate detached comments with their respective declarations.
+
+***
+
+### 3.3 The 4-Mode JSX Tailwind Pruner (`ReactJsxPruner`)
+
+Modern utility-first CSS causes significant token bloat in LLM contexts. `ReactJsxPruner` intercepts JSX attributes via `visit_mut_jsx_opening_element`:
+
+```rust
+match self.mode {
+    TailwindMode::Remove => {
+        // Static string literals exceeding threshold are stripped.
+        // Dynamic expressions (clsx, cva, ternaries) are preserved!
+        if let Some(JSXAttrValue::JSXExprContainer(expr)) = jsx_attr.value {
+            pruned_attrs.push(...);
+        }
+    }
+    TailwindMode::Summarize => {
+        // Converts strings > threshold into a natural language description
+        let summary = ollama.summarize_tailwind_classes(&raw_str);
+        // Emits: className="/* UI: Frosted glass card with dark mode */"
+    }
+    TailwindMode::RemoveAggr => {
+        // Unconditionally strips all static class strings
+    }
+    TailwindMode::Preserve => {
+        // Keeps all styles intact for CSS debugging
+    }
+}
+```
+
+- **Dynamic Code Preservation**: By filtering on `JSXAttrValue::JSXExprContainer`, patterns like `className={clsx("base", isActive && "active")}` remain untouched, preserving conditional UI logic for the LLM.
+
+***
+
+### 3.4 Backend API Route Extraction (`RouteVisitor`)
+
+`RouteVisitor` parses endpoint declarations across major backend frameworks:
+
+#### 1. Next.js App Router
+
+Inspects exported functions within file paths containing `route.ts`, `route.js`, or `/api/`:
+
+```rust
+if matches!(upper_name.as_str(), "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS") {
+    let derived_path = derive_nextjs_route_path(self.file_path);
+    // Emits: Next.js | POST | /api/v1/auth | POST | route.ts:18
+}
+```
+
+#### 2. NestJS Controllers
+
+Inspects AST decorators on classes and methods:
+
+- Identifies `@Controller(prefix)` to establish the base route.
+- Matches method decorators (`@Get`, `@Post`, `@Put`, etc.) and joins subpaths to produce full URI endpoints.
+
+#### 3. Express & Fastify
+
+Detects Member Expression calls on common server variables (`app`, `router`, `fastify`, `server`):
+
+- Handles both string literals and template literals:
+  ```rust
+  Expr::Tpl(tpl) => tpl.quasis.iter().map(|q| q.raw.as_str()).collect().join("${...}")
+  ```
+  Resolves route patterns like ``app.get(`/users/${id}`)`` into `/users/${...}`.
+
+***
+
+### 3.5 React Introspection (`ReactComponentAnalyzer`)
+
+`ReactComponentAnalyzer` identifies components by PascalCase naming (`name.chars().next().is_some_and(|c| c.is_uppercase())`) across function declarations and arrow expressions:
+
+- **TypeScript Prop Extraction**: Resolves explicit type annotations (`resolve_ts_type`) and object destructuring patterns (`ObjectPatProp::KeyValue`).
+- **Hook Inspection**: Tracks hook invocations prefixed with `use*`, increments side-effect counters on `useEffect` / `useLayoutEffect`, and matches `useState` variable/setter pairs.
+- **JSX Element Scanning**: Walks the internal JSX element tree and records rendered child elements (e.g., `<Button>`, `<ModalHeader>`).
+
+***
+
+## 4. The Storage Engine: `foyer` Hybrid Cache
+
+When function summarization or Tailwind style summarization is enabled, sending duplicate requests to an LLM slows down processing. `urai-ecma` integrates **`foyer`**, a hybrid memory and disk caching engine written in Rust.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      OllamaUrai Engine                          │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+                   Prompt String │ SHA-512/256 Hash
+                                 ▼
+                     const_hex::encode(digest)
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      foyer::HybridCache                         │
+│                                                                 │
+│   ┌─────────────────────────────────────────────────────────┐   │
+│   │ Memory Tier: 64 MB Direct RAM Buffer                    │   │
+│   └────────────────────────────┬────────────────────────────┘   │
+│                                │ Eviction Spillover             │
+│   ┌────────────────────────────▼────────────────────────────┐   │
+│   │ Storage Tier: 128 MB FsDeviceBuilder                    │   │
+│   │ BlockEngineConfig + foyer::Compression::Zstd            │   │
+│   └─────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+             ┌───────────────────┴───────────────────┐
+             │ Cache Hit                             │ Cache Miss
+             ▼                                       ▼
+    Return Cached Response             reqwest::blocking::Client
+    (< 0.5 ms latency)                 HTTP POST /api/generate
+                                       Store result in foyer
+```
+
+### 4.1 Cryptographic Cache Keys
+
+Cache keys are computed using `Sha512_256`:
+
+```rust
+pub fn generate_cache_key(&self, prompt: &String) -> String {
+    let cache_key = Sha512_256::digest(prompt.as_bytes());
+    const_hex::encode(cache_key)
+}
+```
+
+- **No Truncation Collisions**: `Sha512_256` produces a 256-bit digest resistant to collision attacks, making it safe across thousands of distinct code snippets.
+- **Zero-Allocation Hex Formatting**: `const_hex` serializes raw bytes into ASCII hex strings with SIMD optimizations.
+
+### 4.2 Storage and Eviction Policies
+
+```rust
+let device = FsDeviceBuilder::new(cache_folder)
+    .with_capacity(128 * 1024 * 1024) // 128 MB on-disk limit
+    .build()?;
+
+let hybrid = HybridCacheBuilder::new()
+    .memory(64 * 1024 * 1024)         // 64 MB fast in-memory cache
+    .storage()
+    .with_engine_config(BlockEngineConfig::new(device))
+    .with_compression(foyer::Compression::Zstd) // Direct Zstd block compression
+    .build()
+    .await?;
+```
+
+- **Two-Tier Architecture**: Hits resolve directly from memory in nanoseconds. When memory fills, entries spill over to disk.
+- **Zstd Compression**: Compresses cached LLM response text by \~70%, fitting more entries within disk allocations.
+- **Graceful Shutdown**: Implements `Drop` for `OllamaUrai` to flush in-flight disk writes before the process exits:
+  ```rust
+  impl Drop for OllamaUrai {
+      fn drop(&mut self) {
+          let _ = self.rt.block_on(async { self.cache.close().await });
+      }
+  }
+  ```
+
+***
+
+## 5. Dependency Graph Construction
+
+`urai-ecma` builds both directory trees and module dependency graphs without external runtime tooling.
+
+### 5.1 ASCII Tree Generation
+
+Recursively reads project directories while filtering out hidden entries and build output folders (`target`, `dist`, `node_modules`). Connectors (`├── ` and `└── `) are assigned using lookahead counters based on remaining path entries.
+
+### 5.2 `petgraph` Directed Module Graph
+
+Scans source files for relative import declarations (`import ... from './component'`) and tracks them using `petgraph::graph::UnGraph`:
+
+```rust
+let mut graph = UnGraph::<String, ()>::new_undirected();
+let mut node_indices = HashMap::new();
+```
+
+- Resolves relative paths against the project root.
+- Emits a standard **Mermaid.js** diagram (`graph LR;`) embedded directly into the generated prompt context, allowing the LLM to inspect project topology.
+
+***
+
+## 6. Token Telemetry & Context Optimization
+
+### 6.1 `tiktoken` Integration (`o200k_base`)
+
+At the end of an optimization run, `urai-ecma` benchmarks raw source tokens against the final output:
+
+```rust
+if let Some(bpe) = tiktoken::get_encoding("o200k_base") {
+    let output_tokens = bpe.encode(&content).len();
+    let raw_tokens = calculate_raw_project_tokens(&ctx.input_project, bpe);
+    let saved_tokens = raw_tokens.saturating_sub(output_tokens);
+    let reduction_percentage = (saved_tokens as f64 / raw_tokens as f64) * 100.0;
+}
+```
+
+- **Native GPT-4o Tokenizer**: Uses the `o200k_base` vocabulary matching OpenAI's flagship models, ensuring token calculations reflect actual API billing and context usage.
+- **Accurate Source Counting**: `calculate_raw_project_tokens` counts all supported source files, including file name token overhead.
+
+
+
+---
 url: https://sanjaiyan-dev.github.io/urai-ecma/guide/introduction.md
 ---
 
 > For AI agents: the complete documentation index is available at https://sanjaiyan-dev.github.io/urai-ecma/llms.txt, the full documentation bundle is available at https://sanjaiyan-dev.github.io/urai-ecma/llms-full.txt.
 
-# The Philosophy of URAI (உரை
-)
+# The Philosophy of URAI (உரை)
+
 
 Rust SWC Core
 Attention Budget Optimizer
@@ -15,7 +452,7 @@ Tiktoken o200k BPE
 
 > **“உரை” (_Urai_)** in classical Tamil translates to _reasoned exposition, critical discourse, structural commentary, or analytical narrative_.
 >
-> **`urai-ecma`** transforms massive JavaScript, TypeScript, and React codebases into an information-dense, noise-free Markdown prompt engineered specifically for Large Language Model context windows (GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro, and local Llama/Qwen models).
+> **`urai-ecma`** transforms massive JavaScript, TypeScript, and React codebases into an information-dense, noise-free Markdown prompt engineered specifically for Large Language Model context windows (GPT-4o, Claude 3.5 Sonnet, Gemini 3.1 Pro, and local Llama/Gemma models).
 
 ## 📊 Live Interactive BPE Telemetry Simulator
 
@@ -388,22 +825,17 @@ Explore the operational guides to integrate `urai-ecma` into your engineering wo
 Install prebuilt binaries via Shell, PowerShell, npm, or Cargo in seconds.
 
 
-](/guide/quick-start)[🌳 Compiler Pipeline
+](/urai-ecma/guide/quick-start)[🌳 Compiler Pipeline
 
 Deep dive into the SWC visitor pattern, Foyer hybrid caching, and Rayon threading.
 
 
-](/guide/architecture)[🛠️ CLI & Config Reference
+](/urai-ecma/architecture/engine-internals)[🛠️ CLI & Config Reference
 
 Complete reference for all CLI arguments, environment variables, and config options.
 
 
-](/reference/cli)[📈 Empirical Benchmarks
-
-Performance and token comparisons against Repomix, GitIngest, and raw code dumps.
-
-
-](/reference/benchmarks)
+](/urai-ecma/reference/config)
 
 
 ---
@@ -412,7 +844,7 @@ url: https://sanjaiyan-dev.github.io/urai-ecma/guide/quick-start.md
 
 > For AI agents: the complete documentation index is available at https://sanjaiyan-dev.github.io/urai-ecma/llms.txt, the full documentation bundle is available at https://sanjaiyan-dev.github.io/urai-ecma/llms-full.txt.
 
-# Quick Start விரைவு தொடக்கம்
+# Quick Start (விரைவு தொடக்கம்)
 
 
 v0.1.1 Active
@@ -421,8 +853,6 @@ Multi-Platform Binaries
 Zero Dependencies
 
 Transform raw enterprise repositories into token-dense, architecturally intact Markdown prompts. Go from zero to your first synthesized LLM prompt in **4 simple steps**.
-
-***
 
 ## ⚡ Installation Matrix
 
@@ -667,29 +1097,6 @@ When Ollama summarization is enabled, results are cached in `.urai-cache/` at yo
 rm -rf ./src/.urai-cache
 ```
 
-***
-
-## 🧭 Next Steps
-
-Continue exploring the technical guides to get the most out of `urai-ecma`:
-
-
-[✂️ Tailwind Optimization Modes
-
-Compare <code>remove</code>, <code>remove\_aggr</code>, <code>summarize</code>, and <code>preserve</code> with real code samples.
-
-
-](/guide/tailwind-pruning)[⚛️ React & Route Extraction
-
-Learn how Next.js, Fastify, Express, and NestJS routing tables are automatically cataloged.
-
-
-](/guide/react-and-routes)[🛠️ CLI Flags & Variables
-
-Comprehensive reference of all CLI parameters, environment variables, and config keys.
-
-
-](/reference/cli)
 
 
 ---
@@ -705,7 +1112,7 @@ AST-Aware Code-to-Prompt Engine
 
 > Strip styling bloat, summarize method bodies, and feed complete JS/TS codebases into LLMs with up to 80% token reduction.
 
-[Get Started](/guide/quick-start) | [Explore Features](/guide/introduction) | [View on GitHub](https://github.com/sanjaiyan-dev/urai-ecma)
+[Get Started](/guide/quick-start) | [Explore Architecture](/architecture/engine-internals) | [View on GitHub](https://github.com/sanjaiyan-dev/urai-ecma)
 
 ## Features
 
@@ -715,5 +1122,548 @@ AST-Aware Code-to-Prompt Engine
 - [⚛️ **React Component Inspector**](/guide/react-analysis): Extracts typed props, useState variables, effect counters, and hierarchy into clean Markdown summaries.
 - [🦙 **JSDoc & Local Ollama AI**](/guide/function-summarization#jsdoc-first): Prioritizes instant JSDoc extraction. Falls back to local Ollama models with persistent disk caching.
 - [📊 **Built-in Tiktoken Analytics**](/guide/quick-start#token-savings-report): Real-time before-and-after token savings report calculated via OpenAI o200k_base and Llama 3 BPE.
+
+
+
+---
+url: https://sanjaiyan-dev.github.io/urai-ecma/reference/config.md
+---
+
+> For AI agents: the complete documentation index is available at https://sanjaiyan-dev.github.io/urai-ecma/llms.txt, the full documentation bundle is available at https://sanjaiyan-dev.github.io/urai-ecma/llms-full.txt.
+
+# `urai.config`
+ API Reference (நிரலாக்க இடைமுகக் குறிப்பேடு)
+
+`urai-ecma` reads its runtime configuration from `urai.config.jsonc` or `urai.config.json` in your current working directory. The parser is powered by the Rust **`json5`** engine, natively supporting single-line comments (`//`), multi-line comments (`/* */`), trailing commas, and unquoted identifiers.
+
+## Configuration Precedence Architecture
+
+`urai-ecma` applies configuration via a **strict 4-tier waterfall model**:
+
+```
+┌────────────────────────────────────────────────────────┐
+│ 1. CLI Arguments (--tailwind-mode, -i, -o, etc.)      │ ◄ Highest Priority
+└───────────────────────────┬────────────────────────────┘
+                            │ (falls back to)
+┌───────────────────────────▼────────────────────────────┐
+│ 2. Environment Variables (e.g., OLLAMA_ENDPOINT)       │
+└───────────────────────────┬────────────────────────────┘
+                            │ (falls back to)
+┌───────────────────────────▼────────────────────────────┐
+│ 3. urai.config.jsonc / urai.config.json File           │
+└───────────────────────────┬────────────────────────────┘
+                            │ (falls back to)
+┌───────────────────────────▼────────────────────────────┐
+│ 4. Rust Compiler Defaults (e.g., threshold = 96)       │ ◄ Base Default
+└────────────────────────────────────────────────────────┘
+```
+
+When an option is specified via the CLI, it **overrides** the configuration file and environment variables. If an option is omitted everywhere, the internal Rust engine falls back to its deterministic defaults.
+
+***
+
+## Master Template (`urai.config.jsonc`)
+
+Generate this file automatically by running:
+
+```bash
+urai-ecma create
+```
+
+```jsonc
+{
+  "$schema": "https://sanjaiyan-dev.github.io/urai-ecma/json-schema/v0/config.schema.json",
+
+  // Path to the project directory or single source file
+  "input_project": "./src",
+
+  // Target output Markdown file path
+  "output_file": "./output.md",
+
+  // Ollama local endpoint URL (Optional, e.g., "http://localhost:11434")
+  "ollama_endpoint": "http://localhost:11434",
+
+  // Ollama Model Name (e.g., "gemma4", "ornith", "llama3.2")
+  "ollama_modelname": "gemma4",
+
+  // Tailwind CSS / className pruning mode: "remove" | "remove_aggr" | "summarize" | "preserve"
+  // "remove": strips static class strings exceeding threshold while keeping dynamic expressions.
+  // "remove_aggr": aggressively removes class strings even if below character threshold.
+  // "summarize": sends class strings exceeding threshold to Ollama for 1-line style descriptions.
+  // "preserve": keeps classNames untouched.
+  "tailwind_mode": "remove",
+
+  // Character length threshold for Tailwind pruning (default: 96 characters)
+  "tailwind_threshold": 96,
+
+  // Summarize function block bodies using local Ollama or fallback to JSDoc comments
+  "summarize_functions": true,
+
+  // Line count threshold to trigger function summarization (default: 5 lines)
+  "summarize_functions_threshold": 5,
+
+  // Extract and generate Express/Fastify/Next.js/NestJS API Route Table
+  "generate_route_table": true,
+
+  // Analyze React / React Native components and output detailed explanations
+  "analyze_react_components": true,
+
+  // Generate ASCII File Structure & Module Dependency Graph
+  "generate_file_graph": true
+}
+```
+
+***
+
+## Detailed Field Specification
+
+### `$schema`
+
+- **Type**: `string` (URI)
+- **Required**: `No` (Recommended)
+- **Default**: `"https://sanjaiyan-dev.github.io/urai-ecma/json-schema/v0/config.schema.json"`
+
+Enables JSON Schema validation and intelligent IntelliSense autocompletion in VS Code, Cursor, Windsurf, and JetBrains IDEs. As you type inside `urai.config.jsonc`, your editor will surface field descriptions, type checks, and valid enum values.
+
+***
+
+### `input_project`
+
+- **Type**: `string` (File Path or Directory Path)
+- **Required**: `Yes` (if not supplied via `-i` / `--input-project`)
+- **CLI Flag**: `-i <PATH>`, `--input-project <PATH>`
+- **Default**: `None`
+
+Specifies the root directory of your JavaScript/TypeScript project or the path to an individual source file.
+
+- **Directory Mode** (`"./src"`): Scans all `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.cjs` files recursively using `ignore::WalkBuilder`, respecting `.gitignore`, `.ignore`, and skipping build directories (`node_modules`, `dist`, `build`, `target`).
+- **Single File Mode** (`"./src/App.tsx"`): Analyzes and optimizes only that file.
+
+```jsonc
+"input_project": "./packages/client/src"
+```
+
+:::warning Path Resolution
+Relative paths are resolved relative to the current working directory from which `urai-ecma` is invoked, **not** the location of the config file.
+:::
+
+***
+
+### `output_file`
+
+- **Type**: `string` (File Path)
+- **Required**: `Yes` (if not supplied via `-o` / `--output-file`)
+- **CLI Flag**: `-o <PATH>`, `--output-file <PATH>`
+- **Default**: `None`
+
+The destination path where the assembled, token-dense Markdown prompt will be written. If the file already exists, `urai-ecma` truncates and overwrites it. If parent directories do not exist, they will be created automatically.
+
+```jsonc
+"output_file": "./prompts/context.md"
+```
+
+***
+
+### `ollama_endpoint`
+
+- **Type**: `string` (HTTP URL)
+- **Required**: `No`
+- **CLI Flag**: `-e <URL>`, `--ollama-endpoint <URL>`
+- **Env Variable**: `OLLAMA_ENDPOINT`
+- **Default**: `http://localhost:11434`
+
+The base URL of an active local or remote Ollama server (typically `http://localhost:11434`).
+
+- When provided, `urai-ecma` initializes the **`foyer` Hybrid Cache** and uses the Ollama instance for:
+  1. Summarizing function bodies that lack JSDoc comments (`summarize_functions: true`).
+  2. Generating natural language style descriptions for Tailwind classes (`tailwind_mode: "summarize"`).
+- When omitted (`null`), `urai-ecma` runs in **pure offline AST mode**, falling back to JSDoc extraction or generating concise structural stubs without making network calls.
+
+```jsonc
+"ollama_endpoint": "http://127.0.0.1:11434"
+```
+
+***
+
+### `ollama_modelname`
+
+- **Type**: `string`
+- **Required**: `No`
+- **CLI Flag**: `-m <NAME>`, `--ollama-modelname <NAME>`
+- **Default**: `"gemma4"` (Internal Rust fallback) / `"gemma4"` (Config template)
+
+The specific model tag pulled into your Ollama instance to use for semantic code summarization. High-speed, instruction-following small parameter models are recommended to minimize latency.
+
+| Recommended Model                  | Best For                               | Typical Latency / Function |
+| :--------------------------------- | :------------------------------------- | :------------------------- |
+| **`gemma4:latest`** / **`gemma4`** | Maximum throughput, low VRAM footprint | \~80ms                     |
+| **`llama3.2:3b`** / **`llama3.2`** | High precision, complex method logic   | \~110ms                    |
+| **`qwen2.5-coder:1.5b`**           | Dedicated code understanding           | \~70ms                     |
+
+```jsonc
+"ollama_modelname": "gemma4:latest"
+```
+
+***
+
+### `tailwind_mode`
+
+- **Type**: `string` (Enum)
+- **Allowed Values**: `"remove"` | `"remove_aggr"` | `"summarize"` | `"preserve"`
+- **CLI Flag**: `--tailwind-mode <MODE>`
+- **Default**: `"remove"`
+
+Controls how the SWC JSX Visitor (`ReactJsxPruner`) handles `className` and `style` attributes on JSX elements:
+
+```
+JSX Opening Element: <div className="..." style="...">
+                         │
+        ┌────────────────┴────────────────┬────────────────┐
+        ▼                                 ▼                ▼
+     "remove"                      "summarize"        "preserve"
+(Strip static strings > 96 chars;  (Prompt Ollama:    (Keep untouched)
+ keep dynamic clsx / ternaries)    /* UI: Card layout */)
+```
+
+#### Mode Breakdown
+
+#### 1. `"remove"`
+ Default
+
+Strips static string literals when their length exceeds `tailwind_threshold`. **Crucially preserves dynamic expressions** (`JSXExprContainer`) such as `clsx()`, `cn()`, and ternary conditions.
+
+```tsx
+// Before
+<div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-2xl transition-all duration-300 w-full max-w-sm" />
+<span className={clsx("text-sm", isActive ? "text-emerald-500" : "text-zinc-500")} />
+
+// After
+<div />
+<span className={clsx("text-sm", isActive ? "text-emerald-500" : "text-zinc-500")} />
+```
+
+#### 2. `"remove_aggr"`
+
+Aggressively strips static `className` strings **regardless of character count**. Ideal for backend migrations, data modeling, or refactoring where CSS is irrelevant.
+
+#### 3. `"summarize"`
+
+Passes class strings exceeding `tailwind_threshold` to the configured Ollama model with a specialized system prompt, replacing verbose strings with a single-line natural language descriptor:
+
+```tsx
+// After
+<div className="/* UI: Frosted glass card layout with hover shadow */" />
+```
+
+#### 4. `"preserve"`
+
+Leaves all `className` and `style` attributes intact. Use this when asking an LLM to debug responsive styling or pixel-perfect layout issues.
+
+***
+
+### `tailwind_threshold`
+
+- **Type**: `number` (Positive integer)
+- **Required**: `No`
+- **CLI Flag**: `--tailwind-threshold <CHARS>`
+- **Default**: `96`
+
+The minimum character count of a static `className` string required to trigger pruning in `"remove"` and `"summarize"` modes.
+
+- Strings **shorter** than this threshold (e.g., `"flex items-center"`) are kept intact.
+- Strings **equal to or longer** than this threshold are pruned or summarized.
+
+```jsonc
+"tailwind_threshold": 64
+```
+
+***
+
+### `summarize_functions`
+
+- **Type**: `boolean`
+- **Required**: `No`
+- **CLI Flag**: `--summarize-functions <BOOL>`
+- **Default**: `true`
+
+Enables semantic function and class method pruning. When set to `true`:
+
+1. The visitor inspects functions (`FnDecl`, `ArrowExpr`, `ClassMethod`, `PrivateMethod`, constructors).
+2. It checks for **JSDoc annotations** (`@description`, `@param`, `@return`).
+3. If no JSDoc is present and the function line count exceeds `summarize_functions_threshold`, it queries Ollama for a 1-sentence summary.
+4. The internal body statements are cleared using `is_structural_stub_stmt`—retaining hooks (`use*`), timers (`setTimeout`), DOM listeners, and JSX return statements—and a summary expression comment is appended:
+   ```ts
+   /* "Validates authorization token and returns user profile payload." */
+   ```
+
+```jsonc
+"summarize_functions": true
+```
+
+***
+
+### `summarize_functions_threshold`
+
+- **Type**: `number` (Positive integer)
+- **Required**: `No`
+- **CLI Flag**: `--summarize-functions-threshold <LINES>`
+- **Default**: `5`
+
+The line count threshold required to trigger function summarization. Short utility functions (e.g., 2–4 lines) are kept intact without calling Ollama.
+
+```jsonc
+"summarize_functions_threshold": 8
+```
+
+***
+
+### `generate_route_table`
+
+- **Type**: `boolean`
+- **Required**: `No`
+- **CLI Flag**: `--generate-route-table <BOOL>`
+- **Default**: `true`
+
+Enables the AST `RouteVisitor` to discover API route handlers and output a structured Markdown routing table:
+
+- **Next.js App Router**: Discovers exported HTTP verbs (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `HEAD`, `OPTIONS`) from `app/**/route.ts` and `pages/api/**`.
+- **NestJS**: Discovers `@Controller('prefix')` and method-level decorators (`@Get`, `@Post`, `@Put`, `@Delete`, etc.).
+- **Express & Fastify**: Discovers `app.get()`, `router.post()`, `fastify.delete()`, including template literals (e.g., `` `/users/${id}` ``).
+
+```markdown
+## Backend API Route Table
+| Framework | Method | Path | Handler | File Location |
+| :--- | :--- | :--- | :--- | :--- |
+| **Next.js** | `GET` | `/api/v1/auth` | `GET` | `app/api/v1/auth/route.ts:4` |
+| **NestJS** | `POST` | `/billing/checkout` | `BillingController::checkout` | `billing.controller.ts:12` |
+```
+
+***
+
+### `analyze_react_components`
+
+- **Type**: `boolean`
+- **Required**: `No`
+- **CLI Flag**: `--analyze-react-components <BOOL>`
+- **Default**: `true`
+
+Enables `ReactComponentAnalyzer`. Introspects uppercase functional and arrow components to extract:
+
+- **Props**: Destructured keys and explicit TypeScript type annotations (`resolve_ts_type`).
+- **State Variables**: Variable and setter pairs declared via `useState`.
+- **Hooks & Side-Effects**: Detects and counts `useEffect`, `useLayoutEffect`, and custom `use*` hooks.
+- **Event Handlers**: Attaches registered event listeners (`onClick`, `onChange`, `onSubmit`).
+- **Rendered JSX Hierarchy**: Lists rendered child element tag names.
+
+```markdown
+### React Component Breakdown: `<CheckoutDrawer>` 
+- **Props**: `isOpen` (type: `boolean`), `onClose` (type: `() => void`)
+- **State Management**: Manages state `step` via setter `setStep`.
+- **Hooks**: Uses `useState, useEffect` (Total Side-Effects: 1).
+- **Event Handlers**: Handlers attached: `onClick, onKeyDown`.
+- **Rendered JSX Tree**: `<Drawer>, <DrawerOverlay>, <DrawerContent>`
+```
+
+***
+
+### `generate_file_graph`
+
+- **Type**: `boolean`
+- **Required**: `No`
+- **CLI Flag**: `--generate-file-graph <BOOL>`
+- **Default**: `true`
+
+Constructs and injects two architectural overviews into the final prompt:
+
+1. **ASCII Project Directory Tree**: A clean visual file tree respecting `.gitignore` rules.
+2. **Mermaid.js Dependency Graph**: Built using `petgraph::graph::UnGraph`, tracking relative ESM `import ... from './path'` relationships across modules.
+
+```mermaid
+graph LR;
+    components/Header.tsx --> ./NavMenu;
+    components/Header.tsx --> ./UserBadge;
+    services/api.ts --> ./httpClient;
+```
+
+***
+
+## Complete CLI Flag Mapping
+
+Every config option maps directly to an equivalent CLI flag:
+
+| JSON Key                        | CLI Equivalent                            | Type      | Default    |
+| :------------------------------ | :---------------------------------------- | :-------- | :--------- |
+| `input_project`                 | `-i`, `--input-project <PATH>`            | `PathBuf` | _Required_ |
+| `output_file`                   | `-o`, `--output-file <PATH>`              | `PathBuf` | _Required_ |
+| `ollama_endpoint`               | `-e`, `--ollama-endpoint <URL>`           | `Url`     | `null`     |
+| `ollama_modelname`              | `-m`, `--ollama-modelname <NAME>`         | `string`  | `"gemma2"` |
+| `tailwind_mode`                 | `--tailwind-mode <MODE>`                  | `string`  | `"remove"` |
+| `tailwind_threshold`            | `--tailwind-threshold <CHARS>`            | `usize`   | `96`       |
+| `summarize_functions`           | `--summarize-functions <BOOL>`            | `bool`    | `true`     |
+| `summarize_functions_threshold` | `--summarize-functions-threshold <LINES>` | `usize`   | `5`        |
+| `generate_route_table`          | `--generate-route-table <BOOL>`           | `bool`    | `true`     |
+| `analyze_react_components`      | `--analyze-react-components <BOOL>`       | `bool`    | `true`     |
+| `generate_file_graph`           | `--generate-file-graph <BOOL>`            | `bool`    | `true`     |
+
+***
+
+## Production Recipes
+
+
+**Full-Stack Next.js (Fast / Offline)**
+
+```jsonc
+{
+  "$schema": "https://sanjaiyan-dev.github.io/urai-ecma/json-schema/v0/config.schema.json",
+  "input_project": "./src",
+  "output_file": "./prompt.md",
+  "tailwind_mode": "remove",
+  "tailwind_threshold": 80,
+  "summarize_functions": false, // No Ollama required
+  "generate_route_table": true,
+  "analyze_react_components": true,
+  "generate_file_graph": true
+}
+```
+
+
+**Design System & UI Review (Ollama Powered)**
+
+```jsonc
+{
+  "$schema": "https://sanjaiyan-dev.github.io/urai-ecma/json-schema/v0/config.schema.json",
+  "input_project": "./packages/ui/src",
+  "output_file": "./ui-prompt.md",
+  "ollama_endpoint": "http://localhost:11434",
+  "ollama_modelname": "gemma2",
+  "tailwind_mode": "summarize", // Converts styles to 1-line descriptions
+  "tailwind_threshold": 64,
+  "summarize_functions": true,
+  "summarize_functions_threshold": 5,
+  "generate_route_table": false,
+  "analyze_react_components": true,
+  "generate_file_graph": true
+}
+```
+
+
+**Pure Backend Microservice (NestJS / Fastify)**
+
+```jsonc
+{
+  "$schema": "https://sanjaiyan-dev.github.io/urai-ecma/json-schema/v0/config.schema.json",
+  "input_project": "./apps/api/src",
+  "output_file": "./api-prompt.md",
+  "tailwind_mode": "preserve", // No JSX present
+  "summarize_functions": true,
+  "summarize_functions_threshold": 8,
+  "generate_route_table": true,
+  "analyze_react_components": false,
+  "generate_file_graph": true
+}
+```
+
+
+***
+
+## 🛠️ Interactive Configuration Architect
+
+Design, tweak, test presets, and export your configuration file right inside this interactive studio:
+
+
+Interactive Studiov0 Schema Compliant
+
+### `urai.config.jsonc` Visual Architect
+
+JSONCCLI Equivalent
+
+📋 Copy💾 Download .jsonc
+
+⚡ Quick Presets (Click to load)
+
+Next.js App RouterFull-StackUI & Design SystemAI SummarizerOffline Zero-LLMBlazing FastNestJS & Express APIBackendMax Token CompressionAggressive
+
+Est. Token Reduction
+
+~72%
+
+SWC Latency / 50 Files
+
+~1.1s (Hybrid cached)
+
+Offline Air-Gap Safety
+
+Local Ollama
+
+📁 I/O Path Mapping
+
+`input_project`
+
+`output_file`
+
+🎨 Tailwind CSS Pruner
+
+`tailwind_mode`remove (Strip static classes > threshold; keep clsx)remove_aggr (Aggressive purge of all static classes)summarize (Ollama 1-line natural style intent)preserve (Keep untouched for CSS debugging)
+
+`tailwind_threshold`96 chars
+
+🧠 Function & Method Stubs
+
+Enable `summarize_functions`
+
+`summarize_functions_threshold`5 lines
+
+🦙 Ollama Local AI
+
+Enabled
+
+`ollama_endpoint`
+
+`ollama_modelname`
+
+gemma4gemma2:2bllama3.2qwen2.5-coder:1.5bmistral
+
+🛣️ `generate_route_table`⚛️ `analyze_react_components`📁 `generate_file_graph`
+
+Generated urai.config.jsoncDirectly recognized by urai-ecma
+
+````
+{
+  "$schema": "https://sanjaiyan-dev.github.io/urai-ecma/json-schema/v0/config.schema.json",
+
+  // Path to the project directory or single source file
+  "input_project": "./src",
+
+  // Target output Markdown file path
+  "output_file": "./output.md",
+
+  // Ollama local endpoint URL (Optional, e.g., "http://localhost:11434")
+  "ollama_endpoint": "http://localhost:11434",
+
+  // Ollama Model Name (e.g., "gemma4", "llama3.2")
+  "ollama_modelname": "gemma4",
+
+  // Tailwind CSS pruning mode: "remove" | "remove_aggr" | "summarize" | "preserve"
+  "tailwind_mode": "remove",
+
+  // Character length threshold for Tailwind pruning (default: 96 characters)
+  "tailwind_threshold": 96,
+
+  // Summarize function block bodies using local Ollama or fallback to JSDoc comments
+  "summarize_functions": true,
+
+  // Line count threshold to trigger function summarization (default: 5 lines)
+  "summarize_functions_threshold": 5,
+
+  // Extract and generate Express/Fastify/Next.js/NestJS API Route Table
+  "generate_route_table": true,
+
+  // Analyze React / React Native components and output detailed explanations
+  "analyze_react_components": true,
+
+  // Generate ASCII File Structure & Module Dependency Graph
+  "generate_file_graph": true
+}
+````
 
 

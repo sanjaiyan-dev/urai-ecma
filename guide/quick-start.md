@@ -1,6 +1,6 @@
 > For AI agents: the complete documentation index is available at https://sanjaiyan-dev.github.io/urai-ecma/llms.txt, the full documentation bundle is available at https://sanjaiyan-dev.github.io/urai-ecma/llms-full.txt.
 
-# Quick Start விரைவு தொடக்கம்
+# Quick Start (விரைவு தொடக்கம்)
 
 
 v0.1.1 Active
@@ -9,8 +9,6 @@ Multi-Platform Binaries
 Zero Dependencies
 
 Transform raw enterprise repositories into token-dense, architecturally intact Markdown prompts. Go from zero to your first synthesized LLM prompt in **4 simple steps**.
-
-***
 
 ## ⚡ Installation Matrix
 
@@ -254,27 +252,3 @@ When Ollama summarization is enabled, results are cached in `.urai-cache/` at yo
 # To clear cached AI function summaries:
 rm -rf ./src/.urai-cache
 ```
-
-***
-
-## 🧭 Next Steps
-
-Continue exploring the technical guides to get the most out of `urai-ecma`:
-
-
-[✂️ Tailwind Optimization Modes
-
-Compare <code>remove</code>, <code>remove\_aggr</code>, <code>summarize</code>, and <code>preserve</code> with real code samples.
-
-
-](/guide/tailwind-pruning)[⚛️ React & Route Extraction
-
-Learn how Next.js, Fastify, Express, and NestJS routing tables are automatically cataloged.
-
-
-](/guide/react-and-routes)[🛠️ CLI Flags & Variables
-
-Comprehensive reference of all CLI parameters, environment variables, and config keys.
-
-
-](/reference/cli)
