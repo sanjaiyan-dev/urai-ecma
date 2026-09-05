@@ -39,8 +39,8 @@ hero:
       text: Get Started
       link: /guide/quick-start
     - theme: alt
-      text: Explore Features
-      link: /guide/tailwind-pruning
+      text:  Explore Architecture 
+      link: /architecture/engine-internals
     - theme: alt
       text: View on GitHub
       link: https://github.com/sanjaiyan-dev/urai-ecma

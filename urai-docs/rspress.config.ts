@@ -3,6 +3,10 @@ import { defineConfig } from '@rspress/core';
 
 const SITE_URL = 'https://sanjaiyan-dev.github.io/urai-ecma';
 
+const CRATES_IO_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+  <path d="M12 1.5 3 6.5v11l9 5 9-5v-11L12 1.5zm0 2.2 6.8 3.8-2.9 1.6-6.8-3.8 2.9-1.6zm-7.2 4.9 6.2 3.4v6.9l-6.2-3.4V8.6zm8.2 10.3v-6.9l6.2-3.4v6.9l-6.2 3.4z"/>
+</svg>`;
+
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
   globalStyles: path.join(__dirname, 'styles/index.css'),
@@ -14,12 +18,36 @@ export default defineConfig({
   icon: '/urai-icon.png',
   logo: '/urai.jpg',
   logoText: 'URAI (உரை)',
+
   themeConfig: {
+    footer: {
+      message:
+        'Released under the MIT License. Copyright © 2026 Sanjaiyan Parthipan.',
+    },
+
     socialLinks: [
       {
         icon: 'github',
         mode: 'link',
         content: 'https://github.com/sanjaiyan-dev/urai-ecma',
+      },
+      {
+        icon: {
+          svg: CRATES_IO_SVG,
+        },
+        mode: 'link',
+        content: 'https://crates.io/crates/urai-ecma',
+      },
+
+      {
+        icon: 'npm',
+        mode: 'link',
+        content: 'https://www.npmjs.com/package/urai-ecma',
+      },
+      {
+        icon: 'instagram',
+        mode: 'link',
+        content: 'https://instagram.com/sanjaiyan_dev',
       },
     ],
     enableContentAnimation: true,
@@ -36,6 +64,21 @@ export default defineConfig({
     },
     html: {
       tags: [
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'preconnect',
+            href: 'https://fonts.googleapis.com',
+          },
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'preconnect',
+            href: 'https://fonts.gstatic.com',
+            crossorigin: 'anonymous',
+          },
+        },
         // Open Graph Meta Tags
         {
           tag: 'meta',
