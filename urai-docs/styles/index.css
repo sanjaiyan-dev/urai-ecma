@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Fira+Code:wght@400;500;600&family=Mukta+Malar:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
+  /* Typography */
   --rp-font-family-base:
     "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;
@@ -22,7 +23,7 @@
   --rp-c-brand-darker: #914513;
   --rp-c-brand-tint: rgba(217, 119, 54, 0.14);
 
-  /* Cyber Accents */
+  /* Cyber Bioluminescent Accents */
   --urai-cyan: #00f2fe;
   --urai-cyan-deep: #00b4d8;
   --urai-cyan-glow: rgba(0, 242, 254, 0.4);
@@ -59,10 +60,10 @@
   --rp-c-text-code-border: rgba(217, 119, 54, 0.2);
   --rp-c-link: #b85d20;
 
-  /* Glass Layers Light */
-  --urai-glass-surface: rgba(255, 255, 255, 0.72);
+  /* Glass Layers */
+  --urai-glass-surface: rgba(255, 255, 255, 0.78);
   --urai-glass-border: 1px solid rgba(217, 119, 54, 0.22);
-  --urai-glass-nav: rgba(250, 247, 242, 0.82);
+  --urai-glass-nav: rgba(250, 247, 242, 0.85);
 
   /* Home Canvas Lighting */
   --rp-home-hero-secondary-color: #00b4d8;
@@ -107,30 +108,34 @@
   --rp-code-block-border: 1px solid rgba(217, 119, 54, 0.22);
 }
 
-:where(html.rp-dark) {
-  --rp-c-bg: #090c13;
-  --rp-c-bg-soft: #111724;
-  --rp-c-bg-mute: #172033;
-  --rp-c-bg-alt: #05070a;
+/* ==========================================================================
+   DARK MODE (Midnight Obsidian & Cyber Glass)
+   ========================================================================== */
+:where(html.rp-dark),
+:where(html.dark) {
+  --rp-c-bg: #070a10;
+  --rp-c-bg-soft: #0e1422;
+  --rp-c-bg-mute: #141c30;
+  --rp-c-bg-alt: #030508;
 
-  --rp-c-divider: rgba(217, 119, 54, 0.25);
-  --rp-c-divider-light: rgba(0, 242, 254, 0.15);
+  --rp-c-divider: rgba(217, 119, 54, 0.28);
+  --rp-c-divider-light: rgba(0, 242, 254, 0.16);
 
   --rp-c-text-0: #fcf6ed;
   --rp-c-text-1: #e2d9cc;
   --rp-c-text-2: #a89f92;
-  --rp-c-text-3: rgba(226, 217, 204, 0.35);
-  --rp-c-text-4: rgba(226, 217, 204, 0.15);
+  --rp-c-text-3: rgba(226, 217, 204, 0.4);
+  --rp-c-text-4: rgba(226, 217, 204, 0.18);
 
   --rp-c-text-code: #00f2fe;
   --rp-c-text-code-bg: rgba(0, 242, 254, 0.08);
-  --rp-c-text-code-border: rgba(0, 242, 254, 0.25);
+  --rp-c-text-code-border: rgba(0, 242, 254, 0.28);
   --rp-c-link: #f39c12;
 
-  /* Glass Layers Dark */
-  --urai-glass-surface: rgba(17, 23, 36, 0.65);
+  /* Glass Layers */
+  --urai-glass-surface: rgba(14, 20, 34, 0.72);
   --urai-glass-border: 1px solid rgba(255, 255, 255, 0.09);
-  --urai-glass-nav: rgba(9, 12, 19, 0.78);
+  --urai-glass-nav: rgba(7, 10, 16, 0.82);
 
   /* Home Canvas Lighting */
   --rp-home-hero-secondary-color: #00f2fe;
@@ -144,25 +149,25 @@
   --rp-home-background-bg:
     radial-gradient(
       55% 70% at 85% 0%,
-      rgba(0, 242, 254, 0.18) 0%,
+      rgba(0, 242, 254, 0.2) 0%,
       transparent 100%
     ),
     radial-gradient(
       65% 85% at 15% 0%,
-      rgba(217, 119, 54, 0.25) 0%,
+      rgba(217, 119, 54, 0.28) 0%,
       transparent 100%
     ),
-    radial-gradient(100% 100% at 50% 100%, #05070b 0%, transparent 100%),
-    #090c13;
+    radial-gradient(100% 100% at 50% 100%, #030508 0%, transparent 100%),
+    #070a10;
   --rp-home-feature-bg: linear-gradient(
     145deg,
-    rgba(17, 23, 36, 0.75),
-    rgba(9, 12, 19, 0.88)
+    rgba(14, 20, 34, 0.75),
+    rgba(7, 10, 16, 0.88)
   );
 
   /* Shiki Dark Mode */
   --shiki-foreground: #f3ece2;
-  --shiki-background: #0d121c;
+  --shiki-background: #090e17;
   --shiki-token-constant: #00f2fe;
   --shiki-token-string: #4ade80;
   --shiki-token-comment: #69778d;
@@ -171,12 +176,15 @@
   --shiki-token-function: #38bdf8;
   --shiki-token-punctuation: #94a3b8;
 
-  --rp-code-title-bg: #141b2b;
-  --rp-code-block-bg: #0d121c;
-  --rp-code-block-border: 1px solid rgba(0, 242, 254, 0.22);
+  --rp-code-title-bg: #111828;
+  --rp-code-block-bg: #090e17;
+  --rp-code-block-border: 1px solid rgba(0, 242, 254, 0.25);
 }
 
-/* Top Navigation Bar */
+/* ==========================================================================
+   NAVIGATION & GLASS COMPONENTS
+   ========================================================================== */
+
 .rp-nav {
   background: var(--urai-glass-nav) !important;
   backdrop-filter: var(--urai-glass-blur) !important;
@@ -185,7 +193,6 @@
   transition: all 0.3s ease;
 }
 
-/* Sidebar Navigation */
 .rp-sidebar {
   background: var(--urai-glass-surface) !important;
   backdrop-filter: var(--urai-glass-blur) !important;
@@ -193,40 +200,7 @@
   border-right: 1px solid var(--rp-c-divider-light) !important;
 }
 
-/* Global Card Glass Styling */
-.rp-home-feature-card,
-.metric-card,
-.rspress-callout,
-.rspress-tabs {
-  background: var(--urai-glass-surface) !important;
-  backdrop-filter: var(--urai-glass-blur) !important;
-  -webkit-backdrop-filter: var(--urai-glass-blur) !important;
-  border: var(--urai-glass-border) !important;
-}
-
-/* Perspective context for card grids */
-.rp-home-features {
-  perspective: 1200px;
-}
-
-/* Feature Cards 3D Lift */
-.rp-home-feature-card {
-  position: relative;
-  border-radius: var(--rp-radius) !important;
-  transition: var(--urai-transition-spring) !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.3) !important;
-  transform-style: preserve-3d;
-}
-
-.rp-home-feature-card:hover {
-  transform: translateY(-6px) rotateX(2deg) scale(1.015);
-  border-color: var(--urai-cyan) !important;
-  box-shadow:
-    0 16px 40px -8px rgba(0, 0, 0, 0.5),
-    0 0 24px -2px var(--urai-cyan-glow) !important;
-}
-
-/* 3D Action Buttons (Isometric Physical Push Feel) */
+/* 3D Action Buttons */
 .rp-home-hero-action .rp-button-brand {
   position: relative;
   background: linear-gradient(135deg, #d97736 0%, #b85d20 100%) !important;
@@ -240,7 +214,6 @@
     0 4px 0 #914513,
     0 10px 24px var(--urai-terracotta-glow) !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  transform: translateY(0);
 }
 
 .rp-home-hero-action .rp-button-brand:hover {
@@ -257,7 +230,6 @@
     0 4px 10px var(--urai-terracotta-glow) !important;
 }
 
-/* Secondary Alt Button (Cyber Hologram Glass) */
 .rp-home-hero-action .rp-button-alt {
   background: var(--urai-glass-surface) !important;
   backdrop-filter: var(--urai-glass-blur) !important;
@@ -277,6 +249,31 @@
   color: var(--urai-cyan) !important;
 }
 
+/* Feature Cards 3D Lift */
+.rp-home-features {
+  perspective: 1200px;
+}
+
+.rp-home-feature-card {
+  position: relative;
+  background: var(--urai-glass-surface) !important;
+  backdrop-filter: var(--urai-glass-blur) !important;
+  border: var(--urai-glass-border) !important;
+  border-radius: var(--rp-radius) !important;
+  transition: var(--urai-transition-spring) !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.3) !important;
+  transform-style: preserve-3d;
+}
+
+.rp-home-feature-card:hover {
+  transform: translateY(-6px) rotateX(2deg) scale(1.015);
+  border-color: var(--urai-cyan) !important;
+  box-shadow:
+    0 16px 40px -8px rgba(0, 0, 0, 0.5),
+    0 0 24px -2px var(--urai-cyan-glow) !important;
+}
+
+/* Animated Laser Scanline on Code Blocks */
 .rp-codeblock {
   position: relative;
   border-radius: var(--rp-radius) !important;
@@ -285,7 +282,6 @@
   overflow: hidden;
 }
 
-/* Subtle Animated Laser Scanline Effect on Code Blocks */
 .rp-codeblock::before {
   content: "";
   position: absolute;
@@ -319,110 +315,7 @@
   }
 }
 
-html.rp-dark .rp-codeblock:hover {
-  border-color: var(--urai-cyan) !important;
-  box-shadow: 0 0 25px -4px var(--urai-cyan-glow) !important;
-  transform: translateY(-2px);
-}
-
-/* Codeblock Title Bar Glass */
-.rp-code-title {
-  backdrop-filter: var(--urai-glass-blur);
-  font-family: var(--rp-font-family-mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-  font-weight: 600;
-  border-bottom: 1px solid var(--rp-c-divider-light);
-}
-
-/* ==========================================================================
-   CALLOUTS & TABLES 3D ENHANCEMENTS
-   ========================================================================== */
-
-.rspress-callout {
-  border-radius: var(--rp-radius) !important;
-  box-shadow: 0 4px 20px -3px rgba(0, 0, 0, 0.15);
-  border-left-width: 4px !important;
-  transition: transform 0.25s ease;
-}
-
-.rspress-callout:hover {
-  transform: translateX(4px);
-}
-
-/* Markdown Tables with Sandstone/Obsidian Frosted Headers */
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: var(--rp-radius);
-  overflow: hidden;
-  border: var(--urai-glass-border);
-  box-shadow: var(--urai-shadow-3d);
-  width: 100%;
-  margin: 1.5rem 0;
-}
-
-th {
-  background: var(--rp-c-bg-mute) !important;
-  backdrop-filter: var(--urai-glass-blur);
-  color: var(--rp-c-text-0) !important;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  padding: 0.85rem 1rem !important;
-  border-bottom: 2px solid var(--rp-c-brand) !important;
-}
-
-td {
-  padding: 0.85rem 1rem !important;
-  background: var(--urai-glass-surface);
-  border-bottom: 1px solid var(--rp-c-divider-light);
-  color: var(--rp-c-text-1);
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-tr:hover td {
-  background: rgba(217, 119, 54, 0.07);
-}
-
-/* ==========================================================================
-   ANIMATIONS & HERO ARTWORK PRESENTATION
-   ========================================================================== */
-
-/* 3D Floating Hero Showcase */
-.rp-home-hero-image img {
-  border-radius: var(--rp-radius-large) !important;
-  box-shadow:
-    0 25px 60px -12px rgba(0, 0, 0, 0.6),
-    0 0 45px -5px var(--urai-cyan-glow),
-    0 0 20px 2px var(--urai-terracotta-glow) !important;
-  border: 1px solid rgba(0, 242, 254, 0.3) !important;
-  transition: var(--urai-transition-spring) !important;
-  animation: urai-float 6s ease-in-out infinite;
-}
-
-.rp-home-hero-image img:hover {
-  transform: scale(1.03) rotateY(-2deg) rotateX(2deg);
-  box-shadow:
-    0 35px 80px -15px rgba(0, 0, 0, 0.8),
-    0 0 60px 0 var(--urai-cyan-glow) !important;
-}
-
-@keyframes urai-float {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(0.4deg);
-  }
-}
-
-/* Glowing Bioluminescent Tamil Accent */
+/* Classical Tamil Wordmark */
 .urai-tamil-wordmark {
   font-family: var(--font-tamil);
   font-weight: 800;
@@ -435,7 +328,7 @@ tr:hover td {
   filter: drop-shadow(0 2px 8px rgba(217, 119, 54, 0.3));
 }
 
-/* Custom Cyber Badges */
+/* Badges */
 .urai-badge-terracotta {
   background: rgba(217, 119, 54, 0.15);
   color: #e8823a;
@@ -446,7 +339,6 @@ tr:hover td {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  box-shadow: 0 0 10px rgba(217, 119, 54, 0.15);
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -462,16 +354,15 @@ tr:hover td {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  box-shadow: 0 0 12px rgba(0, 242, 254, 0.22);
   display: inline-flex;
   align-items: center;
   gap: 5px;
 }
 
-/* Telemetry Metric HUD Card */
+/* Metric HUD */
 .metric-hud {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.25rem;
   margin: 2rem 0;
 }
@@ -495,211 +386,38 @@ tr:hover td {
 
 .metric-hud-value {
   font-family: var(--rp-font-family-mono);
-  font-size: 2rem;
+  font-size: 2.1rem;
   font-weight: 800;
   color: var(--urai-cyan);
   text-shadow: 0 0 18px var(--urai-cyan-glow);
 }
 
 .metric-hud-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--rp-c-text-2);
-  margin-top: 0.25rem;
-}
-
-/* ==========================================================================
-   URAI 3D METRIC & NAVIGATION CARD SYSTEM
-   ========================================================================== */
-
-/* Responsive Card Grid Container */
-.metric-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  margin: 2rem 0;
-  perspective: 1200px; /* Perspective anchor for 3D card tilt */
-}
-
-/* Base Frosted Glass Card */
-.metric-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1.5rem;
-  border-radius: var(--rp-radius);
-  overflow: hidden;
-  cursor: pointer;
-  transform-style: preserve-3d;
-  transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.2);
-  user-select: none;
-}
-
-/* Light Mode: Warm Temple Sandstone & Marble Glass */
-:where(html:not(.rp-dark)) .metric-card {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.85) 0%,
-    rgba(242, 236, 225, 0.65) 100%
-  );
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(217, 119, 54, 0.22);
-  box-shadow:
-    0 8px 24px -4px rgba(139, 69, 19, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-/* Dark Mode: Midnight Obsidian & Cyber Glass */
-:where(html.rp-dark) .metric-card {
-  background: linear-gradient(
-    145deg,
-    rgba(17, 23, 36, 0.7) 0%,
-    rgba(9, 12, 19, 0.85) 100%
-  );
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 10px 30px -6px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-/* Top Edge Laser Accent Line */
-.metric-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #d97736, var(--urai-cyan), transparent);
-  opacity: 0.4;
-  transition:
-    opacity 0.3s ease,
-    height 0.3s ease;
-}
-
-/* Diagonal Light Sweep Shimmer on Hover */
-.metric-card::after {
-  content: "";
-  position: absolute;
-  top: -60%;
-  left: -60%;
-  width: 220%;
-  height: 220%;
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 242, 254, 0.12) 0%,
-    transparent 60%
-  );
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
-  transform: translate(-20%, -20%);
-}
-
-/* 3D Elevation & Bioluminescent Bloom on Hover */
-.metric-card:hover {
-  transform: translateY(-5px) scale(1.015);
-}
-
-:where(html:not(.rp-dark)) .metric-card:hover {
-  border-color: #d97736;
-  box-shadow:
-    0 16px 36px -8px rgba(184, 93, 32, 0.22),
-    0 0 20px 0 rgba(217, 119, 54, 0.15);
-}
-
-:where(html.rp-dark) .metric-card:hover {
-  border-color: var(--urai-cyan);
-  box-shadow:
-    0 18px 45px -8px rgba(0, 0, 0, 0.7),
-    0 0 25px -3px var(--urai-cyan-glow);
-}
-
-.metric-card:hover::before {
-  opacity: 1;
-  height: 3px;
-}
-
-.metric-card:hover::after {
-  opacity: 1;
-  transform: translate(0, 0);
-}
-
-/* Tactile Active Press State */
-.metric-card:active {
-  transform: translateY(-1px) scale(0.99);
-  transition-duration: 0.1s;
-}
-
-/* Link Wrapping Normalization */
-a:has(> .metric-card),
-a.metric-card-link {
-  text-decoration: none !important;
-  color: inherit !important;
-  display: block;
-}
-
-/* ==========================================================================
-   TYPOGRAPHY & INTERNAL ELEMENTS
-   ========================================================================== */
-
-/* Title & Header */
-.metric-card-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--rp-c-text-0);
-  margin-bottom: 0.45rem;
-}
-
-/* KPI Counter / Big Numeric Display */
-.metric-card-value {
-  font-family: var(--rp-font-family-mono);
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--urai-cyan);
-  margin: 0.5rem 0;
-  text-shadow: 0 0 16px var(--urai-cyan-glow);
-}
-
-/* Description Text */
-.metric-card-desc,
-.metric-card p {
-  font-size: 0.85rem;
-  line-height: 1.55;
-  color: var(--rp-c-text-2);
-  margin: 0;
-}
-
-/* Bottom Footer / Action Hint */
-.metric-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--rp-c-divider-light);
   font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--rp-c-brand);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rp-c-text-2);
+  margin-top: 0.35rem;
 }
 
-.metric-card:hover .metric-card-footer span.arrow {
-  transform: translateX(4px);
+/* Custom Brand Hover Colors for Social Links */
+.rp-nav a[href*="github.com"]:hover svg {
+  color: var(--urai-cyan) !important;
+  filter: drop-shadow(0 0 8px var(--urai-cyan-glow));
 }
 
-.metric-card-footer span.arrow {
-  transition: transform 0.25s ease;
+.rp-nav a[href*="crates.io"]:hover svg {
+  color: var(--rp-c-brand) !important;
+  filter: drop-shadow(0 0 8px var(--urai-terracotta-glow));
+}
+
+.rp-nav a[href*="npmjs.com"]:hover svg {
+  color: #cb3837 !important;
+  filter: drop-shadow(0 0 8px rgba(203, 56, 55, 0.45));
+}
+
+.rp-nav a[href*="instagram.com"]:hover svg {
+  color: #c13584 !important;
+  filter: drop-shadow(0 0 8px rgba(203, 55, 139, 0.45));
 }

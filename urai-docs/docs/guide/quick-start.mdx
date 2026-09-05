@@ -3,9 +3,9 @@ title: Installation & Quick Start
 description: Get up and running with urai-ecma in under 60 seconds. Install via Shell, PowerShell, npm, or Cargo, scaffold urai.config.jsonc, and synthesize your first AST-dense prompt.
 ---
 
-import { Steps, Tabs, Tab, Callout, Badge, PackageManagerTabs } from '@rspress/core/theme';
+import { Steps, Tabs, Tab, Callout, Badge, PackageManagerTabs, Link } from '@rspress/core/theme';
 
-# Quick Start <span className="urai-tamil-wordmark">விரைவு தொடக்கம்</span>
+# Quick Start <span className="urai-tamil-wordmark">(விரைவு தொடக்கம்)</span>
 
 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '0.75rem 0 1.5rem 0' }}>
   <span className="urai-badge-cyan">v0.1.1 Active</span>
@@ -16,7 +16,7 @@ import { Steps, Tabs, Tab, Callout, Badge, PackageManagerTabs } from '@rspress/c
 
 Transform raw enterprise repositories into token-dense, architecturally intact Markdown prompts. Go from zero to your first synthesized LLM prompt in **4 simple steps**.
 
----
+
 
 ## ⚡ Installation Matrix
 
@@ -271,39 +271,4 @@ When Ollama summarization is enabled, results are cached in `.urai-cache/` at yo
 # To clear cached AI function summaries:
 rm -rf ./src/.urai-cache
 ```
-
----
-
-## 🧭 Next Steps
-
-Continue exploring the technical guides to get the most out of `urai-ecma`:
-
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', margin: '2rem 0' }}>
-  <a href="/guide/tailwind-pruning" style={{ textDecoration: 'none' }}>
-    <div className="metric-card">
-      <div style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.25rem' }}>✂️ Tailwind Optimization Modes</div>
-      <p style={{ fontSize: '0.85rem', color: 'var(--rp-c-text-2)', margin: 0 }}>
-        Compare <code>remove</code>, <code>remove_aggr</code>, <code>summarize</code>, and <code>preserve</code> with real code samples.
-      </p>
-    </div>
-  </a>
-
-  <a href="/guide/react-and-routes" style={{ textDecoration: 'none' }}>
-    <div className="metric-card">
-      <div style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.25rem' }}>⚛️ React & Route Extraction</div>
-      <p style={{ fontSize: '0.85rem', color: 'var(--rp-c-text-2)', margin: 0 }}>
-        Learn how Next.js, Fastify, Express, and NestJS routing tables are automatically cataloged.
-      </p>
-    </div>
-  </a>
-
-  <a href="/reference/cli" style={{ textDecoration: 'none' }}>
-    <div className="metric-card">
-      <div style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.25rem' }}>🛠️ CLI Flags & Variables</div>
-      <p style={{ fontSize: '0.85rem', color: 'var(--rp-c-text-2)', margin: 0 }}>
-        Comprehensive reference of all CLI parameters, environment variables, and config keys.
-      </p>
-    </div>
-  </a>
-</div>
 

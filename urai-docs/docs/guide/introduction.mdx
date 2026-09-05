@@ -3,11 +3,14 @@ title: Introduction & Philosophy
 description: Discover the philosophy of URAI (உரை), the mathematics of attention budgets, and why compiler-level AST pruning radically outperforms naive codebase dumpers.
 ---
 
-import { Callout, Badge, Tabs, Tab, Steps } from '@rspress/core/theme';
+import { Callout, Badge, Tabs, Tab, Steps, Link } from '@rspress/core/theme';
 import { TokenTelemetryHud } from '../../components/TokenTelemetryHud';
 import { CompilerPipelineCard } from '../../components/AstPipelineMatrix';
+import TokenSavingSimulator from '../../components/TokenSimulator';
+import RouteMatrixExplorer from '../../components/RouteMatrixExplorer';
+import ConfigGenerator from '../../components/ConfigGenerator';
 
-# The Philosophy of URAI (<span className="urai-tamil-wordmark">உரை</span>)
+# The Philosophy of URAI <span className="urai-tamil-wordmark">(உரை)</span>
 
 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '0.75rem 0 1.5rem 0' }}>
   <span className="urai-badge-cyan">Rust SWC Core</span>
@@ -19,7 +22,7 @@ import { CompilerPipelineCard } from '../../components/AstPipelineMatrix';
 
 > **“உரை” (*Urai*)** in classical Tamil translates to *reasoned exposition, critical discourse, structural commentary, or analytical narrative*.
 >
-> **`urai-ecma`** transforms massive JavaScript, TypeScript, and React codebases into an information-dense, noise-free Markdown prompt engineered specifically for Large Language Model context windows (GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro, and local Llama/Qwen models).
+> **`urai-ecma`** transforms massive JavaScript, TypeScript, and React codebases into an information-dense, noise-free Markdown prompt engineered specifically for Large Language Model context windows (GPT-4o, Claude 3.5 Sonnet, Gemini 3.1 Pro, and local Llama/Gemma models).
 
 
 
@@ -38,6 +41,7 @@ Inspect how `urai-ecma` executes internally across its 5-stage compiler pipeline
 <CompilerPipelineCard />
 
 ---
+
 
 ## 🏛️ The Classical Inspiration: The Art of *"உரை எழுதுதல்"* (Urai Ezhuthudhal)
 
@@ -284,41 +288,32 @@ export function BillingDashboard({ accountId, onInvoicePaid }: BillingProps) {
 Explore the operational guides to integrate `urai-ecma` into your engineering workflow:
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', margin: '1.5rem 0', }}>
-  <a href="/guide/quick-start" style={{ textDecoration: 'none' }}>
+  <Link href="/guide/quick-start" style={{ textDecoration: 'none' }}>
     <div className="metric-card">
       <div style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }}>⚡ Installation & Quick Start</div>
       <p style={{ fontSize: '0.85rem', color: 'var(--rp-c-text-2)', margin: 0 }}>
         Install prebuilt binaries via Shell, PowerShell, npm, or Cargo in seconds.
       </p>
     </div>
-  </a>
+  </Link>
 
-  <a href="/guide/architecture" style={{ textDecoration: 'none' }}>
+  <Link href="/architecture/engine-internals" style={{ textDecoration: 'none' }}>
     <div className="metric-card">
       <div style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }}>🌳 Compiler Pipeline</div>
       <p style={{ fontSize: '0.85rem', color: 'var(--rp-c-text-2)', margin: 0 }}>
         Deep dive into the SWC visitor pattern, Foyer hybrid caching, and Rayon threading.
       </p>
     </div>
-  </a>
+  </Link>
 
-  <a href="/reference/cli" style={{ textDecoration: 'none' }}>
+  <Link href="/reference/config" style={{ textDecoration: 'none' }}>
     <div className="metric-card">
       <div style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }}>🛠️ CLI & Config Reference</div>
       <p style={{ fontSize: '0.85rem', color: 'var(--rp-c-text-2)', margin: 0 }}>
         Complete reference for all CLI arguments, environment variables, and config options.
       </p>
     </div>
-  </a>
-
-  <a href="/reference/benchmarks" style={{ textDecoration: 'none' }}>
-    <div className="metric-card">
-      <div style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }}>📈 Empirical Benchmarks</div>
-      <p style={{ fontSize: '0.85rem', color: 'var(--rp-c-text-2)', margin: 0 }}>
-        Performance and token comparisons against Repomix, GitIngest, and raw code dumps.
-      </p>
-    </div>
-  </a>
+  </Link>
 </div>
 
 

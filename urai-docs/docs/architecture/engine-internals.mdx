@@ -1,0 +1,419 @@
+---
+title: "Engine Internals: Rust SWC AST & Cache Architecture | URAI"
+description: "Explore URAI's compiler internals: SWC AST pruning, foyer Zstd hybrid caching, Rayon concurrency, and structural stubs for up to 80% LLM token reduction."
+---
+
+# Architecture & Engine Internals <span className="urai-tamil-wordmark">(கட்டமைப்பு மற்றும் பொறி உள்ளமைப்புகள்)</span>
+
+```
+               ┌────────────────────────────────────────────────────────┐
+               │           RAW JS / TS / TSX / JSON CODEBASE            │
+               └───────────────────────────┬────────────────────────────┘
+                                           │
+                       ignore::WalkBuilder │ Prunes node_modules, target,
+                                           │ .git, respects .gitignore
+                                           ▼
+               ┌────────────────────────────────────────────────────────┐
+               │        Rayon Parallel Work-Stealing Threadpool         │
+               │             files.par_iter().filter_map(...)           │
+               └─────────────┬────────────────────────────┬─────────────┘
+                             │                            │
+             Thread Worker A │            Thread Worker B │
+                             ▼                            ▼
+            ┌────────────────────────────────┐ ┌────────────────────────────────┐
+            │       SWC Ingestion Core       │ │       SWC Ingestion Core       │
+            │   swc_ecma_parser::parse_file  │ │   swc_ecma_parser::parse_file  │
+            │  Lrc<SourceMap> + Comments Map │ │  Lrc<SourceMap> + Comments Map │
+            └────────────────┬───────────────┘ └────────────────┬───────────────┘
+                             │                                  │
+      ┌──────────────────────┴──────────────────────────────────┴──────────────────────┐
+      │                     MULTI-STAGE AST VISITOR PIPELINE                           │
+      │                                                                                │
+      │   1. RouteVisitor               ──► Next.js verbs, NestJS @Controller, Express │
+      │   2. ReactComponentAnalyzer     ──► Props, useState, useEffect, JSX hierarchy  │
+      │   3. FunctionSummarizerVisitor  ──► JSDoc / Ollama AI + Structural Stubs       │
+      │   4. ClassMethodSummarizer      ──► Constructors, Methods, Private #methods     │
+      │   5. ReactJsxPruner             ──► 4-Mode Tailwind Utility Pruning            │
+      └──────────────────────────────────────┬─────────────────────────────────────────┘
+                                             │
+                                             ▼
+                             ┌────────────────────────────────┐
+                             │       foyer Hybrid Cache       │
+                             │  Sha512_256 Key ──► Zstd Disk  │
+                             │  (Sub-ms Ollama Memoization)   │
+                             └───────────────┬────────────────┘
+                                             │
+                                             ▼
+                             ┌────────────────────────────────┐
+                             │    swc_ecma_codegen Emitter    │
+                             │    JsWriter AST-to-String      │
+                             └───────────────┬────────────────┘
+                                             │
+                                             ▼
+                             ┌────────────────────────────────┐
+                             │    MarkdownContentBuilder      │
+                             │  + petgraph Dependency Graph   │
+                             └───────────────┬────────────────┘
+                                             │
+                                             ▼
+                             ┌────────────────────────────────┐
+                             │   tiktoken o200k_base Engine   │
+                             │ BPE Reduction Telemetry Report │
+                             └────────────────────────────────┘
+```
+
+
+
+## 1. Concurrency Model & File Ingestion
+
+`urai-ecma` processes large enterprise monorepos (10,000+ files) without thread contention or memory exhaustion.
+
+### 1.1 Git-Aware Pruning Traversal (`collect_source_files`)
+Standard directory traversals choke on `node_modules`, `.next`, or build artifacts. `urai-ecma` uses `ignore::WalkBuilder` with early prefix pruning:
+
+```rust
+WalkBuilder::new(path)
+    .hidden(true)
+    .git_ignore(true)
+    .ignore(true)
+    .filter_entry(|entry| {
+        if let Some(file_name) = entry.file_name().to_str()
+            && (file_name == "node_modules"
+                || file_name == "dist"
+                || file_name == "build"
+                || file_name == "target")
+        {
+            return false; // Skips descending into directory entirely
+        }
+        true
+    })
+```
+
+* **Early Branch Termination**: By returning `false` inside `filter_entry`, the directory tree traversal avoids calling `stat()` or descending into tens of thousands of nested dependencies.
+* **Extension Matching**: `is_supported_extension` bounds AST ingestion to valid ECMAScript/TypeScript MIME signatures: `js`, `jsx`, `ts`, `tsx`, `mjs`, and `cjs`.
+
+### 1.2 Rayon Parallelism and Thread Safety
+File processing runs inside a fork-join work-stealing pool using `rayon::prelude::*`:
+
+```rust
+let processed_data: Vec<(FileAnalysisResult, Vec<RouteInfo>)> = files
+    .par_iter()
+    .filter_map(|file_path| { ... })
+    .collect();
+```
+
+* **Thread Confinement**: Each worker thread maintains its own independent AST traversal instance, avoiding mutex contention during parsing.
+* **Safe Context Sharing**: `UraiContext` is wrapped in an `Arc<UraiContext>`. Read-only properties (thresholds, modes, endpoint paths) are accessed concurrently across CPU cores without locking.
+
+---
+
+## 2. The SWC Parser & AST Ingestion Engine
+
+Rather than relying on brittle regex matching, `urai-ecma` parses full Abstract Syntax Trees using **SWC (`swc_ecma_parser`)**.
+
+### Memory Layout and Comment Attachment
+```rust
+let parse_res = parse_file(&raw_content, file_path.to_str().unwrap_or_default());
+```
+
+When SWC parses a module, it yields a three-part tuple:
+1. `swc_ecma_ast::Module`: The root AST node representing statements, imports, exports, and declarations.
+2. `SingleThreadedComments`: A two-tiered comment map separating **leading** and **trailing** trivia tokens indexed by `BytePos`.
+3. `Lrc<SourceMap>`: An atomic reference-counted source map linking internal byte offsets (`lo`, `hi`) to concrete file line numbers and character positions.
+
+---
+
+## 3. The AST Visitor Pipeline
+
+`urai-ecma` sequences AST visitors in a specific order: extraction occurs before destructive pruning.
+
+```
+AST Node (Module)
+   │
+   ├──► 1. RouteVisitor (Read-Only: Next.js, NestJS, Express)
+   │
+   ├──► 2. ReactComponentAnalyzer (Read-Only: Props, useState, useEffect, Tags)
+   │
+   ├──► 3. FunctionSummarizerVisitor (Mutating: Stubs body, inserts summary comment)
+   │
+   ├──► 4. ClassMethodSummarizerVisitor (Mutating: Handles classes, constructors, #private)
+   │
+   └──► 5. ReactJsxPruner (Mutating: Strips or summarizes static className/style)
+```
+
+---
+
+### 3.1 Structural Stub Retention (`is_structural_stub_stmt`)
+
+The core innovation of `urai-ecma` is **Structural Stub Retention**. When collapsing multi-line function bodies, removing all statements blinds the downstream LLM to component lifecycle and reactive event flows. 
+
+`urai-ecma` solves this with `is_structural_stub_stmt`:
+
+```rust
+fn is_structural_stub_stmt(stmt: &Stmt) -> bool {
+    match stmt {
+        // 1. Nested function declarations
+        Stmt::Decl(Decl::Fn(_)) => true,
+
+        // 2. Nested arrow expressions assigned to variables
+        Stmt::Decl(Decl::Var(var_decl)) => var_decl.decls.iter().any(|decl| {
+            if let Some(init) = &decl.init {
+                matches!(**init, Expr::Arrow(_) | Expr::Fn(_))
+            } else {
+                false
+            }
+        }),
+
+        // 3. Reactive hooks, lifecycle timers, and global listeners
+        Stmt::Expr(expr_stmt) => {
+            if let Expr::Call(call_expr) = &*expr_stmt.expr
+                && let Callee::Expr(callee_expr) = &call_expr.callee
+                && let Expr::Ident(ident) = &**callee_expr
+            {
+                let name = ident.sym.as_ref();
+                return name.starts_with("use")
+                    || name == "setTimeout"
+                    || name == "setInterval"
+                    || name.contains("addEventListener")
+                    || name.contains("requestIdleCallback");
+            }
+            false
+        }
+
+        // 4. Component JSX returns (preserves UI hierarchy)
+        Stmt::Return(ret_stmt) => {
+            if let Some(arg) = &ret_stmt.arg {
+                matches!(
+                    &**arg,
+                    Expr::JSXElement(_) | Expr::JSXFragment(_) | Expr::Paren(_)
+                )
+            } else {
+                false
+            }
+        }
+
+        _ => false, // Computational loops, arithmetic, validations are stripped
+    }
+}
+```
+
+#### Why This Works
+* **Hooks Kept Intact**: `useEffect(() => { ... }, [dep])` is preserved, signaling side-effect dependencies to the LLM.
+* **JSX Output Preserved**: The return structure (`<div ...><Child /></div>`) remains visible.
+* **Dead Logic Discarded**: Intermediate loops, data sanitization, and variable assignments are stripped and replaced with a single synthetic expression comment:
+  ```rust
+  function_body.stmts.push(Stmt::Expr(ExprStmt {
+      span: DUMMY_SP,
+      expr: Box::new(Expr::Lit(Lit::Str(Str {
+          span: DUMMY_SP,
+          value: format!("/* {:?} */", summary).into(),
+          raw: None,
+      }))),
+  }));
+  ```
+
+---
+
+### 3.2 JSDoc Extraction with Distance-Based Fallback
+
+Before querying an LLM, `FunctionSummarizerVisitor` checks for human-written documentation using the `jsdoc` crate:
+
+```rust
+let positions_to_check = [self.current_export_lo, Some(fn_lo), Some(ident_lo)];
+for pos in positions_to_check.into_iter().flatten() {
+    if let Some(leading_comments) = self.comments.get_leading(pos) {
+        for comment in &leading_comments {
+            if let Some(info) = parse_jsdoc_comment(comment) {
+                return Some(format_jsdoc_summary(&info));
+            }
+        }
+    }
+}
+```
+
+* **Export Anchor Matching**: When functions are wrapped in export statements (e.g., `export default function ...`), comments attach to the `ExportDecl` span rather than the inner `FnDecl`. Tracking `current_export_lo` captures these comments.
+* **Proximity Scan Fallback**: If exact span alignment fails, the engine scans all comments within a 300-byte window (`distance <= 300`) to associate detached comments with their respective declarations.
+
+---
+
+### 3.3 The 4-Mode JSX Tailwind Pruner (`ReactJsxPruner`)
+
+Modern utility-first CSS causes significant token bloat in LLM contexts. `ReactJsxPruner` intercepts JSX attributes via `visit_mut_jsx_opening_element`:
+
+```rust
+match self.mode {
+    TailwindMode::Remove => {
+        // Static string literals exceeding threshold are stripped.
+        // Dynamic expressions (clsx, cva, ternaries) are preserved!
+        if let Some(JSXAttrValue::JSXExprContainer(expr)) = jsx_attr.value {
+            pruned_attrs.push(...);
+        }
+    }
+    TailwindMode::Summarize => {
+        // Converts strings > threshold into a natural language description
+        let summary = ollama.summarize_tailwind_classes(&raw_str);
+        // Emits: className="/* UI: Frosted glass card with dark mode */"
+    }
+    TailwindMode::RemoveAggr => {
+        // Unconditionally strips all static class strings
+    }
+    TailwindMode::Preserve => {
+        // Keeps all styles intact for CSS debugging
+    }
+}
+```
+
+* **Dynamic Code Preservation**: By filtering on `JSXAttrValue::JSXExprContainer`, patterns like `className={clsx("base", isActive && "active")}` remain untouched, preserving conditional UI logic for the LLM.
+
+---
+
+### 3.4 Backend API Route Extraction (`RouteVisitor`)
+
+`RouteVisitor` parses endpoint declarations across major backend frameworks:
+
+#### 1. Next.js App Router
+Inspects exported functions within file paths containing `route.ts`, `route.js`, or `/api/`:
+```rust
+if matches!(upper_name.as_str(), "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS") {
+    let derived_path = derive_nextjs_route_path(self.file_path);
+    // Emits: Next.js | POST | /api/v1/auth | POST | route.ts:18
+}
+```
+
+#### 2. NestJS Controllers
+Inspects AST decorators on classes and methods:
+* Identifies `@Controller(prefix)` to establish the base route.
+* Matches method decorators (`@Get`, `@Post`, `@Put`, etc.) and joins subpaths to produce full URI endpoints.
+
+#### 3. Express & Fastify
+Detects Member Expression calls on common server variables (`app`, `router`, `fastify`, `server`):
+* Handles both string literals and template literals:
+  ```rust
+  Expr::Tpl(tpl) => tpl.quasis.iter().map(|q| q.raw.as_str()).collect().join("${...}")
+  ```
+  Resolves route patterns like ``app.get(`/users/${id}`)`` into `/users/${...}`.
+
+---
+
+### 3.5 React Introspection (`ReactComponentAnalyzer`)
+
+`ReactComponentAnalyzer` identifies components by PascalCase naming (`name.chars().next().is_some_and(|c| c.is_uppercase())`) across function declarations and arrow expressions:
+
+* **TypeScript Prop Extraction**: Resolves explicit type annotations (`resolve_ts_type`) and object destructuring patterns (`ObjectPatProp::KeyValue`).
+* **Hook Inspection**: Tracks hook invocations prefixed with `use*`, increments side-effect counters on `useEffect` / `useLayoutEffect`, and matches `useState` variable/setter pairs.
+* **JSX Element Scanning**: Walks the internal JSX element tree and records rendered child elements (e.g., `<Button>`, `<ModalHeader>`).
+
+---
+
+## 4. The Storage Engine: `foyer` Hybrid Cache
+
+When function summarization or Tailwind style summarization is enabled, sending duplicate requests to an LLM slows down processing. `urai-ecma` integrates **`foyer`**, a hybrid memory and disk caching engine written in Rust.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      OllamaUrai Engine                          │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+                   Prompt String │ SHA-512/256 Hash
+                                 ▼
+                     const_hex::encode(digest)
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      foyer::HybridCache                         │
+│                                                                 │
+│   ┌─────────────────────────────────────────────────────────┐   │
+│   │ Memory Tier: 64 MB Direct RAM Buffer                    │   │
+│   └────────────────────────────┬────────────────────────────┘   │
+│                                │ Eviction Spillover             │
+│   ┌────────────────────────────▼────────────────────────────┐   │
+│   │ Storage Tier: 128 MB FsDeviceBuilder                    │   │
+│   │ BlockEngineConfig + foyer::Compression::Zstd            │   │
+│   └─────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+             ┌───────────────────┴───────────────────┐
+             │ Cache Hit                             │ Cache Miss
+             ▼                                       ▼
+    Return Cached Response             reqwest::blocking::Client
+    (< 0.5 ms latency)                 HTTP POST /api/generate
+                                       Store result in foyer
+```
+
+### 4.1 Cryptographic Cache Keys
+Cache keys are computed using `Sha512_256`:
+
+```rust
+pub fn generate_cache_key(&self, prompt: &String) -> String {
+    let cache_key = Sha512_256::digest(prompt.as_bytes());
+    const_hex::encode(cache_key)
+}
+```
+
+* **No Truncation Collisions**: `Sha512_256` produces a 256-bit digest resistant to collision attacks, making it safe across thousands of distinct code snippets.
+* **Zero-Allocation Hex Formatting**: `const_hex` serializes raw bytes into ASCII hex strings with SIMD optimizations.
+
+### 4.2 Storage and Eviction Policies
+```rust
+let device = FsDeviceBuilder::new(cache_folder)
+    .with_capacity(128 * 1024 * 1024) // 128 MB on-disk limit
+    .build()?;
+
+let hybrid = HybridCacheBuilder::new()
+    .memory(64 * 1024 * 1024)         // 64 MB fast in-memory cache
+    .storage()
+    .with_engine_config(BlockEngineConfig::new(device))
+    .with_compression(foyer::Compression::Zstd) // Direct Zstd block compression
+    .build()
+    .await?;
+```
+
+* **Two-Tier Architecture**: Hits resolve directly from memory in nanoseconds. When memory fills, entries spill over to disk.
+* **Zstd Compression**: Compresses cached LLM response text by ~70%, fitting more entries within disk allocations.
+* **Graceful Shutdown**: Implements `Drop` for `OllamaUrai` to flush in-flight disk writes before the process exits:
+  ```rust
+  impl Drop for OllamaUrai {
+      fn drop(&mut self) {
+          let _ = self.rt.block_on(async { self.cache.close().await });
+      }
+  }
+  ```
+
+---
+
+## 5. Dependency Graph Construction
+
+`urai-ecma` builds both directory trees and module dependency graphs without external runtime tooling.
+
+### 5.1 ASCII Tree Generation
+Recursively reads project directories while filtering out hidden entries and build output folders (`target`, `dist`, `node_modules`). Connectors (`├── ` and `└── `) are assigned using lookahead counters based on remaining path entries.
+
+### 5.2 `petgraph` Directed Module Graph
+Scans source files for relative import declarations (`import ... from './component'`) and tracks them using `petgraph::graph::UnGraph`:
+
+```rust
+let mut graph = UnGraph::<String, ()>::new_undirected();
+let mut node_indices = HashMap::new();
+```
+
+* Resolves relative paths against the project root.
+* Emits a standard **Mermaid.js** diagram (`graph LR;`) embedded directly into the generated prompt context, allowing the LLM to inspect project topology.
+
+---
+
+## 6. Token Telemetry & Context Optimization
+
+### 6.1 `tiktoken` Integration (`o200k_base`)
+At the end of an optimization run, `urai-ecma` benchmarks raw source tokens against the final output:
+
+```rust
+if let Some(bpe) = tiktoken::get_encoding("o200k_base") {
+    let output_tokens = bpe.encode(&content).len();
+    let raw_tokens = calculate_raw_project_tokens(&ctx.input_project, bpe);
+    let saved_tokens = raw_tokens.saturating_sub(output_tokens);
+    let reduction_percentage = (saved_tokens as f64 / raw_tokens as f64) * 100.0;
+}
+```
+
+* **Native GPT-4o Tokenizer**: Uses the `o200k_base` vocabulary matching OpenAI's flagship models, ensuring token calculations reflect actual API billing and context usage.
+* **Accurate Source Counting**: `calculate_raw_project_tokens` counts all supported source files, including file name token overhead.
