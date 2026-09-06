@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import { defineConfig } from '@rspress/core';
+import { pluginSitemap } from '@rspress/plugin-sitemap';
 
 const SITE_URL = 'https://sanjaiyan-dev.github.io/urai-ecma';
 
@@ -188,6 +189,11 @@ export default defineConfig({
                 name: 'Sri Lanka',
               },
               url: 'https://github.com/sanjaiyan-dev',
+              sameAs: [
+                'https://github.com/sanjaiyan-dev',
+                'https://www.npmjs.com/~sanjaiyan',
+                'https://www.instagram.com/sanjaiyan_dev',
+              ],
               knowsLanguage: ['ta', 'en'],
             },
           } as const),
@@ -203,4 +209,9 @@ export default defineConfig({
       ],
     } as const,
   },
+  plugins: [
+    pluginSitemap({
+      siteUrl: SITE_URL, // Replace with your site URL
+    }),
+  ],
 });
