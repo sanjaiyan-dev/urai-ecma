@@ -56,6 +56,7 @@ export default defineConfig({
   },
   route: {
     useTransitions: true,
+    cleanUrls: true,
   },
   llms: true,
 
