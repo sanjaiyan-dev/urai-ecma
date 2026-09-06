@@ -79,6 +79,13 @@ export default defineConfig({
             crossorigin: 'anonymous',
           },
         },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'theme-color',
+            content: '#0e1422',
+          },
+        },
         // Open Graph Meta Tags
         {
           tag: 'meta',
@@ -158,6 +165,30 @@ export default defineConfig({
             offers: {
               '@type': 'Offer',
               price: '0',
+            },
+            author: {
+              '@type': 'Person',
+              '@id': 'https://sanjaiyan-dev.github.io/urai-ecma/#author',
+              name: 'Sanjaiyan Parthipan',
+              givenName: 'Sanjaiyan',
+              familyName: 'Parthipan',
+              birthDate: '2006-04-12',
+              birthPlace: {
+                '@type': 'Place',
+                name: 'Point Pedro',
+                address: {
+                  '@type': 'PostalAddress',
+                  addressLocality: 'Point Pedro',
+                  addressRegion: 'Northern Province',
+                  addressCountry: 'LK',
+                },
+              },
+              nationality: {
+                '@type': 'Country',
+                name: 'Sri Lanka',
+              },
+              url: 'https://github.com/sanjaiyan-dev',
+              knowsLanguage: ['ta', 'en'],
             },
           } as const),
         },
