@@ -192,6 +192,14 @@ export default defineConfig({
             },
           } as const),
         },
+
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'google-site-verification',
+            content: 't8ZpmhQGxIyqHkOxRPQ7gmGjIjE_2CjUnPpOBJ5-sH4',
+          },
+        },
       ],
     } as const,
   },
