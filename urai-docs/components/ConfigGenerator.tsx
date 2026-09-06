@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 type TailwindMode = 'remove' | 'remove_aggr' | 'summarize' | 'preserve';
 type PresetKey =

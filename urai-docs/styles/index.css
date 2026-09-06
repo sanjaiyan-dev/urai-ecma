@@ -1,3 +1,10 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.5.15,
+* Autoprefixer: v10.5.0
+* Browsers: last 12 version
+*/
+
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Fira+Code:wght@400;500;600&family=Mukta+Malar:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
@@ -31,7 +38,7 @@
   --urai-moss: #10b981;
 
   /* 3D Glass & Elevation Defaults */
-  --urai-glass-blur: blur(20px) saturate(190%);
+  --urai-glass-blur: blur(5px) saturate(190%);
   --urai-shadow-3d:
     0 14px 35px -8px rgba(0, 0, 0, 0.4), 0 0 1px 1px rgba(255, 255, 255, 0.08);
   --urai-transition-spring: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15);
@@ -187,16 +194,17 @@
 
 .rp-nav {
   background: var(--urai-glass-nav) !important;
-  backdrop-filter: var(--urai-glass-blur) !important;
   -webkit-backdrop-filter: var(--urai-glass-blur) !important;
+  backdrop-filter: var(--urai-glass-blur) !important;
   border-bottom: 1px solid var(--rp-c-divider-light) !important;
+  -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 
 .rp-sidebar {
   background: var(--urai-glass-surface) !important;
-  backdrop-filter: var(--urai-glass-blur) !important;
   -webkit-backdrop-filter: var(--urai-glass-blur) !important;
+  backdrop-filter: var(--urai-glass-blur) !important;
   border-right: 1px solid var(--rp-c-divider-light) !important;
 }
 
@@ -210,21 +218,35 @@
   font-weight: 700 !important;
   letter-spacing: 0.02em;
   padding: 0.8rem 1.8rem !important;
+  -webkit-box-shadow:
+    0 4px 0 #914513,
+    0 10px 24px var(--urai-terracotta-glow) !important;
   box-shadow:
     0 4px 0 #914513,
     0 10px 24px var(--urai-terracotta-glow) !important;
+  -webkit-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .rp-home-hero-action .rp-button-brand:hover {
+  -webkit-transform: translateY(-2px);
+  -ms-transform: translateY(-2px);
   transform: translateY(-2px);
+  -webkit-box-shadow:
+    0 6px 0 #914513,
+    0 14px 28px var(--urai-terracotta-glow) !important;
   box-shadow:
     0 6px 0 #914513,
     0 14px 28px var(--urai-terracotta-glow) !important;
 }
 
 .rp-home-hero-action .rp-button-brand:active {
+  -webkit-transform: translateY(3px) !important;
+  -ms-transform: translateY(3px) !important;
   transform: translateY(3px) !important;
+  -webkit-box-shadow:
+    0 1px 0 #914513,
+    0 4px 10px var(--urai-terracotta-glow) !important;
   box-shadow:
     0 1px 0 #914513,
     0 4px 10px var(--urai-terracotta-glow) !important;
@@ -232,42 +254,57 @@
 
 .rp-home-hero-action .rp-button-alt {
   background: var(--urai-glass-surface) !important;
+  -webkit-backdrop-filter: var(--urai-glass-blur) !important;
   backdrop-filter: var(--urai-glass-blur) !important;
   border: 1px solid var(--urai-cyan) !important;
   color: var(--rp-c-text-0) !important;
   border-radius: var(--rp-radius) !important;
   font-weight: 600 !important;
   padding: 0.8rem 1.8rem !important;
+  -webkit-transition: var(--urai-transition-spring) !important;
   transition: var(--urai-transition-spring) !important;
+  -webkit-box-shadow: 0 4px 20px -2px rgba(0, 242, 254, 0.15) !important;
   box-shadow: 0 4px 20px -2px rgba(0, 242, 254, 0.15) !important;
 }
 
 .rp-home-hero-action .rp-button-alt:hover {
+  -webkit-transform: translateY(-2px);
+  -ms-transform: translateY(-2px);
   transform: translateY(-2px);
   background: rgba(0, 242, 254, 0.12) !important;
+  -webkit-box-shadow: 0 6px 25px 0 var(--urai-cyan-glow) !important;
   box-shadow: 0 6px 25px 0 var(--urai-cyan-glow) !important;
   color: var(--urai-cyan) !important;
 }
 
 /* Feature Cards 3D Lift */
 .rp-home-features {
+  -webkit-perspective: 1200px;
   perspective: 1200px;
 }
 
 .rp-home-feature-card {
   position: relative;
   background: var(--urai-glass-surface) !important;
+  -webkit-backdrop-filter: var(--urai-glass-blur) !important;
   backdrop-filter: var(--urai-glass-blur) !important;
   border: var(--urai-glass-border) !important;
   border-radius: var(--rp-radius) !important;
+  -webkit-transition: var(--urai-transition-spring) !important;
   transition: var(--urai-transition-spring) !important;
+  -webkit-box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.3) !important;
   box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.3) !important;
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 }
 
 .rp-home-feature-card:hover {
+  -webkit-transform: translateY(-6px) rotateX(2deg) scale(1.015);
   transform: translateY(-6px) rotateX(2deg) scale(1.015);
   border-color: var(--urai-cyan) !important;
+  -webkit-box-shadow:
+    0 16px 40px -8px rgba(0, 0, 0, 0.5),
+    0 0 24px -2px var(--urai-cyan-glow) !important;
   box-shadow:
     0 16px 40px -8px rgba(0, 0, 0, 0.5),
     0 0 24px -2px var(--urai-cyan-glow) !important;
@@ -277,7 +314,9 @@
 .rp-codeblock {
   position: relative;
   border-radius: var(--rp-radius) !important;
+  -webkit-transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35);
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
@@ -296,6 +335,7 @@
     transparent
   );
   opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease;
   z-index: 5;
   pointer-events: none;
@@ -303,7 +343,17 @@
 
 .rp-codeblock:hover::before {
   opacity: 1;
+  -webkit-animation: urai-scanline 2.8s infinite linear;
   animation: urai-scanline 2.8s infinite linear;
+}
+
+@-webkit-keyframes urai-scanline {
+  0% {
+    left: -60%;
+  }
+  100% {
+    left: 140%;
+  }
 }
 
 @keyframes urai-scanline {
@@ -325,6 +375,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
+  -webkit-filter: drop-shadow(0 2px 8px rgba(217, 119, 54, 0.3));
   filter: drop-shadow(0 2px 8px rgba(217, 119, 54, 0.3));
 }
 
@@ -339,7 +390,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
   display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
   gap: 5px;
 }
@@ -354,13 +409,18 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
   display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
   gap: 5px;
 }
 
 /* Metric HUD */
 .metric-hud {
+  display: -ms-grid;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.25rem;
@@ -369,17 +429,22 @@
 
 .metric-hud-item {
   background: var(--urai-glass-surface);
+  -webkit-backdrop-filter: var(--urai-glass-blur);
   backdrop-filter: var(--urai-glass-blur);
   border: var(--urai-glass-border);
   border-radius: var(--rp-radius);
   padding: 1.25rem;
+  -webkit-box-shadow: var(--urai-shadow-3d);
   box-shadow: var(--urai-shadow-3d);
   position: relative;
   overflow: hidden;
+  -webkit-transition: var(--urai-transition-spring);
   transition: var(--urai-transition-spring);
 }
 
 .metric-hud-item:hover {
+  -webkit-transform: translateY(-4px);
+  -ms-transform: translateY(-4px);
   transform: translateY(-4px);
   border-color: var(--urai-cyan);
 }
@@ -404,20 +469,24 @@
 /* Custom Brand Hover Colors for Social Links */
 .rp-nav a[href*="github.com"]:hover svg {
   color: var(--urai-cyan) !important;
+  -webkit-filter: drop-shadow(0 0 8px var(--urai-cyan-glow));
   filter: drop-shadow(0 0 8px var(--urai-cyan-glow));
 }
 
 .rp-nav a[href*="crates.io"]:hover svg {
   color: var(--rp-c-brand) !important;
+  -webkit-filter: drop-shadow(0 0 8px var(--urai-terracotta-glow));
   filter: drop-shadow(0 0 8px var(--urai-terracotta-glow));
 }
 
 .rp-nav a[href*="npmjs.com"]:hover svg {
   color: #cb3837 !important;
+  -webkit-filter: drop-shadow(0 0 8px rgba(203, 56, 55, 0.45));
   filter: drop-shadow(0 0 8px rgba(203, 56, 55, 0.45));
 }
 
 .rp-nav a[href*="instagram.com"]:hover svg {
   color: #c13584 !important;
+  -webkit-filter: drop-shadow(0 0 8px rgba(203, 55, 139, 0.45));
   filter: drop-shadow(0 0 8px rgba(203, 55, 139, 0.45));
 }
