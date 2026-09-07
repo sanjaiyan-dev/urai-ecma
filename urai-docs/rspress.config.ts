@@ -164,10 +164,6 @@ export default defineConfig({
             url: 'https://sanjaiyan-dev.github.io/urai-ecma/',
             codeRepository: 'https://github.com/sanjaiyan-dev/urai-ecma',
             license: 'https://opensource.org/licenses/MIT',
-            offers: {
-              '@type': 'Offer',
-              price: '0',
-            },
             author: {
               '@type': 'Person',
               '@id': 'https://sanjaiyan-dev.github.io/urai-ecma/#author',
