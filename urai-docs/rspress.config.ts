@@ -135,6 +135,10 @@ export default defineConfig({
             applicationCategory: 'DeveloperApplication',
             operatingSystem: 'Cross-platform',
             isAccessibleForFree: true,
+            offers: {
+              '@type': 'Offer',
+              price: 0,
+            },
 
             disambiguatingDescription:
               'A high-performance Rust CLI compiler that compresses JavaScript and TypeScript codebases into token-efficient LLM context prompts.',
@@ -166,7 +170,7 @@ export default defineConfig({
             license: 'https://opensource.org/licenses/MIT',
             author: {
               '@type': 'Person',
-              '@id': 'https://sanjaiyan-dev.github.io/urai-ecma/#author',
+              '@id': 'https://sanjaiyan-dev.github.io/#person',
               name: 'Sanjaiyan Parthipan',
               givenName: 'Sanjaiyan',
               familyName: 'Parthipan',
