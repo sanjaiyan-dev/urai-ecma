@@ -1,0 +1,65 @@
+cff-version: 1.2.0
+message: "If you use this software or reference the whitepaper, please cite it as below."
+title: "urai-ecma: AST-Aware JS/TS Codebase-to-Prompt Compiler"
+authors:
+  - family-names: "Parthipan"
+    given-names: "Sanjaiyan"
+    affiliation: "Independent Researcher"
+    website: "https://github.com/sanjaiyan-dev"
+version: 0.1.1
+date-released: 2026-09-15
+license: MIT
+repository-code: "https://github.com/sanjaiyan-dev/urai-ecma"
+url: "https://sanjaiyan-dev.github.io/urai-ecma/"
+doi: 10.5281/zenodo.22774527
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22774527
+    description: "Zenodo version DOI for the whitepaper"
+  - type: doi
+    value: 10.5281/zenodo.22774526
+    description: "Zenodo parent concept DOI"
+keywords:
+  - "abstract-syntax-tree"
+  - "large-language-models"
+  - "prompt-compression"
+  - "token-optimization"
+  - "rust"
+  - "swc"
+  - "typescript"
+  - "javascript"
+  - "tailwind-css"
+
+
+preferred-citation:
+  type: article
+  title: "urai-ecma: Compressing JavaScript and TypeScript Codebases into Token-Efficient Context for Large Language Models"
+  authors:
+    - family-names: "Parthipan"
+      given-names: "Sanjaiyan"
+  journal: "Zenodo"
+  publisher:
+    name: "Zenodo"
+  year: 2026
+  month: 9
+  doi: 10.5281/zenodo.22774527
+  url: "https://doi.org/10.5281/zenodo.22774527"
+  license: CC-BY-4.0
+  abstract: >-
+    Large Language Models (LLMs) are now everyday tools for reading,
+    explaining, and improving source code. But real JavaScript and TypeScript
+    projects are large, and sending a whole codebase to an LLM wastes tokens,
+    costs money, and can confuse the model, since the parts that matter get
+    buried in boilerplate. This paper presents urai-ecma, a command-line tool
+    written in Rust that turns a JavaScript or TypeScript codebase into a compact,
+    LLM-ready summary. urai-ecma parses every source file into a full Abstract
+    Syntax Tree with SWC, then walks that tree with a pipeline of visitors:
+    one finds backend API routes, one reads React component structure, one
+    keeps or writes short function summaries, and one shortens long Tailwind
+    CSS class names. A local hybrid cache remembers past AI-written summaries,
+    so repeat runs are almost instant. We test urai-ecma on six real open-source
+    repositories. Across these repositories it cuts token count by 24% to 65%,
+    and by up to 82.7% in a larger real-world case that motivated the project.
+    Runs that hit the cache finish up to three orders of magnitude faster than
+    the first, cold run. We describe the design, the core algorithms, the
+    benchmark results, and the trade-offs, and we suggest directions for future work.

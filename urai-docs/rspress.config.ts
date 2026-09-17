@@ -199,6 +199,57 @@ export default defineConfig({
             },
           } as const),
         },
+        {
+          tag: 'script',
+          attrs: { type: 'application/ld+json' },
+          children: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'ScholarlyArticle',
+            '@id': 'https://doi.org/10.5281/zenodo.22774527',
+            name: 'urai-ecma: Compressing JavaScript and TypeScript Codebases into Token-Efficient Context for Large Language Models',
+            headline:
+              'urai-ecma: Compressing JavaScript and TypeScript Codebases into Token-Efficient Context for Large Language Models',
+            url: 'https://zenodo.org/records/22774527',
+            sameAs: ['https://doi.org/10.5281/zenodo.22774527'],
+            identifier: 'https://doi.org/10.5281/zenodo.22774527',
+            datePublished: '2026-09-15T18:01:11+00:00',
+            dateCreated: '2026-09-15T18:01:11+00:00',
+            dateModified: '2026-09-15T18:01:12+00:00',
+            inLanguage: 'en',
+            isAccessibleForFree: true,
+            license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
+            author: [
+              {
+                '@type': 'Person',
+                '@id': 'https://sanjaiyan-dev.github.io/#person',
+                name: 'Sanjaiyan Parthipan',
+                givenName: 'Sanjaiyan',
+                familyName: 'Parthipan',
+                url: 'https://github.com/sanjaiyan-dev',
+              },
+            ],
+            publisher: {
+              '@type': 'Organization',
+              name: 'Zenodo',
+              url: 'https://zenodo.org',
+            },
+            keywords: [
+              'Large Language Models',
+              'AST',
+              'Code Summarization',
+              'Token Compression',
+              'Prompt Engineering',
+              'Rust',
+              'JavaScript',
+              'TypeScript',
+              'urai-ecma',
+            ],
+            abstract:
+              'Large Language Models (LLMs) are now everyday tools for reading, explaining, and improving source code. But real JavaScript and TypeScript projects are large, and sending a whole codebase to an LLM wastes tokens, costs money, and can confuse the model, since the parts that matter get buried in boilerplate. This paper presents urai-ecma, a command-line tool written in Rust that turns a JavaScript or TypeScript codebase into a compact, LLM-ready summary. urai-ecma parses every source file into a full Abstract Syntax Tree with SWC, then walks that tree with a pipeline of visitors: one finds backend API routes, one reads React component structure, one keeps or writes short function summaries, and one shortens long Tailwind CSS class names. A local hybrid cache remembers past AI-written summaries, so repeat runs are almost instant. We test urai-ecma on six real open-source repositories. Across these repositories it cuts token count by 24% to 65%, and by up to 82.7% in a larger real-world case that motivated the project. Runs that hit the cache finish up to three orders of magnitude faster than the first, cold run. We describe the design, the core algorithms, the benchmark results, and the trade-offs, and we suggest directions for future work.',
+            description:
+              'A research paper introducing urai-ecma: an AST-aware Rust CLI for compressing JavaScript and TypeScript codebases into token-efficient context windows for LLMs.',
+          } as const),
+        },
 
         {
           tag: 'meta',
